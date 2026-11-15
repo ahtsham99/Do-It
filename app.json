@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Do It",
+    "slug": "do-it",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "doit",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.doit.planner"
+    },
+    "android": {
+      "package": "app.doit.planner",
+      "adaptiveIcon": {
+        "backgroundColor": "#14120F",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Do It — Planner",
+      "shortName": "Do It",
+      "description": "The planner that won't let you quit.",
+      "themeColor": "#14120F",
+      "backgroundColor": "#14120F"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F7F5F0",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120,
+          "dark": { "backgroundColor": "#14120F", "image": "./assets/images/splash-icon.png" }
+        }
+      ],
+      [
+        "expo-notifications",
+        { "color": "#E8613C" }
+      ],
+      "@react-native-community/datetimepicker"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
