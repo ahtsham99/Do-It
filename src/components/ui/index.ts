@@ -13,3 +13,5 @@ export { Section } from './Section';
 export { Segmented } from './Segmented';
 export { SheetHeader } from './SheetHeader';
 export { Text } from './Text';
+export { DialogHost, showDialog, type DialogAction } from './Dialog';
+export { Toggle } from './Toggle';

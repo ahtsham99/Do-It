@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { DialogHost } from '@/components/ui';
 import { hydrate, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme';
 
@@ -41,7 +42,9 @@ function Navigator() {
       <StatusBar style={dark ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="task" options={{ presentation: 'modal' }} />
       </Stack>
+      <DialogHost />
     </ThemeProvider>
   );
 }

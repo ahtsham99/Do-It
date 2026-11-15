@@ -1,9 +1,189 @@
-import { Empty, Screen } from '@/components/ui';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { View } from 'react-native';
+
+import { Button, Fab, IconButton, Screen, Section, Segmented, Text } from '@/components/ui';
+import { MonthGrid } from '@/features/tasks/MonthGrid';
+import { TaskList } from '@/features/tasks/TaskList';
+import { WeekStrip } from '@/features/tasks/WeekStrip';
+import {
+  isDone,
+  nextOccurrence,
+  occurrencesOn,
+  overdue,
+  sortOccurrences,
+  type Occurrence,
+} from '@/features/tasks/logic';
+import {
+  addDays,
+  addMonths,
+  formatDay,
+  fromKey,
+  monthName,
+  range,
+  startOfWeek,
+  todayKey,
+  type DayKey,
+} from '@/lib/dates';
+import { useSettings, useTasks } from '@/store/hooks';
+import { space } from '@/theme';
+
+type View_ = 'day' | 'week' | 'month' | 'list';
+const VIEWS: { value: View_; label: string }[] = [
+  { value: 'day', label: 'Day' },
+  { value: 'week', label: 'Week' },
+  { value: 'month', label: 'Month' },
+  { value: 'list', label: 'List' },
+];
+
+// Remember the chosen view while the app is open.
+let lastView: View_ = 'day';
 
 export default function PlannerScreen() {
+  const tasks = useTasks();
+  const { weekStartsOn } = useSettings();
+  const [view, setViewState] = useState<View_>(lastView);
+  const [day, setDay] = useState<DayKey>(todayKey());
+  const today = todayKey();
+
+  const setView = (v: View_) => {
+    lastView = v;
+    setViewState(v);
+  };
+
+  const step = (dir: 1 | -1) => {
+    if (view === 'day') setDay(addDays(day, dir));
+    else if (view === 'week') setDay(addDays(day, 7 * dir));
+    else if (view === 'month') setDay(addMonths(day, dir));
+  };
+
+  const weekStart = startOfWeek(day, weekStartsOn);
+  const label =
+    view === 'day'
+      ? formatDay(day, { long: true })
+      : view === 'week'
+        ? `${formatDay(weekStart, { relative: false })} – ${formatDay(addDays(weekStart, 6), { relative: false })}`
+        : `${monthName(day)} ${fromKey(day).getFullYear()}`;
+
+  const addFor = (d: DayKey) => router.push({ pathname: '/task', params: { date: d } });
+
   return (
-    <Screen title="Planner">
-      <Empty icon="construct-outline" title="Coming soon" body="This section is being built." />
-    </Screen>
+    <View style={{ flex: 1 }}>
+      <Screen
+        title="Planner"
+        right={
+          day !== today && view !== 'list' ? (
+            <Button small kind="secondary" label="Today" onPress={() => setDay(today)} />
+          ) : null
+        }>
+        <Segmented options={VIEWS} value={view} onChange={setView} />
+
+        {view !== 'list' && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+            <IconButton icon="chevron-back" label="Previous" size={18} onPress={() => step(-1)} />
+            <Text variant="heading" style={{ flex: 1, textAlign: 'center' }} numberOfLines={1}>
+              {label}
+            </Text>
+            <IconButton icon="chevron-forward" label="Next" size={18} onPress={() => step(1)} />
+          </View>
+        )}
+
+        {view === 'day' && <DayView day={day} setDay={setDay} weekStartsOn={weekStartsOn} />}
+        {view === 'week' && <WeekView start={weekStart} onAdd={addFor} />}
+        {view === 'month' && (
+          <>
+            <MonthGrid month={day} selected={day} onSelect={setDay} tasks={tasks} weekStartsOn={weekStartsOn} />
+            <Section title={formatDay(day)}>
+              <TaskList items={occurrencesOn(tasks, day)} emptyText="Nothing planned. Tap + to add." />
+            </Section>
+          </>
+        )}
+        {view === 'list' && <ListView />}
+      </Screen>
+      <Fab label="Add task" onPress={() => addFor(view === 'list' ? today : day)} />
+    </View>
+  );
+}
+
+function DayView({ day, setDay, weekStartsOn }: { day: DayKey; setDay: (d: DayKey) => void; weekStartsOn: 0 | 1 }) {
+  const tasks = useTasks();
+  const items = occurrencesOn(tasks, day);
+  const open = items.filter((o) => !o.done).length;
+  return (
+    <>
+      <WeekStrip selected={day} onSelect={setDay} tasks={tasks} weekStartsOn={weekStartsOn} />
+      <Section title={items.length ? `${open} to do · ${items.length - open} done` : undefined}>
+        <TaskList items={items} emptyText="A blank page. Tap + and give this day a purpose." />
+      </Section>
+    </>
+  );
+}
+
+function WeekView({ start, onAdd }: { start: DayKey; onAdd: (d: DayKey) => void }) {
+  const tasks = useTasks();
+  return (
+    <>
+      {range(start, 7).map((d) => (
+        <Section
+          key={d}
+          title={formatDay(d)}
+          right={<IconButton icon="add" label={`Add task on ${formatDay(d)}`} size={16} onPress={() => onAdd(d)} />}>
+          <TaskList items={occurrencesOn(tasks, d)} emptyText="—" />
+        </Section>
+      ))}
+    </>
+  );
+}
+
+function ListView() {
+  const tasks = useTasks();
+  const [showDone, setShowDone] = useState(false);
+  const today = todayKey();
+  const groups = useMemo(() => {
+    const late = overdue(tasks);
+    const lateIds = new Set(late.map((o) => o.task.id));
+    const upcoming: Occurrence[] = [];
+    const done: Occurrence[] = [];
+    for (const task of tasks) {
+      if (task.repeat === 'none' && isDone(task, task.date)) {
+        done.push({ task, day: task.date, done: true });
+        continue;
+      }
+      if (lateIds.has(task.id) && task.repeat === 'none') continue;
+      const next = nextOccurrence(task, today);
+      if (next) upcoming.push({ task, day: next, done: false });
+    }
+    upcoming.sort(sortOccurrences);
+    done.sort((a, b) => (a.day < b.day ? 1 : -1));
+    const byDay = new Map<DayKey, Occurrence[]>();
+    for (const o of upcoming) byDay.set(o.day, [...(byDay.get(o.day) ?? []), o]);
+    return { late, byDay: [...byDay.entries()], done: done.slice(0, 50) };
+  }, [tasks, today]);
+
+  return (
+    <>
+      {groups.late.length > 0 && (
+        <Section title={`Overdue · ${groups.late.length}`}>
+          <TaskList items={groups.late} showDate overdue />
+        </Section>
+      )}
+      {groups.byDay.length === 0 && groups.late.length === 0 && (
+        <Text tone="muted" style={{ textAlign: 'center', paddingVertical: space.xl }}>
+          Nothing upcoming. Suspiciously quiet…
+        </Text>
+      )}
+      {groups.byDay.map(([d, items]) => (
+        <Section key={d} title={formatDay(d)}>
+          <TaskList items={items} />
+        </Section>
+      ))}
+      {groups.done.length > 0 && (
+        <Section
+          title={`Completed · ${groups.done.length}`}
+          right={<Button small kind="ghost" label={showDone ? 'Hide' : 'Show'} onPress={() => setShowDone(!showDone)} />}>
+          {showDone && <TaskList items={groups.done} showDate />}
+        </Section>
+      )}
+    </>
   );
 }
