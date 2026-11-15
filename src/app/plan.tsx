@@ -24,7 +24,7 @@ export default function PlanScreen() {
 
   const lockIn = () => {
     markPlanned(n.today);
-    showToast(n.todays.length ? 'Plan locked. Now go do it.' : 'Planned. A light day — make it count.', 'lock-closed');
+    showToast(n.todays.length ? 'Your day is planned.' : 'Planned. A light day ahead.', 'lock-closed');
     if (router.canGoBack()) router.back();
     else router.replace('/');
   };
@@ -61,7 +61,7 @@ export default function PlanScreen() {
               ))}
             </Card>
             <Text variant="small" tone="muted">
-              Do it today, or let it go. Pretending it doesn’t exist isn’t an option.
+              Move each one to today, or let it go. Either is fine.
             </Text>
           </Section>
         )}
@@ -69,19 +69,19 @@ export default function PlanScreen() {
         <Section title={`${leftovers.length ? '2' : '1'} · Today’s plan`}>
           {lateToday.length > 0 && (
             <Text variant="small" tone="danger">
-              {lateToday.length} of these {lateToday.length === 1 ? 'is' : 'are'} already past due.
+              {lateToday.length} of these {lateToday.length === 1 ? 'is' : 'are'} past the planned time.
             </Text>
           )}
           <TaskList items={n.todays} />
           <QuickAdd date={n.today} placeholder="What will you get done today?" />
           {n.todays.length === 0 && (
             <Text variant="small" tone="muted">
-              Tip: three tasks is a great day. Pick the one you’re avoiding first.
+              Three tasks make a good day. Begin with the one that matters most.
             </Text>
           )}
         </Section>
 
-        <Button icon="lock-closed" label={n.planned ? 'Update plan' : 'Lock in my plan'} onPress={lockIn} />
+        <Button icon="lock-closed" label={n.planned ? 'Update plan' : 'Set my plan'} onPress={lockIn} />
       </ScrollView>
     </View>
   );

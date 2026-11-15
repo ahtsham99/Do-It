@@ -1,25 +1,17 @@
 import { StyleSheet } from 'react-native';
 
-import { Icon, Press, Text, showDialog } from '@/components/ui';
+import { router } from 'expo-router';
+
+import { Icon, Press, Text } from '@/components/ui';
 import { cardShadow, radius, useTheme } from '@/theme';
 
-export function StreakPill({ streak, best, activeToday }: { streak: number; best: number; activeToday: boolean }) {
+export function StreakPill({ streak, activeToday }: { streak: number; activeToday: boolean }) {
   const { c } = useTheme();
   const lit = activeToday && streak > 0;
   return (
     <Press
       accessibilityLabel={`${streak} day streak`}
-      onPress={() =>
-        showDialog({
-          title: `${streak} day streak`,
-          message: lit
-            ? `You showed up today. Best ever: ${best} days. Come back tomorrow to keep it going.`
-            : streak > 0
-              ? `Finish a task, tick a habit or plan your day before midnight, or it resets to zero. Best: ${best}.`
-              : 'Plan your day, tick a habit or finish one task to start a streak.',
-          actions: [{ label: 'Got it', onPress: () => {} }],
-        })
-      }
+      onPress={() => router.push('/streaks')}
       style={[styles.pill, { backgroundColor: c.surface, borderColor: c.border, ...cardShadow(c) }]}>
       <Icon name={lit ? 'flame' : 'flame-outline'} size={20} color={c.flame} />
       <Text variant="bodyStrong">{streak}</Text>

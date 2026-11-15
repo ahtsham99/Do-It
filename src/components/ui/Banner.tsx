@@ -8,7 +8,7 @@ import { Text } from './Text';
 
 type Kind = 'danger' | 'warning' | 'accent' | 'success';
 
-/** Big, unmissable nudge banner. */
+/** A quiet nudge: soft tint, one line of encouragement, one clear action. */
 export function Banner({
   kind = 'accent',
   icon,
@@ -28,36 +28,34 @@ export function Banner({
 }) {
   const { c } = useTheme();
   const map = {
-    danger: { bg: c.danger, fg: '#fff' },
-    warning: { bg: c.warning, fg: '#fff' },
-    accent: { bg: c.accent, fg: '#fff' },
-    success: { bg: c.success, fg: '#fff' },
+    danger: { bg: c.dangerSoft, fg: c.danger },
+    warning: { bg: c.warningSoft, fg: c.warning },
+    accent: { bg: c.accentSoft, fg: c.accent },
+    success: { bg: c.successSoft, fg: c.success },
   }[kind];
   return (
     <Press onPress={onPress} disabled={!onPress} style={[styles.wrap, { backgroundColor: map.bg }]}>
-      <View style={styles.iconWrap}>
-        <Icon name={icon} size={26} color={map.fg} />
+      <View style={[styles.iconWrap, { backgroundColor: c.surface }]}>
+        <Icon name={icon} size={22} color={map.fg} />
       </View>
-      <View style={{ flex: 1, gap: 2 }}>
-        <Text variant="heading" color={map.fg}>
-          {title}
-        </Text>
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text variant="heading">{title}</Text>
         {body && (
-          <Text variant="small" color={map.fg} style={{ opacity: 0.92 }}>
+          <Text variant="small" tone="muted" style={{ lineHeight: 20 }}>
             {body}
           </Text>
         )}
         {action && (
-          <View style={styles.action}>
-            <Text variant="small" color={map.bg} style={{ fontWeight: '600' }}>
+          <View style={[styles.action, { backgroundColor: c.surface, borderColor: c.border }]}>
+            <Text variant="small" color={map.fg} style={{ fontWeight: '600' }}>
               {action}
             </Text>
           </View>
         )}
       </View>
       {onDismiss && (
-        <Press onPress={onDismiss} hitSlop={12} accessibilityLabel="Dismiss" style={{ padding: 2 }}>
-          <Icon name="close" size={20} color={map.fg} />
+        <Press onPress={onDismiss} hitSlop={14} accessibilityLabel="Dismiss" style={{ padding: 4 }}>
+          <Icon name="close" size={20} color={c.textMuted} />
         </Press>
       )}
     </Press>
@@ -65,27 +63,15 @@ export function Banner({
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: 'row',
-    gap: space.md,
-    padding: space.lg,
-    borderRadius: radius.xl,
-    alignItems: 'flex-start',
-  },
-  iconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  wrap: { flexDirection: 'row', gap: space.md, padding: space.xl - 4, borderRadius: radius.xl, alignItems: 'flex-start' },
+  iconWrap: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   action: {
     alignSelf: 'flex-start',
-    backgroundColor: '#fff',
     borderRadius: radius.pill,
-    paddingHorizontal: space.md,
-    paddingVertical: 6,
+    borderWidth: 1,
+    paddingHorizontal: space.lg,
+    minHeight: 40,
+    justifyContent: 'center',
     marginTop: space.sm,
   },
 });

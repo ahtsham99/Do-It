@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
-import { Platform, StyleSheet, TextInput, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 import { DateTimeField } from '@/components/pickers';
-import { Button, Card, ListRow, Press, Screen, Segmented, Text, Toggle, showDialog, showToast } from '@/components/ui';
+import { Button, Card, Icon, ListRow, Press, Screen, Segmented, Text, Toggle, showDialog, showToast } from '@/components/ui';
 import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
@@ -11,12 +11,12 @@ import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { resetAll } from '@/store/store';
 import type { ThemePreference, Tone } from '@/store/types';
-import { font, radius, space, useTheme } from '@/theme';
+import { radius, space, useTheme } from '@/theme';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
-  { value: 'gentle', label: 'Gentle', blurb: 'A soft tap on the shoulder.' },
-  { value: 'balanced', label: 'Firm', blurb: 'Straight talk, every time. The default.' },
-  { value: 'savage', label: 'Relentless', blurb: 'Won’t let it slide. Not once.' },
+  { value: 'gentle', label: 'Gentle', blurb: 'Soft reminders, no pressure.' },
+  { value: 'balanced', label: 'Firm', blurb: 'Clear and steady. The default.' },
+  { value: 'savage', label: 'Relentless', blurb: 'Direct reminders that keep you moving.' },
 ];
 const THEMES: { value: ThemePreference; label: string; icon?: 'sunny-outline' | 'moon-outline' }[] = [
   { value: 'system', label: 'Auto' },
@@ -38,24 +38,22 @@ export default function SettingsScreen() {
 
   return (
     <Screen title="Settings" subtitle="Just enough, nothing more.">
-      <Card padded={false} style={styles.group}>
-        <View style={[styles.row, { borderBottomColor: c.border, borderBottomWidth: 1 }]}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            value={s.name}
-            onChangeText={(name) => updateSettings({ name })}
-            placeholder="Your first name"
-            placeholderTextColor={c.textFaint}
-            style={[font.body, styles.input, { color: c.textMuted }]}
-          />
-        </View>
-        <Press onPress={() => router.push('/suggestions')} style={styles.row}>
-          <Text style={styles.label}>You are a</Text>
-          <Text tone="muted" style={styles.label}>
-            {PERSONAS.find((p) => p.value === s.persona)?.label ?? 'Not set'}
-          </Text>
-        </Press>
-      </Card>
+      <Press onPress={() => router.push('/profile')} accessibilityLabel="Profile">
+        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
+          <View style={[styles.avatar, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
+            <Text tone="muted" style={{ fontWeight: '500', letterSpacing: 0.5 }}>
+              {(s.name.trim() || 'Me').slice(0, 2).toUpperCase()}
+            </Text>
+          </View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={styles.label}>{s.name.trim() || 'Your profile'}</Text>
+            <Text variant="small" tone="muted">
+              {PERSONAS.find((p) => p.value === s.persona)?.label ?? 'Tell us who you are'}
+            </Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={c.textFaint} />
+        </Card>
+      </Press>
 
       <Card style={{ gap: space.md }}>
         <Text style={styles.label}>Appearance</Text>
@@ -65,7 +63,7 @@ export default function SettingsScreen() {
       <Card style={{ gap: space.md }}>
         <Text style={styles.label}>Nudges</Text>
         <Text tone="muted" style={{ lineHeight: 23 }}>
-          How hard should this app push you? “{pick('overdue', s.tone, 'preview')}”
+          How firmly should the app remind you? “{pick('overdue', s.tone, 'preview')}”
         </Text>
         {TONES.map((t) => {
           const on = s.tone === t.value;
@@ -107,7 +105,7 @@ export default function SettingsScreen() {
         />
         <ListRow
           label="Evening check-in"
-          detail="Unfinished tasks get called out from this time"
+          detail="When we check in on what’s left"
           last
           right={<DateTimeField mode="time" value={s.eveningCheckTime} onChange={(eveningCheckTime) => updateSettings({ eveningCheckTime })} use24h={s.use24h} />}
         />
@@ -177,9 +175,8 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   group: { paddingHorizontal: space.xl - 4 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 64, gap: space.lg },
+  avatar: { width: 52, height: 52, borderRadius: 26, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   label: { fontSize: 17 },
-  input: { flex: 1, minWidth: 0, textAlign: 'right', fontSize: 17, height: 44, outlineStyle: 'none' } as object,
   option: {
     flexDirection: 'row',
     alignItems: 'center',

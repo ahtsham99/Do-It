@@ -22,7 +22,7 @@ export default function SuggestionsScreen() {
 
   const add = () => {
     const n = applySuggestions(SUGGESTIONS[persona].filter((s) => selected.has(suggestionKey(s))));
-    showToast(n ? `Added ${n}. Now actually do them.` : 'You already have those.');
+    showToast(n ? `Added ${n}.` : 'You already have those.');
     if (router.canGoBack()) router.back();
     else router.replace('/settings');
   };

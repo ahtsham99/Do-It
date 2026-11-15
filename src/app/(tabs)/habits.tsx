@@ -25,7 +25,7 @@ export default function HabitsScreen() {
         <Empty
           icon="flame-outline"
           title="No habits yet"
-          body="Start with one you can do even on your worst day."
+          body="Start with one small thing you can do on any day."
           action="Add a habit"
           onAction={add}
         />

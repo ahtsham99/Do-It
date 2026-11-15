@@ -12,17 +12,19 @@ export function SheetHeader({
   onSave,
   saveLabel = 'Save',
   canSave = true,
+  cancelLabel = 'Cancel',
 }: {
   title: string;
   onSave?: () => void;
   saveLabel?: string;
   canSave?: boolean;
+  cancelLabel?: string;
 }) {
   const { c } = useTheme();
   return (
     <View style={[styles.wrap, { borderBottomColor: c.border }]}>
       <Press onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={10} style={styles.side}>
-        <Text tone="muted">Cancel</Text>
+        <Text tone="muted">{cancelLabel}</Text>
       </Press>
       <Text variant="bodyStrong">{title}</Text>
       <Press onPress={onSave} disabled={!canSave || !onSave} hitSlop={10} style={[styles.side, { alignItems: 'flex-end' }]}>

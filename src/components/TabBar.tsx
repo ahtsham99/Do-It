@@ -1,3 +1,4 @@
+import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from 'expo-router/tabs';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,15 +16,14 @@ export const TAB_META: Record<string, { title: string; icon: IconName }> = {
 
 /** Floating, pill-shaped tab bar. */
 export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
-  const { c } = useTheme();
+  const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
+  const active = dark ? c.text : c.accent;
   return (
     <View pointerEvents="box-none" style={[styles.outer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-      <View
-        style={[
-          styles.bar,
-          { backgroundColor: c.tabBar, borderColor: c.border, boxShadow: `0px 10px 30px ${c.shadow}` },
-        ]}>
+      <View style={[styles.bar, { borderColor: c.border, boxShadow: `0px 10px 30px ${c.shadow}` }]}>
+        {/* Frosted glass: blurred content behind a translucent tint. */}
+        <BlurView intensity={60} tint={dark ? 'dark' : 'light'} style={[StyleSheet.absoluteFill, styles.glass, { backgroundColor: c.tabBar }]} />
         {state.routes.map((route, i) => {
           const meta = TAB_META[route.name];
           if (!meta) return null;
@@ -40,12 +40,12 @@ export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
               accessibilityState={{ selected: focused }}
               accessibilityLabel={meta.title}
               style={styles.item}>
-              <View style={[styles.iconPill, focused && { backgroundColor: c.surfaceAlt }]}>
-                <Icon name={meta.icon} size={22} color={focused ? c.accent : c.textMuted} />
+              <View style={[styles.iconPill, focused && { backgroundColor: c.accentSoft }]}>
+                <Icon name={meta.icon} size={22} color={focused ? active : c.textMuted} />
               </View>
               <Text
                 numberOfLines={1}
-                color={focused ? c.accent : c.textMuted}
+                color={focused ? active : c.textMuted}
                 style={{ fontSize: 10.5, fontWeight: focused ? '600' : '400' }}>
                 {meta.title}
               </Text>
@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     alignItems: 'center',
   },
+  glass: { borderRadius: radius.pill, overflow: 'hidden' },
   item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3, height: '100%' },
   iconPill: { width: 46, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
 });

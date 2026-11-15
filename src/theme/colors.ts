@@ -51,7 +51,7 @@ export const light: ThemeColors = {
   successSoft: '#E1EEE7',
   warning: '#A97B2F',
   warningSoft: '#F5ECD8',
-  tabBar: '#FBFAF7',
+  tabBar: 'rgba(251,250,247,0.8)',
   overlay: 'rgba(30,28,25,0.4)',
   shadow: 'rgba(30,28,25,0.07)',
 };
@@ -76,7 +76,7 @@ export const dark: ThemeColors = {
   successSoft: '#1D2E26',
   warning: '#D2A251',
   warningSoft: '#33290F',
-  tabBar: '#1E211E',
+  tabBar: 'rgba(30,33,30,0.78)',
   overlay: 'rgba(0,0,0,0.6)',
   shadow: 'rgba(0,0,0,0.35)',
 };

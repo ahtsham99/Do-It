@@ -59,7 +59,7 @@ export default function Onboarding() {
 
   switch (step) {
     case 'welcome':
-      cta = 'Let’s do it';
+      cta = 'Begin';
       body = (
         <View style={{ flex: 1, justifyContent: 'center', gap: space.lg }}>
           <View style={[styles.logo, { backgroundColor: c.accent }]}>
@@ -69,7 +69,7 @@ export default function Onboarding() {
             Start it.{'\n'}Finish it.
           </Text>
           <Text variant="body" tone="muted" style={{ fontSize: 18, lineHeight: 26 }}>
-            Do It is a planner for people who start things and don’t finish — or forget them entirely. It will nag you. Lovingly.
+            A calm place for your tasks, habits and the days you’re counting down to. It will keep you company until things are done.
           </Text>
         </View>
       );
@@ -77,7 +77,7 @@ export default function Onboarding() {
     case 'name':
       body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="What should we call you?" sub="So the nagging feels personal." />
+          <Heading title="What should we call you?" sub="So the app can greet you properly." />
           <Field placeholder="First name (optional)" value={name} onChangeText={setName} autoFocus returnKeyType="next" onSubmitEditing={next} />
         </View>
       );
@@ -118,7 +118,7 @@ export default function Onboarding() {
       cta = selected.size ? `Add ${selected.size} & continue` : 'Skip for now';
       body = persona && (
         <View style={{ gap: space.lg }}>
-          <Heading title="A starter kit" sub="Pick a few. Start small — you can add more any time." />
+          <Heading title="A starter kit" sub="Pick a few. Start small; you can add more any time." />
           <SuggestionPicker
             items={SUGGESTIONS[persona]}
             selected={selected}
@@ -134,7 +134,7 @@ export default function Onboarding() {
     case 'tone':
       body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="How hard should we push?" sub="You can change this in Settings." />
+          <Heading title="How firmly should we remind you?" sub="You can change this in Settings." />
           <Segmented
             tone="accent"
             options={[
@@ -167,17 +167,17 @@ export default function Onboarding() {
         <View style={{ gap: space.lg }}>
           <Heading
             title={`You’re in${name.trim() ? `, ${name.trim()}` : ''}.`}
-            sub="Every morning we’ll ask you to plan your day. Every evening we’ll check you did it. Keep showing up to grow your streak."
+            sub="Each morning we’ll invite you to plan your day, and each evening we’ll check in. Showing up, even a little, grows your streak."
           />
           {supportsLocalNotifications ? (
-            <Tip icon="notifications" text="Turn on notifications so we can remind you — that’s the whole point." />
+            <Tip icon="notifications" text="Turn on notifications and we’ll remind you at the right moments." />
           ) : !isStandaloneWeb() ? (
             <Tip
               icon="share-outline"
               text="Install it: tap the Share button in Safari, then “Add to Home Screen”. It opens full-screen like a real app."
             />
           ) : (
-            <Tip icon="notifications" text="Reminders show up as big banners on the Today screen whenever you open the app." />
+            <Tip icon="notifications" text="Reminders appear on the Today screen whenever you open the app." />
           )}
         </View>
       );

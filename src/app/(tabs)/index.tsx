@@ -38,12 +38,70 @@ export default function TodayScreen() {
   const initials = (name.trim() || 'Me').slice(0, 2).toUpperCase();
   const addTask = () => router.push({ pathname: '/task', params: { date: n.today } });
 
+  const plural = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
+  const nudges: React.ReactNode[] = [];
+  // On web this card is the reminder; on native it backs up the notification.
+  for (const o of reminders) {
+    nudges.push(
+      <Banner
+        key={o.task.id}
+        kind="warning"
+        icon="notifications-outline"
+        title={o.task.title}
+        body={`${pick('reminder', tone, o.task.id)} ${o.task.time ? `planned for ${formatTime(o.task.time, use24h)}` : 'planned for today'}.`}
+        onPress={() => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } })}
+        onDismiss={() => {
+          dismissed.add(`${o.task.id}:${n.today}`);
+          force((x) => x + 1);
+        }}
+      />,
+    );
+  }
+  if (!n.planned) {
+    nudges.push(
+      <Banner key="plan" icon="sunny-outline" title="Plan your day" body={pick('planPrompt', tone, n.today)} action="Plan my day" onPress={() => router.push('/plan')} />,
+    );
+  }
+  if (n.overdue.length > 0) {
+    nudges.push(
+      <Banner
+        key="overdue"
+        kind="danger"
+        icon="time-outline"
+        title={`${plural(n.overdue.length, 'task')} still waiting`}
+        body={pick('overdue', tone, n.today)}
+        action="Review"
+        onPress={() => router.push('/plan')}
+      />,
+    );
+  }
+  if (n.evening && n.open.length > 0 && n.planned) {
+    nudges.push(<Banner key="open" kind="warning" icon="moon-outline" title={`${n.open.length} left for today`} body={pick('unfinished', tone, n.today)} />);
+  }
+  if (n.evening && habitsLeft.length > 0) {
+    nudges.push(
+      <Banner
+        key="habits"
+        kind="warning"
+        icon="flame-outline"
+        title={`${plural(habitsLeft.length, 'habit')} still open today`}
+        body={habitsLeft.map((h) => h.name).join(', ')}
+        onPress={() => router.push('/habits')}
+      />,
+    );
+  }
+  if (n.streakAtRisk) {
+    nudges.push(
+      <Banner key="streak" kind="warning" icon="flame-outline" title={`Keep your ${n.streak}-day streak going`} body={pick('streakRisk', tone, n.today)} onPress={() => router.push('/streaks')} />,
+    );
+  }
+
   const progressLine =
     n.open.length === 0
       ? pick('allDone', tone, n.today)
       : n.evening
         ? pick('unfinished', tone, n.today)
-        : `${n.open.length} to go. ${pick('done', tone, n.today)}`;
+        : `${n.open.length} to go. One at a time.`;
 
   return (
     <View style={{ flex: 1 }}>
@@ -57,10 +115,10 @@ export default function TodayScreen() {
               <Icon name="notifications-outline" size={24} color={c.textMuted} />
               {needsAttention && <View style={[styles.bellDot, { backgroundColor: c.flame, borderColor: c.bg }]} />}
             </Press>
-            <StreakPill streak={n.streak} best={n.bestStreak} activeToday={n.activeToday} />
+            <StreakPill streak={n.streak} activeToday={n.activeToday} />
             <Press
-              onPress={() => router.push('/settings')}
-              accessibilityLabel="Settings"
+              onPress={() => router.push('/profile')}
+              accessibilityLabel="Profile"
               style={[styles.avatar, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
               <Text variant="small" tone="muted" style={{ fontWeight: '500', letterSpacing: 0.5 }}>
                 {initials}
@@ -76,59 +134,14 @@ export default function TodayScreen() {
           </Text>
         </View>
 
-        {/* Nudges: big, unmissable */}
-        {(!n.planned || n.overdue.length > 0 || n.streakAtRisk || n.evening || reminders.length > 0) && (
-          <View style={{ gap: space.md }}>
-            {!n.planned && (
-              <Banner
-                kind="accent"
-                icon="sunny"
-                title="Plan your day"
-                body={pick('planPrompt', tone, n.today)}
-                action="Plan my day →"
-                onPress={() => router.push('/plan')}
-              />
-            )}
-            {n.overdue.length > 0 && (
-              <Banner
-                kind="danger"
-                icon="alert-circle"
-                title={`${n.overdue.length} overdue task${n.overdue.length === 1 ? '' : 's'}`}
-                body={pick('overdue', tone, n.today)}
-                action="Deal with it →"
-                onPress={() => router.push('/plan')}
-              />
-            )}
-            {n.streakAtRisk && n.planned && (
-              <Banner kind="warning" icon="flame" title={`Your ${n.streak}-day streak is at risk`} body={pick('streakRisk', tone, n.today)} />
-            )}
-            {n.evening && habitsLeft.length > 0 && (
-              <Banner
-                kind="warning"
-                icon="flame"
-                title={`${habitsLeft.length} habit${habitsLeft.length === 1 ? '' : 's'} not ticked`}
-                body={habitsLeft.map((h) => h.name).join(', ')}
-              />
-            )}
-            {n.evening && n.open.length > 0 && n.planned && (
-              <Banner kind="warning" icon="moon" title={`${n.open.length} unfinished today`} body={pick('unfinished', tone, n.today)} />
-            )}
-            {/* On web these banners are the reminder; on native they back up the notification. */}
-            {reminders.map((o) => (
-              <Banner
-                key={o.task.id}
-                kind="warning"
-                icon="notifications"
-                title={o.task.title}
-                body={`${pick('reminder', tone, o.task.id)} ${o.task.time ? `due ${formatTime(o.task.time, use24h)}` : 'due today'}.`}
-                onPress={() => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } })}
-                onDismiss={() => {
-                  dismissed.add(`${o.task.id}:${n.today}`);
-                  force((x) => x + 1);
-                }}
-              />
-            ))}
-          </View>
+        {/* One quiet nudge at a time, most important first. */}
+        {nudges[0]}
+        {nudges.length > 1 && (
+          <Press onPress={() => router.push('/plan')} hitSlop={8} style={{ alignSelf: 'center', marginTop: -space.sm }}>
+            <Text variant="small" tone="muted">
+              and {nudges.length - 1} more in your plan
+            </Text>
+          </Press>
         )}
 
         {next && <CountdownCard item={next} hero />}
