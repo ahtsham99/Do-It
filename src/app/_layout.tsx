@@ -47,6 +47,8 @@ function Navigator() {
         <Stack.Screen name="plan" options={{ presentation: 'modal' }} />
         <Stack.Screen name="countdown" options={{ presentation: 'modal' }} />
         <Stack.Screen name="habit" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="suggestions" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
       </Stack>
       <NotificationSync />
       <ToastHost />

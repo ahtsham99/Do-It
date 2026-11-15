@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { Banner, Screen, Section } from '@/components/ui';
+import { Banner, Button, Screen, Section } from '@/components/ui';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { HabitCard } from '@/features/habits/HabitCard';
 import { isDueToday } from '@/features/habits/logic';
@@ -119,6 +119,9 @@ export default function TodayScreen() {
       <Section title="Today">
         <TaskList items={n.todays} />
         <QuickAdd date={n.today} />
+        {n.todays.length === 0 && (
+          <Button small kind="ghost" icon="bulb-outline" label="Need ideas? See suggestions" onPress={() => router.push('/suggestions')} />
+        )}
       </Section>
 
       {habits.length > 0 && (

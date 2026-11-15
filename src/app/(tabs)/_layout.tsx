@@ -1,8 +1,10 @@
+import { Redirect } from 'expo-router';
 import { Tabs } from 'expo-router/tabs';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from '@/components/ui';
+import { useSettings } from '@/store/hooks';
 import { useTheme } from '@/theme';
 
 const TABS: { name: string; title: string; icon: IconName; iconActive: IconName }[] = [
@@ -16,8 +18,10 @@ const TABS: { name: string; title: string; icon: IconName; iconActive: IconName 
 export default function TabLayout() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const { onboarded } = useSettings();
   // On iOS home-screen web apps the home indicator inset comes from CSS env().
   const bottom = Math.max(insets.bottom, Platform.OS === 'web' ? 8 : 0);
+  if (!onboarded) return <Redirect href="/onboarding" />;
   return (
     <Tabs
       screenOptions={{

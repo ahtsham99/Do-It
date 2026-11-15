@@ -1,8 +1,11 @@
+import { router } from 'expo-router';
 import { Platform, View } from 'react-native';
 
 import { DateTimeField } from '@/components/pickers';
 import { Card, Field, ListRow, Screen, Section, Segmented, Text, Toggle, showDialog, showToast } from '@/components/ui';
+import { PERSONAS } from '@/features/onboarding/suggestions';
 import { pick } from '@/features/nudges/messages';
+import { useEntitlements } from '@/lib/premium';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
@@ -23,6 +26,7 @@ const THEMES: { value: ThemePreference; label: string }[] = [
 
 export default function SettingsScreen() {
   const s = useSettings();
+  const { isPremium } = useEntitlements();
 
   const toggleNotifications = async (on: boolean) => {
     if (!on) return updateSettings({ notificationsEnabled: false });
@@ -35,6 +39,26 @@ export default function SettingsScreen() {
     <Screen title="Settings">
       <Section title="You">
         <Field placeholder="Your first name" value={s.name} onChangeText={(name) => updateSettings({ name })} />
+        <Card padded={false} style={{ paddingHorizontal: space.lg }}>
+          <ListRow
+            icon="person-outline"
+            label="I am a…"
+            detail={`${PERSONAS.find((p) => p.value === s.persona)?.label ?? 'Not set'} · used only for suggestions`}
+            onPress={() => router.push('/suggestions')}
+          />
+          <ListRow icon="bulb-outline" label="Suggested tasks & habits" last onPress={() => router.push('/suggestions')} />
+        </Card>
+      </Section>
+
+      <Section title="Plan">
+        <Card padded={false} style={{ paddingHorizontal: space.lg }}>
+          <ListRow
+            icon="diamond-outline"
+            label={isPremium ? 'Do It Pro' : 'Do It Free'}
+            detail={isPremium ? 'Thanks for supporting Do It.' : 'Pro (sync, themes, stats) is coming soon.'}
+            last
+          />
+        </Card>
       </Section>
 
       <Section title="Nudges">
