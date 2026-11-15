@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { DialogHost } from '@/components/ui';
+import { DialogHost, ToastHost } from '@/components/ui';
+import { NotificationSync } from '@/features/nudges/NotificationSync';
 import { hydrate, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme';
 
@@ -43,7 +44,10 @@ function Navigator() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="task" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="plan" options={{ presentation: 'modal' }} />
       </Stack>
+      <NotificationSync />
+      <ToastHost />
       <DialogHost />
     </ThemeProvider>
   );

@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Checkbox, Icon, Press, Text } from '@/components/ui';
 import { formatDay, formatTime, nowTime, todayKey } from '@/lib/dates';
-import { toggleTask } from '@/store/actions/tasks';
+import { completeTask } from '@/features/nudges/celebrate';
 import { useSettings } from '@/store/hooks';
 import { space, useTheme } from '@/theme';
 
@@ -32,7 +32,7 @@ export function TaskRow({
 
   return (
     <View style={[styles.row, { borderBottomColor: c.border }]}>
-      <Checkbox checked={done} onToggle={() => toggleTask(task, day)} label={`Complete ${task.title}`} />
+      <Checkbox checked={done} onToggle={() => completeTask(task, day)} label={`Complete ${task.title}`} />
       <Press
         haptic={false}
         style={styles.body}
