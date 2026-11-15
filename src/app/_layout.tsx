@@ -1,3 +1,5 @@
+import { InstrumentSerif_400Regular } from '@expo-google-fonts/instrument-serif';
+import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -15,13 +17,20 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 export default function RootLayout() {
   const hydrated = useStore((s) => s.hydrated);
 
+  const [fontsLoaded, fontError] = useFonts({ InstrumentSerif_400Regular });
+  const ready = hydrated && (fontsLoaded || !!fontError);
+
   useEffect(() => {
-    hydrate().finally(() => SplashScreen.hideAsync().catch(() => {}));
+    hydrate();
   }, []);
+
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
 
   return (
     <SafeAreaProvider>
-      <AppThemeProvider>{hydrated ? <Navigator /> : <Blank />}</AppThemeProvider>
+      <AppThemeProvider>{ready ? <Navigator /> : <Blank />}</AppThemeProvider>
     </SafeAreaProvider>
   );
 }

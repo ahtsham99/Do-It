@@ -26,7 +26,7 @@ export function SheetHeader({
       </Press>
       <Text variant="bodyStrong">{title}</Text>
       <Press onPress={onSave} disabled={!canSave || !onSave} hitSlop={10} style={[styles.side, { alignItems: 'flex-end' }]}>
-        <Text tone="accent" style={{ fontWeight: '700', opacity: canSave ? 1 : 0.35 }}>
+        <Text tone="accent" style={{ fontWeight: '600', opacity: canSave ? 1 : 0.35 }}>
           {onSave ? saveLabel : ''}
         </Text>
       </Press>

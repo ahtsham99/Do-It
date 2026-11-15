@@ -1,4 +1,4 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -35,7 +35,7 @@ export function ToastHost() {
   );
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const anim = useRef(new Animated.Value(0)).current;
+  const [anim] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     Animated.spring(anim, { toValue: t ? 1 : 0, useNativeDriver: true, friction: 8 }).start();
@@ -48,13 +48,13 @@ export function ToastHost() {
           styles.toast,
           {
             top: insets.top + space.sm,
-            backgroundColor: c.text,
+            backgroundColor: c.ink,
             opacity: anim,
             transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-30, 0] }) }],
           },
         ]}>
-        {t?.icon && <Icon name={t.icon} size={20} color={c.accent} />}
-        <Text variant="bodyStrong" color={c.bg} style={{ flexShrink: 1 }}>
+        {t?.icon && <Icon name={t.icon} size={20} color={c.flame} />}
+        <Text variant="bodyStrong" color={c.inkText} style={{ flexShrink: 1 }}>
           {t?.text ?? ''}
         </Text>
       </Animated.View>

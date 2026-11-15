@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Icon, Press, type IconName } from '@/components/ui';
+import { Glyph, Press } from '@/components/ui';
 import { radius, useTheme } from '@/theme';
 
 export function IconPicker({
@@ -9,10 +9,10 @@ export function IconPicker({
   color,
   onChange,
 }: {
-  icons: IconName[];
+  icons: string[];
   value: string;
   color: string;
-  onChange: (i: IconName) => void;
+  onChange: (i: string) => void;
 }) {
   const { c } = useTheme();
   return (
@@ -25,8 +25,8 @@ export function IconPicker({
             onPress={() => onChange(i)}
             accessibilityLabel={i}
             accessibilityState={{ selected: sel }}
-            style={[styles.cell, { backgroundColor: sel ? color : c.surfaceAlt }]}>
-            <Icon name={i} size={22} color={sel ? '#fff' : c.textMuted} />
+            style={[styles.cell, { backgroundColor: c.surfaceAlt, borderColor: sel ? color : 'transparent' }]}>
+            <Glyph value={i} size={22} color={c.textMuted} />
           </Press>
         );
       })}
@@ -53,7 +53,7 @@ export function ColorPicker({ colors, value, onChange }: { colors: string[]; val
 
 const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  cell: { width: 46, height: 46, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  cell: { width: 48, height: 48, borderRadius: radius.md, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   swatch: { width: 44, height: 44, borderRadius: 22, borderWidth: 2.5, padding: 3 },
   swatchInner: { flex: 1, borderRadius: 20 },
 });

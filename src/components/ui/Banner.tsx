@@ -49,7 +49,7 @@ export function Banner({
         )}
         {action && (
           <View style={styles.action}>
-            <Text variant="small" color={map.bg} style={{ fontWeight: '700' }}>
+            <Text variant="small" color={map.bg} style={{ fontWeight: '600' }}>
               {action}
             </Text>
           </View>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: space.md,
     padding: space.lg,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     alignItems: 'flex-start',
   },
   iconWrap: {

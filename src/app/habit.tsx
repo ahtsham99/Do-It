@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ColorPicker, IconPicker } from '@/components/pickers';
-import { Button, Card, Chip, Field, Icon, IconButton, Label, Segmented, SheetHeader, Text, showDialog, type IconName } from '@/components/ui';
+import { Button, Card, Field, Glyph, IconButton, Label, Segmented, SheetHeader, Text, showDialog } from '@/components/ui';
 import { HistoryGrid } from '@/features/habits/HistoryGrid';
 import { HABIT_ICONS, habitStreak, streakLabel } from '@/features/habits/logic';
 import { addHabit, deleteHabit, updateHabit } from '@/store/actions/habits';
@@ -21,8 +21,8 @@ export default function HabitEditor() {
   const { weekStartsOn } = useSettings();
 
   const [name, setName] = useState(existing?.name ?? params.name ?? '');
-  const [icon, setIcon] = useState<string>(existing?.icon ?? params.icon ?? 'checkmark-done');
-  const [color, setColor] = useState(existing?.color ?? SWATCHES[2]);
+  const [icon, setIcon] = useState<string>(existing?.icon ?? params.icon ?? '✅');
+  const [color, setColor] = useState(existing?.color ?? SWATCHES[0]);
   const [frequency, setFrequency] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [timesPerWeek, setTimes] = useState(existing?.timesPerWeek ?? 3);
 
@@ -47,8 +47,8 @@ export default function HabitEditor() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-          <View style={{ width: 58, height: 58, borderRadius: 29, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name={icon as IconName} size={28} color="#fff" />
+          <View style={{ width: 58, height: 58, borderRadius: 29, borderWidth: 3, borderColor: color, backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
+            <Glyph value={icon} size={26} color={color} />
           </View>
           <View style={{ flex: 1 }}>
             <Field placeholder="e.g. Read 20 pages" value={name} onChangeText={setName} autoFocus={!existing} />

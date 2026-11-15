@@ -1,6 +1,6 @@
 import { ActivityIndicator, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { radius, space, useTheme } from '@/theme';
+import { cardShadow, radius, space, useTheme } from '@/theme';
 
 import { Icon, type IconName } from './Icon';
 import { Press } from './Pressable';
@@ -28,8 +28,8 @@ export function Button({
   style?: StyleProp<ViewStyle>;
 }) {
   const { c } = useTheme();
-  const bg = { primary: c.text, secondary: c.surfaceAlt, ghost: 'transparent', danger: c.dangerSoft }[kind];
-  const fg = { primary: c.bg, secondary: c.text, ghost: c.text, danger: c.danger }[kind];
+  const bg = { primary: c.accent, secondary: c.surface, ghost: 'transparent', danger: c.dangerSoft }[kind];
+  const fg = { primary: c.accentText, secondary: c.text, ghost: c.textMuted, danger: c.danger }[kind];
   return (
     <Press
       onPress={onPress}
@@ -39,6 +39,7 @@ export function Button({
         styles.base,
         small && styles.small,
         { backgroundColor: bg, opacity: disabled ? 0.4 : 1 },
+        kind === 'secondary' && { borderWidth: 1, borderColor: c.border, ...cardShadow(c) },
         style,
       ]}>
       {loading ? (
@@ -46,7 +47,7 @@ export function Button({
       ) : (
         <View style={styles.row}>
           {icon && <Icon name={icon} size={small ? 16 : 19} color={fg} />}
-          <Text variant={small ? 'small' : 'bodyStrong'} color={fg} style={small && { fontWeight: '600' }}>
+          <Text variant={small ? 'small' : 'bodyStrong'} color={fg} style={{ fontWeight: '500' }}>
             {label}
           </Text>
         </View>
@@ -55,6 +56,7 @@ export function Button({
   );
 }
 
+/** Round icon button (the "+" in screen headers, chevrons, etc.). */
 export function IconButton({
   icon,
   onPress,
@@ -62,6 +64,7 @@ export function IconButton({
   color,
   bg,
   label,
+  diameter = 46,
 }: {
   icon: IconName;
   onPress?: () => void;
@@ -69,6 +72,7 @@ export function IconButton({
   color?: string;
   bg?: string;
   label: string;
+  diameter?: number;
 }) {
   const { c } = useTheme();
   return (
@@ -77,7 +81,17 @@ export function IconButton({
       accessibilityLabel={label}
       accessibilityRole="button"
       hitSlop={8}
-      style={[styles.icon, { backgroundColor: bg ?? c.surfaceAlt }]}>
+      style={[
+        styles.icon,
+        {
+          width: diameter,
+          height: diameter,
+          borderRadius: diameter / 2,
+          backgroundColor: bg ?? c.surface,
+          borderColor: c.border,
+          ...cardShadow(c),
+        },
+      ]}>
       <Icon name={icon} size={size} color={color ?? c.text} />
     </Press>
   );
@@ -85,13 +99,13 @@ export function IconButton({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 52,
+    minHeight: 54,
     paddingHorizontal: space.xl,
-    borderRadius: radius.lg,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  small: { minHeight: 36, paddingHorizontal: space.lg, borderRadius: radius.md },
+  small: { minHeight: 38, paddingHorizontal: space.lg },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  icon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  icon: { alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
 });

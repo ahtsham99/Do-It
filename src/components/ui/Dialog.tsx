@@ -93,5 +93,5 @@ const styles = StyleSheet.create({
     maxWidth: 640,
     alignSelf: 'center',
   },
-  btn: { height: 52, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  btn: { height: 52, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
 });

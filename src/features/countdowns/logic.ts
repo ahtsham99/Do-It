@@ -1,23 +1,22 @@
-import type { IconName } from '@/components/ui';
 import { diffDays, todayKey } from '@/lib/dates';
 import type { Countdown } from '@/store/types';
 
 export const DEFAULT_CATEGORIES = ['Exams', 'Appointments', 'Holidays', 'Birthdays', 'Deadlines', 'Events'];
 
-export const CATEGORY_DEFAULTS: Record<string, { icon: IconName; color: string }> = {
-  Exams: { icon: 'school', color: '#E8613C' },
-  Appointments: { icon: 'medkit', color: '#3FA3A0' },
-  Holidays: { icon: 'airplane', color: '#D9A441' },
-  Birthdays: { icon: 'gift', color: '#D9677F' },
-  Deadlines: { icon: 'flag', color: '#8E6BBF' },
-  Events: { icon: 'sparkles', color: '#5B8DEF' },
+export const CATEGORY_DEFAULTS: Record<string, { icon: string; color: string }> = {
+  Exams: { icon: '🎓', color: '#2F4F40' },
+  Appointments: { icon: '🩺', color: '#3F7C7A' },
+  Holidays: { icon: '✈️', color: '#B5873A' },
+  Birthdays: { icon: '🎂', color: '#A8554B' },
+  Deadlines: { icon: '🚩', color: '#7A5C8E' },
+  Events: { icon: '✨', color: '#4A6B8A' },
 };
 
-export const COUNTDOWN_ICONS: IconName[] = [
-  'school', 'book', 'flask', 'calculator', 'medkit', 'fitness', 'airplane', 'car',
-  'train', 'boat', 'gift', 'heart', 'balloon', 'musical-notes', 'ticket', 'film',
-  'trophy', 'football', 'basketball', 'bicycle', 'briefcase', 'flag', 'rocket', 'home',
-  'paw', 'restaurant', 'cafe', 'sunny', 'snow', 'leaf', 'star', 'sparkles',
+export const COUNTDOWN_ICONS = [
+  '🎓', '📚', '🧪', '📝', '🩺', '🦷', '✈️', '🚗',
+  '🏖️', '🏔️', '🎂', '🎁', '❤️', '💍', '🎉', '🎵',
+  '🎟️', '🎬', '🏆', '⚽', '🏀', '🚴', '💼', '🚩',
+  '🚀', '🏠', '🐾', '🍽️', '☀️', '❄️', '⭐', '✨',
 ];
 
 /** Positive = days left, negative = days ago, 0 = today. */

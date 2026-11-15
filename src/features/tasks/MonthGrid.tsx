@@ -57,18 +57,18 @@ export function MonthGrid({
                 <View
                   style={[
                     styles.num,
-                    isSel && { backgroundColor: c.text },
+                    isSel && { backgroundColor: c.accent },
                     !isSel && isToday && { backgroundColor: c.accentSoft },
                   ]}>
                   <Text
-                    style={{ fontWeight: isToday || isSel ? '700' : '500' }}
-                    color={isSel ? c.bg : isToday ? c.accent : inMonth ? c.text : c.textFaint}>
+                    style={{ fontWeight: isToday || isSel ? '600' : '400' }}
+                    color={isSel ? c.accentText : isToday ? c.accent : inMonth ? c.text : c.textFaint}>
                     {fromKey(d).getDate()}
                   </Text>
                 </View>
                 <View style={styles.dots}>
                   {n.open > 0 && (
-                    <View style={[styles.dot, { backgroundColor: d < today ? c.danger : c.accent }]} />
+                    <View style={[styles.dot, { backgroundColor: d < today ? c.danger : c.flame }]} />
                   )}
                   {n.done > 0 && <View style={[styles.dot, { backgroundColor: c.success }]} />}
                 </View>

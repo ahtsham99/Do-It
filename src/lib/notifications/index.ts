@@ -25,6 +25,7 @@ export function configureNotifications() {
   if (Platform.OS === 'android') {
     Notifications.setNotificationChannelAsync('nudges', {
       name: 'Nudges & reminders',
+      // eslint-disable-next-line import/namespace -- re-exported enum the resolver can't follow
       importance: Notifications.AndroidImportance.HIGH,
     }).catch(() => {});
   }

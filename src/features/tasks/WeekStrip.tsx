@@ -30,14 +30,14 @@ export function WeekStrip({
             key={d}
             haptic={false}
             onPress={() => onSelect(d)}
-            style={[styles.day, { backgroundColor: sel ? c.text : c.surface, borderColor: c.border }]}>
-            <Text variant="caption" color={sel ? c.bg : c.textMuted}>
+            style={[styles.day, { backgroundColor: sel ? c.accent : c.surface, borderColor: c.border }]}>
+            <Text variant="caption" color={sel ? c.accentText : c.textMuted}>
               {weekdayShort(d).toUpperCase()}
             </Text>
-            <Text variant="heading" color={sel ? c.bg : d === today ? c.accent : c.text}>
+            <Text variant="heading" color={sel ? c.accentText : d === today ? c.accent : c.text}>
               {fromKey(d).getDate()}
             </Text>
-            <View style={[styles.dot, { backgroundColor: open ? (sel ? c.bg : c.accent) : 'transparent' }]} />
+            <View style={[styles.dot, { backgroundColor: open ? (sel ? c.accentText : c.flame) : 'transparent' }]} />
           </Press>
         );
       })}
@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radius.lg,
+    borderWidth: 1,
     gap: 2,
   },
   dot: { width: 5, height: 5, borderRadius: 3 },

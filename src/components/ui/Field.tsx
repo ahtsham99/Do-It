@@ -34,8 +34,8 @@ export function Label({ children }: { children: string }) {
 
 const styles = StyleSheet.create({
   input: {
-    minHeight: 50,
-    borderRadius: radius.md,
+    minHeight: 54,
+    borderRadius: radius.lg,
     borderWidth: 1,
     paddingHorizontal: space.lg,
     fontSize: 16, // ≥16 stops iOS Safari zooming on focus

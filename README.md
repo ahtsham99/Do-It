@@ -2,7 +2,8 @@
 
 A planner, habit tracker and countdown app for people who start things and
 don't finish them, or forget them. It nags you like Duolingo, and it looks
-calm and minimal while doing it.
+calm and minimal while doing it: warm paper background, deep green accent,
+serif headings (Instrument Serif) and a floating pill tab bar.
 
 One codebase (Expo SDK 58, React Native, TypeScript, Expo Router) for
 **iOS, Android and web**. The web build is a **home-screen web app (PWA)**
@@ -79,7 +80,7 @@ rewrites and the caching headers. You don't need to configure anything by hand.
 src/
   app/                      Expo Router routes (screens only)
     _layout.tsx             root: hydrate store, theme, stack, dialogs/toasts, notification sync
-    (tabs)/                 Today · Planner · Habits · Countdowns · Settings
+    (tabs)/                 Today · Tasks (Planner) · Habits · Countdowns · Settings
     task.tsx habit.tsx countdown.tsx plan.tsx suggestions.tsx onboarding.tsx   (modals/flows)
   features/                 domain logic + feature components
     tasks/ habits/ countdowns/ nudges/ onboarding/
@@ -94,7 +95,8 @@ src/
     premium.ts              plans, feature flags, limits  ← paid tier hooks in here
     dates.ts                timezone-safe YYYY-MM-DD helpers
   components/ui/            design system (Text, Button, Card, Banner, Dialog, Toast, …)
-  theme/                    light/dark tokens
+  components/TabBar.tsx     floating tab bar
+  theme/                    light/dark tokens, serif font, shadows
 public/                     index.html (PWA meta), manifest.json, sw.js, icons
 ```
 

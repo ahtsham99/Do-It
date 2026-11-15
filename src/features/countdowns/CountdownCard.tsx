@@ -1,72 +1,70 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Icon, Press, Text, type IconName } from '@/components/ui';
+import { Glyph, Press, Text } from '@/components/ui';
 import { formatDay } from '@/lib/dates';
 import type { Countdown } from '@/store/types';
-import { radius, space, useTheme } from '@/theme';
+import { SERIF, radius, space, useTheme } from '@/theme';
 
 import { countdownLabel, daysUntil } from './logic';
 
+const WHITE = '#FFFFFF';
+const SOFT = 'rgba(255,255,255,0.72)';
+
+/** Coloured countdown card. `hero` is the large "Next up" version on Today. */
 export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean }) {
   const { c } = useTheme();
   const days = daysUntil(item);
   const past = days < 0;
   const { big, small } = countdownLabel(days);
   const open = () => router.push({ pathname: '/countdown', params: { id: item.id } });
+  const shadow = { boxShadow: `0px 10px 24px ${c.shadow}` };
 
   if (hero) {
     return (
-      <Press onPress={open} style={[styles.hero, { backgroundColor: item.color }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-          <Icon name={item.icon as IconName} size={18} color="#fff" />
-          <Text variant="caption" color="#fff" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
-            Next up · {item.category}
+      <Press onPress={open} style={[styles.hero, { backgroundColor: item.color }, shadow]}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Text variant="caption" color={SOFT} style={{ textTransform: 'uppercase' }}>
+            Next up
+          </Text>
+          <View style={styles.heroIcon}>
+            <Glyph value={item.icon} size={22} />
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: space.sm, flexWrap: 'wrap', marginTop: -space.md }}>
+          <Text color={WHITE} style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 60 }}>
+            {big}
+          </Text>
+          <Text color={WHITE} style={{ fontSize: 18, flexShrink: 1 }} numberOfLines={2}>
+            {days === 0 ? `is ${item.title}` : `${days === 1 ? 'day' : 'days'} to ${item.title}`}
           </Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: space.md }}>
-          <View style={{ flex: 1 }}>
-            <Text variant="title" color="#fff" numberOfLines={2}>
-              {item.title}
-            </Text>
-            <Text variant="small" color="#fff" style={{ opacity: 0.85 }}>
-              {formatDay(item.date, { long: true })}
-            </Text>
-          </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text color="#fff" style={{ fontSize: 56, fontWeight: '800', letterSpacing: -2, lineHeight: 60 }}>
-              {big}
-            </Text>
-            {small ? (
-              <Text variant="caption" color="#fff" style={{ textTransform: 'uppercase' }}>
-                {small}
-              </Text>
-            ) : null}
-          </View>
-        </View>
+        <Text variant="small" color={SOFT}>
+          {formatDay(item.date, { relative: false })}
+        </Text>
       </Press>
     );
   }
 
   return (
-    <Press onPress={open} style={[styles.row, { backgroundColor: c.surface, borderColor: c.border, opacity: past ? 0.6 : 1 }]}>
-      <View style={[styles.icon, { backgroundColor: item.color }]}>
-        <Icon name={item.icon as IconName} size={22} color="#fff" />
+    <Press onPress={open} style={[styles.row, { backgroundColor: item.color, opacity: past ? 0.7 : 1 }, shadow]}>
+      <View style={styles.tile}>
+        <Glyph value={item.icon} size={26} />
       </View>
-      <View style={{ flex: 1 }}>
-        <Text variant="bodyStrong" numberOfLines={1}>
+      <View style={{ flex: 1, gap: 4 }}>
+        <Text color={WHITE} style={{ fontSize: 19 }} numberOfLines={2}>
           {item.title}
         </Text>
-        <Text variant="small" tone="muted">
-          {formatDay(item.date)}
+        <Text variant="caption" color={SOFT} style={{ textTransform: 'uppercase' }}>
+          {formatDay(item.date, { relative: false })}
         </Text>
       </View>
-      <View style={{ alignItems: 'flex-end', minWidth: 64 }}>
-        <Text variant="title" color={past ? c.textMuted : days <= 3 ? c.accent : c.text}>
+      <View style={{ alignItems: 'flex-end' }}>
+        <Text color={WHITE} style={{ fontFamily: SERIF, fontSize: days === 0 ? 30 : 40, lineHeight: 44 }}>
           {big}
         </Text>
         {small ? (
-          <Text variant="caption" tone="muted" style={{ fontSize: 10, textTransform: 'uppercase' }}>
+          <Text color={SOFT} style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase' }}>
             {small}
           </Text>
         ) : null}
@@ -76,15 +74,29 @@ export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean 
 }
 
 const styles = StyleSheet.create({
-  hero: { borderRadius: radius.xl, padding: space.xl, gap: space.lg },
+  hero: { borderRadius: radius.xl, padding: space.xl, gap: space.md, minHeight: 168, justifyContent: 'space-between' },
+  heroIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.md,
-    padding: space.md,
-    paddingRight: space.lg,
-    borderRadius: radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
+    gap: space.lg,
+    padding: space.lg + 2,
+    paddingRight: space.xl,
+    borderRadius: radius.xl,
   },
-  icon: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  tile: {
+    width: 58,
+    height: 58,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

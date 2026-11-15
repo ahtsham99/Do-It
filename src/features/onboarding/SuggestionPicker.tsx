@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Card, Checkbox, Icon, Press, Section, Text } from '@/components/ui';
+import { Card, Checkbox, Glyph, Icon, Press, Section, Text } from '@/components/ui';
 import { REPEAT_LABELS } from '@/features/tasks/logic';
 import { formatTime } from '@/lib/dates';
 import { space, useTheme } from '@/theme';
@@ -47,8 +47,8 @@ function Row({ s, on, onToggle, last }: { s: Suggestion; on: boolean; onToggle: 
       onPress={() => onToggle(key)}
       style={[styles.row, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.border }]}>
       {s.kind === 'habit' ? (
-        <View style={[styles.icon, { backgroundColor: s.color }]}>
-          <Icon name={s.icon} size={18} color="#fff" />
+        <View style={[styles.icon, { backgroundColor: c.surfaceAlt }]}>
+          <Glyph value={s.icon} size={18} />
         </View>
       ) : (
         <View style={[styles.icon, { backgroundColor: c.surfaceAlt }]}>

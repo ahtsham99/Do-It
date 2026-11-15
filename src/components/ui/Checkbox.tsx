@@ -37,7 +37,7 @@ export function Checkbox({
           width: size,
           height: size,
           borderRadius: size / 2,
-          borderColor: checked ? tint : c.textFaint,
+          borderColor: checked ? tint : c.border,
           backgroundColor: checked ? tint : 'transparent',
         },
       ]}>
@@ -47,5 +47,5 @@ export function Checkbox({
 }
 
 const styles = StyleSheet.create({
-  box: { borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  box: { borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
 });

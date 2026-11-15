@@ -25,7 +25,8 @@ export default function PlanScreen() {
   const lockIn = () => {
     markPlanned(n.today);
     showToast(n.todays.length ? 'Plan locked. Now go do it.' : 'Planned. A light day — make it count.', 'lock-closed');
-    router.canGoBack() ? router.back() : router.replace('/');
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
   };
 
   const leftovers = n.overdue.filter((o) => o.day < n.today);

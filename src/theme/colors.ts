@@ -1,20 +1,7 @@
-export const palette = {
-  ember: '#E8613C',
-  emberSoft: '#F4A487',
-  gold: '#D9A441',
-  sage: '#6E9F7F',
-  sky: '#5B8DEF',
-  plum: '#8E6BBF',
-  rose: '#D9677F',
-  slate: '#6B7280',
-  ink: '#14120F',
-  paper: '#F7F5F0',
-};
-
-/** Swatches users can pick for countdowns and habits. */
+/** Swatches users can pick for countdowns and habits (muted, to suit the palette). */
 export const SWATCHES = [
-  '#E8613C', '#D9A441', '#6E9F7F', '#3FA3A0', '#5B8DEF',
-  '#8E6BBF', '#D9677F', '#B5835A', '#6B7280', '#2F3A4A',
+  '#2F4F40', '#4A6B8A', '#8A5A44', '#B5873A', '#7A5C8E',
+  '#A8554B', '#3F7C7A', '#5F6B4E', '#6B6660', '#22201D',
 ];
 
 export interface ThemeColors {
@@ -25,9 +12,14 @@ export interface ThemeColors {
   text: string;
   textMuted: string;
   textFaint: string;
+  /** Deep green: primary buttons, hero cards, selected states. */
   accent: string;
   accentText: string;
   accentSoft: string;
+  /** Near-black "ink" used for strong selected pills. */
+  ink: string;
+  inkText: string;
+  flame: string;
   danger: string;
   dangerSoft: string;
   success: string;
@@ -36,46 +28,55 @@ export interface ThemeColors {
   warningSoft: string;
   tabBar: string;
   overlay: string;
+  shadow: string;
 }
 
 export const light: ThemeColors = {
-  bg: '#F7F5F0',
+  bg: '#F8F7F3',
   surface: '#FFFFFF',
-  surfaceAlt: '#EFECE5',
-  border: '#E4E0D7',
-  text: '#14120F',
-  textMuted: '#6B665D',
-  textFaint: '#A39E94',
-  accent: '#E8613C',
+  surfaceAlt: '#F0EFE9',
+  border: '#E5E3DB',
+  text: '#1E1C19',
+  textMuted: '#6F6C66',
+  textFaint: '#ABA8A0',
+  accent: '#2F4F40',
   accentText: '#FFFFFF',
-  accentSoft: '#FBE5DC',
-  danger: '#C8442F',
-  dangerSoft: '#F9DED8',
-  success: '#3E8B5F',
-  successSoft: '#DDEFE3',
-  warning: '#B7801F',
-  warningSoft: '#F6EACD',
-  tabBar: '#FFFFFF',
-  overlay: 'rgba(20,18,15,0.45)',
+  accentSoft: '#E8EEEA',
+  ink: '#1E1C19',
+  inkText: '#FFFFFF',
+  flame: '#C8553D',
+  danger: '#B4513E',
+  dangerSoft: '#F6E4DF',
+  success: '#3C7A5C',
+  successSoft: '#E1EEE7',
+  warning: '#A97B2F',
+  warningSoft: '#F5ECD8',
+  tabBar: '#FBFAF7',
+  overlay: 'rgba(30,28,25,0.4)',
+  shadow: 'rgba(30,28,25,0.07)',
 };
 
 export const dark: ThemeColors = {
-  bg: '#14120F',
-  surface: '#1E1B17',
-  surfaceAlt: '#29251F',
-  border: '#34302A',
-  text: '#F4F1EA',
-  textMuted: '#A8A296',
-  textFaint: '#6E695F',
-  accent: '#F06C46',
+  bg: '#121412',
+  surface: '#1B1E1B',
+  surfaceAlt: '#262A26',
+  border: '#323732',
+  text: '#F2F1EC',
+  textMuted: '#A5A8A1',
+  textFaint: '#6C706A',
+  accent: '#4C8369',
   accentText: '#FFFFFF',
-  accentSoft: '#3A2219',
-  danger: '#F0705A',
-  dangerSoft: '#3B1E19',
-  success: '#6CC08D',
-  successSoft: '#1B3024',
-  warning: '#E4B24D',
-  warningSoft: '#352A14',
-  tabBar: '#1A1714',
+  accentSoft: '#22302A',
+  ink: '#F2F1EC',
+  inkText: '#121412',
+  flame: '#E07A60',
+  danger: '#D9705C',
+  dangerSoft: '#3A211C',
+  success: '#6CB590',
+  successSoft: '#1D2E26',
+  warning: '#D2A251',
+  warningSoft: '#33290F',
+  tabBar: '#1E211E',
   overlay: 'rgba(0,0,0,0.6)',
+  shadow: 'rgba(0,0,0,0.35)',
 };

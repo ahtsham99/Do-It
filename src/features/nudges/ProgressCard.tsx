@@ -9,7 +9,7 @@ export function ProgressCard({ done, total, line }: { done: number; total: numbe
   return (
     <Card style={{ gap: space.md }}>
       <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <Text variant="title">
+        <Text variant="title" style={{ fontSize: 40, lineHeight: 44 }}>
           {done}
           <Text variant="heading" tone="faint">
             {' '}

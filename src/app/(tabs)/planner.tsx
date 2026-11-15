@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 
-import { Button, Fab, IconButton, Screen, Section, Segmented, Text } from '@/components/ui';
+import { Button, Empty, IconButton, Screen, Section, Segmented, Text, type IconName } from '@/components/ui';
 import { MonthGrid } from '@/features/tasks/MonthGrid';
 import { TaskList } from '@/features/tasks/TaskList';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
@@ -29,15 +29,15 @@ import { useSettings, useTasks } from '@/store/hooks';
 import { space } from '@/theme';
 
 type View_ = 'day' | 'week' | 'month' | 'list';
-const VIEWS: { value: View_; label: string }[] = [
-  { value: 'day', label: 'Day' },
-  { value: 'week', label: 'Week' },
-  { value: 'month', label: 'Month' },
-  { value: 'list', label: 'List' },
+const VIEWS: { value: View_; label: string; icon: IconName }[] = [
+  { value: 'list', label: 'List', icon: 'list-outline' },
+  { value: 'day', label: 'Day', icon: 'time-outline' },
+  { value: 'week', label: 'Week', icon: 'calendar-outline' },
+  { value: 'month', label: 'Month', icon: 'calendar-clear-outline' },
 ];
 
 // Remember the chosen view while the app is open.
-let lastView: View_ = 'day';
+let lastView: View_ = 'list';
 
 export default function PlannerScreen() {
   const tasks = useTasks();
@@ -66,25 +66,31 @@ export default function PlannerScreen() {
         : `${monthName(day)} ${fromKey(day).getFullYear()}`;
 
   const addFor = (d: DayKey) => router.push({ pathname: '/task', params: { date: d } });
+  const add = () => addFor(view === 'list' ? today : day);
+  const todays = occurrencesOn(tasks, today);
+  const openCount = todays.filter((o) => !o.done).length + overdue(tasks).filter((o) => o.day < today).length;
+  const doneCount = todays.filter((o) => o.done).length;
 
   return (
     <View style={{ flex: 1 }}>
       <Screen
         title="Planner"
+        subtitle={`${openCount} open · ${doneCount} done`}
         right={
-          day !== today && view !== 'list' ? (
-            <Button small kind="secondary" label="Today" onPress={() => setDay(today)} />
-          ) : null
+          <>
+            {day !== today && view !== 'list' && <Button small kind="secondary" label="Today" onPress={() => setDay(today)} style={{ height: 46 }} />}
+            <IconButton icon="add" label="Add task" onPress={add} />
+          </>
         }>
         <Segmented options={VIEWS} value={view} onChange={setView} />
 
         {view !== 'list' && (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-            <IconButton icon="chevron-back" label="Previous" size={18} onPress={() => step(-1)} />
+            <IconButton icon="chevron-back" label="Previous" size={18} diameter={40} onPress={() => step(-1)} />
             <Text variant="heading" style={{ flex: 1, textAlign: 'center' }} numberOfLines={1}>
               {label}
             </Text>
-            <IconButton icon="chevron-forward" label="Next" size={18} onPress={() => step(1)} />
+            <IconButton icon="chevron-forward" label="Next" size={18} diameter={40} onPress={() => step(1)} />
           </View>
         )}
 
@@ -98,9 +104,8 @@ export default function PlannerScreen() {
             </Section>
           </>
         )}
-        {view === 'list' && <ListView />}
+        {view === 'list' && <ListView onAdd={add} />}
       </Screen>
-      <Fab label="Add task" onPress={() => addFor(view === 'list' ? today : day)} />
     </View>
   );
 }
@@ -127,7 +132,7 @@ function WeekView({ start, onAdd }: { start: DayKey; onAdd: (d: DayKey) => void 
         <Section
           key={d}
           title={formatDay(d)}
-          right={<IconButton icon="add" label={`Add task on ${formatDay(d)}`} size={16} onPress={() => onAdd(d)} />}>
+          right={<IconButton icon="add" label={`Add task on ${formatDay(d)}`} size={16} diameter={32} onPress={() => onAdd(d)} />}>
           <TaskList items={occurrencesOn(tasks, d)} emptyText="—" />
         </Section>
       ))}
@@ -135,7 +140,7 @@ function WeekView({ start, onAdd }: { start: DayKey; onAdd: (d: DayKey) => void 
   );
 }
 
-function ListView() {
+function ListView({ onAdd }: { onAdd: () => void }) {
   const tasks = useTasks();
   const [showDone, setShowDone] = useState(false);
   const today = todayKey();
@@ -168,9 +173,13 @@ function ListView() {
         </Section>
       )}
       {groups.byDay.length === 0 && groups.late.length === 0 && (
-        <Text tone="muted" style={{ textAlign: 'center', paddingVertical: space.xl }}>
-          Nothing upcoming. Suspiciously quiet…
-        </Text>
+        <Empty
+          icon="list-outline"
+          title="Today is clear"
+          body="Nothing is waiting on you. Add a task when the day asks for one."
+          action="Add a task"
+          onAction={onAdd}
+        />
       )}
       {groups.byDay.map(([d, items]) => (
         <Section key={d} title={formatDay(d)}>

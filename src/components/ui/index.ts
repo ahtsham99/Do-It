@@ -17,3 +17,4 @@ export { DialogHost, showDialog, type DialogAction } from './Dialog';
 export { Toggle } from './Toggle';
 export { ToastHost, showToast } from './Toast';
 export { ListRow } from './ListRow';
+export { Glyph } from './Glyph';

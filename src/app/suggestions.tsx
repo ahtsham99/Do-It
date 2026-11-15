@@ -23,7 +23,8 @@ export default function SuggestionsScreen() {
   const add = () => {
     const n = applySuggestions(SUGGESTIONS[persona].filter((s) => selected.has(suggestionKey(s))));
     showToast(n ? `Added ${n}. Now actually do them.` : 'You already have those.');
-    router.canGoBack() ? router.back() : router.replace('/settings');
+    if (router.canGoBack()) router.back();
+    else router.replace('/settings');
   };
 
   return (
@@ -57,7 +58,7 @@ export default function SuggestionsScreen() {
           selected={selected}
           onToggle={(k) => {
             const n = new Set(selected);
-            n.has(k) ? n.delete(k) : n.add(k);
+            if (!n.delete(k)) n.add(k);
             setSelected(n);
           }}
         />

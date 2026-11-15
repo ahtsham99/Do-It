@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ColorPicker, DateTimeField, IconPicker } from '@/components/pickers';
-import { Button, Card, Chip, Field, Icon, Label, SheetHeader, Text, showDialog, type IconName } from '@/components/ui';
+import { Button, Card, Chip, Field, Glyph, Label, SheetHeader, Text, showDialog } from '@/components/ui';
 import { CATEGORY_DEFAULTS, COUNTDOWN_ICONS, DEFAULT_CATEGORIES, countdownLabel, daysUntil } from '@/features/countdowns/logic';
 import { addDays, todayKey } from '@/lib/dates';
 import { addCountdown, deleteCountdown, updateCountdown } from '@/store/actions/countdowns';
@@ -63,8 +63,8 @@ export default function CountdownEditor() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-          <View style={{ width: 58, height: 58, borderRadius: 29, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name={icon as IconName} size={28} color="#fff" />
+          <View style={{ width: 58, height: 58, borderRadius: 29, borderWidth: 3, borderColor: color, backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
+            <Glyph value={icon} size={26} color={color} />
           </View>
           <View style={{ flex: 1 }}>
             <Field placeholder="What are you counting down to?" value={title} onChangeText={setTitle} autoFocus={!existing} />

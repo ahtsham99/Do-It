@@ -12,7 +12,7 @@ import { requestNotificationPermission, supportsLocalNotifications } from '@/lib
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import type { Persona, Tone } from '@/store/types';
-import { radius, space, useTheme } from '@/theme';
+import { SERIF, radius, space, useTheme } from '@/theme';
 
 const STEPS = ['welcome', 'name', 'persona', 'suggest', 'tone', 'finish'] as const;
 type Step = (typeof STEPS)[number];
@@ -65,7 +65,7 @@ export default function Onboarding() {
           <View style={[styles.logo, { backgroundColor: c.accent }]}>
             <Icon name="checkmark" size={44} color="#fff" />
           </View>
-          <Text style={{ fontSize: 44, fontWeight: '800', letterSpacing: -1.5, lineHeight: 48 }}>
+          <Text style={{ fontFamily: SERIF, fontSize: 56, letterSpacing: -1, lineHeight: 58 }}>
             Start it.{'\n'}Finish it.
           </Text>
           <Text variant="body" tone="muted" style={{ fontSize: 18, lineHeight: 26 }}>
@@ -94,19 +94,19 @@ export default function Onboarding() {
                 <Press
                   key={p.value}
                   onPress={() => choosePersona(p.value)}
-                  style={[styles.persona, { backgroundColor: sel ? c.text : c.surface, borderColor: sel ? c.text : c.border }]}>
-                  <View style={[styles.personaIcon, { backgroundColor: sel ? c.accent : c.surfaceAlt }]}>
+                  style={[styles.persona, { backgroundColor: sel ? c.accent : c.surface, borderColor: sel ? c.accent : c.border }]}>
+                  <View style={[styles.personaIcon, { backgroundColor: sel ? 'rgba(255,255,255,0.16)' : c.surfaceAlt }]}>
                     <Icon name={p.icon} size={22} color={sel ? '#fff' : c.text} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text variant="bodyStrong" color={sel ? c.bg : c.text}>
+                    <Text variant="bodyStrong" color={sel ? c.accentText : c.text}>
                       {p.label}
                     </Text>
-                    <Text variant="small" color={sel ? c.bg : c.textMuted} style={{ opacity: sel ? 0.75 : 1 }}>
+                    <Text variant="small" color={sel ? c.accentText : c.textMuted} style={{ opacity: sel ? 0.75 : 1 }}>
                       {p.blurb}
                     </Text>
                   </View>
-                  {sel && <Icon name="checkmark-circle" size={22} color={c.accent} />}
+                  {sel && <Icon name="checkmark-circle" size={22} color={c.accentText} />}
                 </Press>
               );
             })}
@@ -124,7 +124,7 @@ export default function Onboarding() {
             selected={selected}
             onToggle={(k) => {
               const n = new Set(selected);
-              n.has(k) ? n.delete(k) : n.add(k);
+              if (!n.delete(k)) n.add(k);
               setSelected(n);
             }}
           />
@@ -136,10 +136,11 @@ export default function Onboarding() {
         <View style={{ gap: space.lg }}>
           <Heading title="How hard should we push?" sub="You can change this in Settings." />
           <Segmented
+            tone="accent"
             options={[
               { value: 'gentle', label: 'Gentle' },
-              { value: 'balanced', label: 'Balanced' },
-              { value: 'savage', label: 'Savage' },
+              { value: 'balanced', label: 'Firm' },
+              { value: 'savage', label: 'Relentless' },
             ]}
             value={tone}
             onChange={setTone}
@@ -215,7 +216,7 @@ export default function Onboarding() {
 function Heading({ title, sub }: { title: string; sub: string }) {
   return (
     <View style={{ gap: space.sm, paddingTop: space.md }}>
-      <Text variant="title" style={{ fontSize: 30, letterSpacing: -0.8 }}>
+      <Text variant="title" style={{ fontSize: 36, lineHeight: 40 }}>
         {title}
       </Text>
       <Text tone="muted" style={{ fontSize: 17, lineHeight: 24 }}>
