@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { Banner, Screen, Section } from '@/components/ui';
+import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { pick, greeting } from '@/features/nudges/messages';
 import { ProgressCard } from '@/features/nudges/ProgressCard';
 import { StreakPill } from '@/features/nudges/StreakPill';
@@ -10,7 +11,7 @@ import { useNudges } from '@/features/nudges/useNudges';
 import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { TaskList } from '@/features/tasks/TaskList';
 import { formatDay, formatTime } from '@/lib/dates';
-import { useSettings } from '@/store/hooks';
+import { useCountdowns, useSettings } from '@/store/hooks';
 import { space } from '@/theme';
 
 // Dismissed reminder banners, remembered until the app reloads.
@@ -18,6 +19,11 @@ const dismissed = new Set<string>();
 
 export default function TodayScreen() {
   const n = useNudges();
+  const countdowns = useCountdowns();
+  const comingUp = countdowns
+    .filter((c) => c.date >= n.today)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .slice(0, 2);
   const { tone, name, use24h } = useSettings();
   const [, force] = useState(0);
   const done = n.todays.length - n.open.length;
@@ -102,6 +108,16 @@ export default function TodayScreen() {
         <TaskList items={n.todays} />
         <QuickAdd date={n.today} />
       </Section>
+
+      {comingUp.length > 0 && (
+        <Section title="Coming up">
+          <View style={{ gap: space.sm }}>
+            {comingUp.map((c) => (
+              <CountdownCard key={c.id} item={c} />
+            ))}
+          </View>
+        </Section>
+      )}
     </Screen>
   );
 }
