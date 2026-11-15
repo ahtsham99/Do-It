@@ -4,6 +4,8 @@ import { View } from 'react-native';
 
 import { Banner, Screen, Section } from '@/components/ui';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
+import { HabitCard } from '@/features/habits/HabitCard';
+import { isDueToday } from '@/features/habits/logic';
 import { pick, greeting } from '@/features/nudges/messages';
 import { ProgressCard } from '@/features/nudges/ProgressCard';
 import { StreakPill } from '@/features/nudges/StreakPill';
@@ -11,7 +13,7 @@ import { useNudges } from '@/features/nudges/useNudges';
 import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { TaskList } from '@/features/tasks/TaskList';
 import { formatDay, formatTime } from '@/lib/dates';
-import { useCountdowns, useSettings } from '@/store/hooks';
+import { useCountdowns, useHabits, useSettings } from '@/store/hooks';
 import { space } from '@/theme';
 
 // Dismissed reminder banners, remembered until the app reloads.
@@ -24,7 +26,9 @@ export default function TodayScreen() {
     .filter((c) => c.date >= n.today)
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .slice(0, 2);
-  const { tone, name, use24h } = useSettings();
+  const { tone, name, use24h, weekStartsOn } = useSettings();
+  const habits = useHabits();
+  const habitsLeft = habits.filter((h) => isDueToday(h, n.today, weekStartsOn) && h.frequency === 'daily');
   const [, force] = useState(0);
   const done = n.todays.length - n.open.length;
   const hour = n.now.getHours();
@@ -77,6 +81,14 @@ export default function TodayScreen() {
             body={pick('streakRisk', tone, n.today)}
           />
         )}
+        {n.evening && habitsLeft.length > 0 && (
+          <Banner
+            kind="warning"
+            icon="flame"
+            title={`${habitsLeft.length} habit${habitsLeft.length === 1 ? '' : 's'} not ticked`}
+            body={habitsLeft.map((h) => h.name).join(', ')}
+          />
+        )}
         {n.evening && n.open.length > 0 && n.planned && (
           <Banner
             kind="warning"
@@ -108,6 +120,17 @@ export default function TodayScreen() {
         <TaskList items={n.todays} />
         <QuickAdd date={n.today} />
       </Section>
+
+      {habits.length > 0 && (
+        <Section
+          title={habitsLeft.length ? `Habits · ${habitsLeft.length} left` : 'Habits · all done'}>
+          <View style={{ gap: space.sm }}>
+            {habits.map((h) => (
+              <HabitCard key={h.id} habit={h} compact />
+            ))}
+          </View>
+        </Section>
+      )}
 
       {comingUp.length > 0 && (
         <Section title="Coming up">
