@@ -16,7 +16,6 @@ export function Press({
 }: Omit<PressableProps, 'style'> & { style?: StyleProp<ViewStyle>; haptic?: boolean }) {
   return (
     <RNPressable
-      accessibilityRole="button"
       {...rest}
       onPress={(e) => {
         if (haptic) tap();

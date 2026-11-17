@@ -2,7 +2,7 @@
  * - Navigations: network first, fall back to the cached app shell.
  * - Hashed static assets (/_expo, /assets, /icons): cache first.
  * BUILD_ID is replaced at export time so each deploy gets a fresh cache. */
-const CACHE = 'chair-__BUILD_ID__';
+const CACHE = 'doit-__BUILD_ID__';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/', '/manifest.json'])));

@@ -53,7 +53,7 @@ export function ToastHost() {
             transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-30, 0] }) }],
           },
         ]}>
-        {t?.icon && <Icon name={t.icon} size={20} color={c.accent} />}
+        {t?.icon && <Icon name={t.icon} size={20} color={c.flame} />}
         <Text variant="bodyStrong" color={c.inkText} style={{ flexShrink: 1 }}>
           {t?.text ?? ''}
         </Text>

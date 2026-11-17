@@ -1,32 +1,17 @@
 {
-  "name": "Chair \u2014 barber bookings",
-  "short_name": "Chair",
-  "description": "Simple bookings for independent barbers. No commission.",
+  "name": "Do It — Planner",
+  "short_name": "Do It",
+  "description": "The planner that won't let you quit.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0E0E0D",
-  "theme_color": "#0E0E0D",
+  "background_color": "#14120F",
+  "theme_color": "#14120F",
   "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

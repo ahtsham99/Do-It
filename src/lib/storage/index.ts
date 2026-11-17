@@ -3,7 +3,7 @@ import type { StorageDriver } from './types';
 
 export type { StorageDriver, SyncMeta } from './types';
 
-const NAMESPACE = 'chair';
+const NAMESPACE = 'doit';
 
 let driver: StorageDriver = asyncStorageDriver;
 

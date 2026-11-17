@@ -1,20 +1,20 @@
 {
   "expo": {
-    "name": "Chair",
-    "slug": "chair",
+    "name": "Do It",
+    "slug": "do-it",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "chair",
+    "scheme": "doit",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.chair.barber"
+      "bundleIdentifier": "app.doit.planner"
     },
     "android": {
-      "package": "app.chair.barber",
+      "package": "app.doit.planner",
       "adaptiveIcon": {
-        "backgroundColor": "#0E0E0D",
+        "backgroundColor": "#14120F",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -25,41 +25,32 @@
       "output": "single",
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png",
-      "name": "Chair \u2014 barber bookings",
-      "shortName": "Chair",
-      "description": "Simple bookings for independent barbers. No commission.",
-      "themeColor": "#0E0E0D",
-      "backgroundColor": "#0E0E0D"
+      "name": "Do It — Planner",
+      "shortName": "Do It",
+      "description": "The planner that won't let you quit.",
+      "themeColor": "#14120F",
+      "backgroundColor": "#14120F"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F6F4EF",
+          "backgroundColor": "#F7F5F0",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 120,
-          "dark": {
-            "backgroundColor": "#0E0E0D",
-            "image": "./assets/images/splash-icon.png"
-          }
+          "dark": { "backgroundColor": "#14120F", "image": "./assets/images/splash-icon.png" }
         }
       ],
-      "@react-native-community/datetimepicker",
       [
-        "expo-image-picker",
-        {
-          "photosPermission": "Chair uses your photos so you can add a picture of your shop.",
-          "cameraPermission": false
-        }
-      ]
+        "expo-notifications",
+        { "color": "#E8613C" }
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "extra": {
-      "publicUrl": ""
     }
   }
 }

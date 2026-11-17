@@ -2,27 +2,22 @@ import { useMemo } from 'react';
 
 import { useStore } from './store';
 
-export function useServices() {
-  const services = useStore((s) => s.services);
-  return useMemo(() => services.filter((x) => !x.deletedAt).sort((a, b) => a.order - b.order), [services]);
+/** Live (non-deleted) collections. */
+export function useTasks() {
+  const tasks = useStore((s) => s.tasks);
+  return useMemo(() => tasks.filter((t) => !t.deletedAt), [tasks]);
 }
 
-export function useClientsById() {
-  const clients = useStore((s) => s.clients);
-  return useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients]);
+export function useHabits() {
+  const habits = useStore((s) => s.habits);
+  return useMemo(() => habits.filter((h) => !h.deletedAt && !h.archived), [habits]);
 }
 
-export function useTimeOff() {
-  const timeOff = useStore((s) => s.timeOff);
-  return useMemo(() => timeOff.filter((t) => !t.deletedAt).sort((a, b) => a.start.localeCompare(b.start)), [timeOff]);
+export function useCountdowns() {
+  const countdowns = useStore((s) => s.countdowns);
+  return useMemo(() => countdowns.filter((c) => !c.deletedAt), [countdowns]);
 }
 
-/** Everything the booking rules need, as one stable object. */
-export function useRulesState() {
-  const hours = useStore((s) => s.hours);
-  const timeOff = useStore((s) => s.timeOff);
-  const blocks = useStore((s) => s.blocks);
-  const bookings = useStore((s) => s.bookings);
-  const policies = useStore((s) => s.policies);
-  return useMemo(() => ({ hours, timeOff, blocks, bookings, policies }), [hours, timeOff, blocks, bookings, policies]);
+export function useSettings() {
+  return useStore((s) => s.settings);
 }

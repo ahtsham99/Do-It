@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DialogHost, ToastHost } from '@/components/ui';
+import { NotificationSync } from '@/features/nudges/NotificationSync';
 import { hydrate, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme';
 
@@ -15,6 +16,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const hydrated = useStore((s) => s.hydrated);
+
   const [fontsLoaded, fontError] = useFonts({ InstrumentSerif_400Regular });
   const ready = hydrated && (fontsLoaded || !!fontError);
 
@@ -38,8 +40,6 @@ function Blank() {
   return <View style={{ flex: 1, backgroundColor: c.bg }} />;
 }
 
-const modal = { presentation: 'modal' } as const;
-
 function Navigator() {
   const { dark, c } = useTheme();
   const navTheme = dark ? DarkTheme : DefaultTheme;
@@ -51,19 +51,17 @@ function Navigator() {
       }}>
       <StatusBar style={dark ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="setup" options={{ gestureEnabled: false }} />
-        <Stack.Screen name="(barber)" />
-        <Stack.Screen name="b/[slug]" />
-        <Stack.Screen name="a/[token]" />
-        <Stack.Screen name="booking/[id]" options={modal} />
-        <Stack.Screen name="client/[id]" options={modal} />
-        <Stack.Screen name="walk-in" options={modal} />
-        <Stack.Screen name="block" options={modal} />
-        <Stack.Screen name="messages" options={modal} />
-        <Stack.Screen name="poster" options={modal} />
-        <Stack.Screen name="edit/[section]" options={modal} />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="task" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="plan" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="countdown" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="habit" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="suggestions" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="streaks" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
       </Stack>
+      <NotificationSync />
       <ToastHost />
       <DialogHost />
     </ThemeProvider>
