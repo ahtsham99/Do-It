@@ -44,6 +44,7 @@ Docs: https://docs.expo.dev/eas/index.md
 
 - Routes in `src/app`, domain code in `src/features/*`, state in `src/store` (write only via `src/store/actions`).
 - Persist only through `src/lib/storage` (StorageDriver) so sync can be added later.
-- Platform splits use `.web.ts(x)` files (see `src/lib/notifications`, `src/components/pickers`).
+- Platform splits use `.web.ts(x)` files (see `src/components/pickers`).
+- Booking rules (slots, closures, cancellation) live only in `src/features/booking/rules.ts`; all times are UK time via `src/lib/dates.ts`.
 - `useStore` selectors must return stable references; derive lists with `useMemo`.
 - Web is a single-page PWA export: `public/index.html` is the HTML template; `npm run build:web` → `dist/`.

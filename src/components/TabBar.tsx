@@ -7,18 +7,17 @@ import { Icon, Press, Text, type IconName } from '@/components/ui';
 import { radius, useTheme } from '@/theme';
 
 export const TAB_META: Record<string, { title: string; icon: IconName }> = {
-  index: { title: 'Today', icon: 'sunny-outline' },
-  planner: { title: 'Tasks', icon: 'list-outline' },
-  habits: { title: 'Habits', icon: 'flame-outline' },
-  countdowns: { title: 'Countdowns', icon: 'hourglass-outline' },
-  settings: { title: 'Settings', icon: 'options-outline' },
+  calendar: { title: 'Calendar', icon: 'calendar-clear-outline' },
+  clients: { title: 'Clients', icon: 'people-outline' },
+  share: { title: 'Link & QR', icon: 'qr-code-outline' },
+  settings: { title: 'Shop', icon: 'storefront-outline' },
 };
 
 /** Floating, pill-shaped tab bar. */
 export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
-  const active = dark ? c.text : c.accent;
+  const active = c.accent;
   return (
     <View pointerEvents="box-none" style={[styles.outer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
       <View style={[styles.bar, { borderColor: c.border, boxShadow: `0px 10px 30px ${c.shadow}` }]}>

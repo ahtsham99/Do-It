@@ -5,7 +5,6 @@ import { useStore } from '@/store/store';
 
 import { dark, light, type ThemeColors } from './colors';
 
-export { SWATCHES } from './colors';
 export type { ThemeColors } from './colors';
 
 /** Loaded in the root layout (Instrument Serif). */

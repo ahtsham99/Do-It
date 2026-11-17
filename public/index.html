@@ -4,17 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
     <title>%WEB_TITLE%</title>
-    <meta name="description" content="The planner that won't let you quit." />
+    <meta name="description" content="Simple bookings for independent barbers. No commission." />
 
     <!-- PWA / home-screen app -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Do It" />
+    <meta name="apple-mobile-web-app-title" content="Chair" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="theme-color" content="#F7F5F0" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#14120F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F6F4EF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0E0E0D" media="(prefers-color-scheme: dark)" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
 
@@ -23,7 +23,7 @@
       body {
         overflow: hidden;
         margin: 0;
-        background: #F7F5F0;
+        background: #F6F4EF;
         overscroll-behavior: none;
         -webkit-tap-highlight-color: transparent;
         -webkit-text-size-adjust: 100%;
@@ -32,7 +32,7 @@
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       }
       input, textarea { -webkit-user-select: text; user-select: text; }
-      @media (prefers-color-scheme: dark) { body { background: #14120F; } }
+      @media (prefers-color-scheme: dark) { body { background: #0E0E0D; } }
       #root { display: flex; height: 100%; flex: 1; }
       /* iOS standalone: fill the whole screen incl. under the status bar */
       @supports (height: 100dvh) { html, body, #root { height: 100dvh; } }
@@ -40,7 +40,7 @@
   </head>
 
   <body>
-    <noscript>You need to enable JavaScript to run Do It.</noscript>
+    <noscript>You need to enable JavaScript to run Chair.</noscript>
     <div id="root"></div>
     <script>
       if ('serviceWorker' in navigator && location.hostname !== 'localhost') {

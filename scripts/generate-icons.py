@@ -3,19 +3,18 @@ from PIL import Image, ImageDraw
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INK = (20, 18, 15, 255)
-EMBER = (232, 97, 60, 255)
+INK = (14, 14, 13, 255)
+EMBER = (201, 163, 107, 255)  # brass
 WHITE = (255, 255, 255, 255)
 S = 2048  # supersample
 
 
-def mark(draw, cx, cy, r, bg=EMBER, fg=WHITE):
+def mark(draw, cx, cy, r, bg=EMBER, fg=INK):
+    """A brass disc with a bold "C" cut out of it (C for Chair)."""
     draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=bg)
-    w = int(r * 0.2)
-    pts = [(cx - r * 0.45, cy + r * 0.02), (cx - r * 0.12, cy + r * 0.34), (cx + r * 0.5, cy - r * 0.32)]
-    draw.line(pts, fill=fg, width=w, joint="curve")
-    for p in (pts[0], pts[-1]):
-        draw.ellipse([p[0] - w / 2, p[1] - w / 2, p[0] + w / 2, p[1] + w / 2], fill=fg)
+    w = int(r * 0.26)
+    rr = r * 0.52
+    draw.arc([cx - rr, cy - rr, cx + rr, cy + rr], start=42, end=318, fill=fg, width=w)
 
 
 def icon(size, path, scale=0.30, bg=INK, transparent=False, rounded=False):
