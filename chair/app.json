@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "name": "Chair",
+    "slug": "chair",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "chair",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.chair.barber"
+    },
+    "android": {
+      "package": "app.chair.barber",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E0E0D",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Chair \u2014 barber bookings",
+      "shortName": "Chair",
+      "description": "Simple bookings for independent barbers. No commission.",
+      "themeColor": "#0E0E0D",
+      "backgroundColor": "#0E0E0D"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F6F4EF",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120,
+          "dark": {
+            "backgroundColor": "#0E0E0D",
+            "image": "./assets/images/splash-icon.png"
+          }
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Chair uses your photos so you can add a picture of your shop.",
+          "cameraPermission": false
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "publicUrl": ""
+    }
+  }
+}
