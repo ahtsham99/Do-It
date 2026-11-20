@@ -10,6 +10,7 @@ import { PolicyBox } from '@/features/booking/PolicyBox';
 import { hoursLabel, isFreeToCancel } from '@/features/booking/rules';
 import { SlotPicker, type Slot } from '@/features/booking/SlotPicker';
 import { createBooking } from '@/store/actions/bookings';
+import { loadSampleData } from '@/store/actions/sample';
 import { useServices } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import { space, useTheme } from '@/theme';
@@ -48,6 +49,14 @@ export default function BookPage() {
             Check the link, or ask your barber for a new one.
           </Text>
         </View>
+        {slug === 'fade-and-co' && !shop.slug && (
+          <View style={{ gap: space.sm, marginTop: space.lg }}>
+            <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
+              Test mode: shops are saved on each phone for now, so the demo shop isn’t on this one yet.
+            </Text>
+            <Button label="Load the Fade & Co. demo" onPress={loadSampleData} />
+          </View>
+        )}
       </ClientShell>
     );
   }
