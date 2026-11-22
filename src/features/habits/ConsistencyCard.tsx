@@ -22,7 +22,7 @@ export function ConsistencyCard({ habits }: { habits: Habit[] }) {
   const data = useMemo(() => consistency(habits, period.days, today), [habits, period.days, today]);
 
   return (
-    <Card style={{ gap: space.md }}>
+    <Card style={{ gap: space.sm }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
         <Icon name="flame-outline" size={16} color={c.textMuted} />
         <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
@@ -32,7 +32,7 @@ export function ConsistencyCard({ habits }: { habits: Habit[] }) {
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-            <Text style={{ fontFamily: SERIF, fontSize: 60, lineHeight: 64 }}>{data.pct}</Text>
+            <Text style={{ fontFamily: SERIF, fontSize: 52, lineHeight: 56 }}>{data.pct}</Text>
             <Text tone="muted">%</Text>
           </View>
           <Text variant="small" tone="muted">
@@ -86,6 +86,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     borderRadius: radius.pill,
   },
-  chart: { height: 96, flexDirection: 'row', alignItems: 'flex-end', gap: 3, borderBottomWidth: 2, marginTop: space.sm },
+  chart: { height: 64, flexDirection: 'row', alignItems: 'flex-end', gap: 3, borderBottomWidth: 2, marginTop: space.sm },
   col: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center' },
 });

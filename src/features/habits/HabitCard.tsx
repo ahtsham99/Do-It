@@ -63,11 +63,11 @@ export function HabitCard({ habit }: { habit: Habit }) {
   const open = () => router.push({ pathname: '/habit', params: { id: habit.id } });
 
   return (
-    <Card style={{ gap: space.lg }}>
+    <Card style={{ gap: space.md, paddingVertical: space.lg }}>
       <View style={styles.top}>
-        <HabitRing habit={habit} size={60} onPress={() => tickHabit(habit, today, tone, weekStartsOn)} />
+        <HabitRing habit={habit} size={54} onPress={() => tickHabit(habit, today, tone, weekStartsOn)} />
         <Press haptic={false} onPress={open} style={{ flex: 1, gap: 3 }}>
-          <Text variant="heading" numberOfLines={1} style={{ fontSize: 20 }}>
+          <Text variant="heading" numberOfLines={1} style={{ fontSize: 18 }}>
             {habit.name}
           </Text>
           <Text variant="small" tone="muted">
@@ -112,7 +112,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
 const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   week: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
-  day: { width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  day: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   badge: {
     position: 'absolute',
     right: -2,

@@ -21,20 +21,22 @@ export function UpNext({ items }: { items: Occurrence[] }) {
           onPress={() => router.push({ pathname: '/task', params: { id: o.task.id, day: o.day } })}
           style={{ flex: i === 0 ? 1.3 : 1 }}>
           <Card style={styles.card}>
-            <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', fontSize: 10, letterSpacing: 1.4 }} numberOfLines={1}>
-              {formatDay(o.day)}
-              {o.task.time ? ` · ${formatTime(o.task.time, use24h)}` : ''}
-            </Text>
-            <Text style={{ fontSize: 17, lineHeight: 22, fontWeight: '500' }} numberOfLines={3}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', fontSize: 10, letterSpacing: 1.4, flexShrink: 1 }} numberOfLines={1}>
+                {formatDay(o.day)}
+                {o.task.time ? ` · ${formatTime(o.task.time, use24h)}` : ''}
+              </Text>
+              {i === 0 && (
+                <View style={[styles.tag, { backgroundColor: c.tag }]}>
+                  <Text color={c.tagText} style={{ fontSize: 10, fontWeight: '700' }}>
+                    Next
+                  </Text>
+                </View>
+              )}
+            </View>
+            <Text style={{ fontSize: 16, lineHeight: 21, fontWeight: '500' }} numberOfLines={2}>
               {o.task.title}
             </Text>
-            {i === 0 && (
-              <View style={[styles.tag, { backgroundColor: c.tag }]}>
-                <Text color={c.tagText} style={{ fontSize: 11, fontWeight: '700' }}>
-                  Next
-                </Text>
-              </View>
-            )}
           </Card>
         </Press>
       ))}
@@ -44,6 +46,6 @@ export function UpNext({ items }: { items: Occurrence[] }) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: space.md - 2, alignItems: 'stretch' },
-  card: { flex: 1, gap: 6, padding: space.lg, borderRadius: radius.lg },
-  tag: { alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3, marginTop: 2 },
+  card: { flex: 1, gap: 4, paddingVertical: space.md + 2, paddingHorizontal: space.lg, borderRadius: radius.lg },
+  tag: { borderRadius: 5, paddingHorizontal: 6, paddingVertical: 2 },
 });

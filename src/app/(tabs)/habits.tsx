@@ -67,7 +67,7 @@ export default function HabitsScreen() {
         ) : (
           <>
             <ConsistencyCard habits={habits} />
-            <View style={{ gap: space.lg }}>
+            <View style={{ gap: space.md }}>
               {daily.map((h) => (
                 <HabitCard key={h.id} habit={h} />
               ))}

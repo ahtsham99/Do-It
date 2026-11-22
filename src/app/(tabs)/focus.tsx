@@ -96,16 +96,16 @@ export default function FocusScreen() {
       actions: [{ label: 'End session', destructive: true, onPress: stopTimer }],
     });
 
-  const status = idle ? 'Ready when you are' : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
+  const status = idle ? 'Ready' : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
 
   return (
     <Screen title="Focus" subtitle="Can’t get started? Just do five minutes.">
-      <Card style={{ alignItems: 'center', gap: space.lg, paddingVertical: space.xxl }}>
-        <TimerRing progress={total ? left / total : 0} color={isBreak ? c.warning : c.accent}>
+      <Card style={{ alignItems: 'center', gap: space.md, paddingVertical: space.xl }}>
+        <TimerRing size={212} stroke={9} progress={total ? left / total : 0} color={isBreak ? c.warning : c.accent}>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
             {status}
           </Text>
-          <Text accessibilityRole="timer" style={{ fontFamily: SERIF, fontSize: 68, lineHeight: 74, fontVariant: ['tabular-nums'] }}>
+          <Text accessibilityRole="timer" style={{ fontFamily: SERIF, fontSize: 58, lineHeight: 64, fontVariant: ['tabular-nums'] }}>
             {formatClock(left)}
           </Text>
           {!idle && timer.label ? (
@@ -117,18 +117,19 @@ export default function FocusScreen() {
 
         {idle ? (
           <>
-            <View style={styles.row}>
+            <View style={[styles.row, { flexWrap: 'nowrap' }]}>
               {PRESETS.map((m) => (
-                <Chip key={m} label={m === 5 ? '5 · just start' : `${m} min`} selected={minutes === m} onPress={() => setMinutes(m)} />
+                <Chip key={m} label={`${m} min`} selected={minutes === m} onPress={() => setMinutes(m)} />
               ))}
             </View>
             <View style={[styles.row, { alignItems: 'center' }]}>
-              <IconButton icon="remove" label="Less time" size={18} diameter={40} onPress={() => setMinutes(Math.max(1, minutes - 5))} />
-              <Text tone="muted" style={{ minWidth: 90, textAlign: 'center' }}>
-                {minutes} minutes
+              <IconButton icon="remove" label="Less time" size={16} diameter={36} onPress={() => setMinutes(Math.max(1, minutes - 5))} />
+              <Text tone="muted" style={{ minWidth: 96, textAlign: 'center' }}>
+                {minutes === 5 ? '5 · just start' : `${minutes} minutes`}
               </Text>
-              <IconButton icon="add" label="More time" size={18} diameter={40} onPress={() => setMinutes(Math.min(180, minutes + 5))} />
+              <IconButton icon="add" label="More time" size={16} diameter={36} onPress={() => setMinutes(Math.min(180, minutes + 5))} />
             </View>
+            <Button label={`Start ${minutes}-minute focus`} icon="play" onPress={start} style={{ alignSelf: 'stretch' }} />
           </>
         ) : (
           <View style={styles.row}>
@@ -145,7 +146,7 @@ export default function FocusScreen() {
 
       {idle && (
         <View style={{ gap: space.md }}>
-          <Label>What will you work on?</Label>
+          <Label>What will you work on? (optional)</Label>
           {options.length > 0 && (
             <View style={[styles.row, { justifyContent: 'flex-start' }]}>
               {options.map((o) => {
@@ -171,7 +172,6 @@ export default function FocusScreen() {
               Finishing the session ticks this habit for today.
             </Text>
           )}
-          <Button label={`Start ${minutes}-minute focus`} icon="play" onPress={start} />
           {minutes !== settings.focusMinutes && (
             <Press onPress={() => updateSettings({ focusMinutes: minutes })} style={{ alignSelf: 'center', padding: space.sm }}>
               <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>

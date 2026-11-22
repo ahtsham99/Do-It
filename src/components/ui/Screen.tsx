@@ -56,11 +56,11 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   content: {
     paddingHorizontal: space.xl - 4,
-    gap: space.xl - 4,
+    gap: space.lg,
     width: '100%',
     maxWidth: MAX_WIDTH,
     alignSelf: 'center',
   },
-  header: { flexDirection: 'row', alignItems: 'flex-start', paddingTop: space.xl },
+  header: { flexDirection: 'row', alignItems: 'flex-start', paddingTop: space.md },
   right: { flexDirection: 'row', gap: space.sm, marginLeft: space.md, paddingTop: 2 },
 });

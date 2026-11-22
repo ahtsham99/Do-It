@@ -24,13 +24,13 @@ export function dayHeadline({
   if (habitsLeft > 0) {
     return {
       title: `${plural(habitsLeft, 'habit')} left`,
-      sub: firstHabit ? `Small steps still count. Start with “${firstHabit}”.` : 'Small steps still count.',
+      sub: firstHabit ? `Small steps count. Start with ${firstHabit}.` : 'Small steps still count.',
     };
   }
   if (remindersLeft > 0) {
     return {
       title: `${plural(remindersLeft, 'thing')} to do`,
-      sub: firstReminder ? `Begin with “${firstReminder}”. Five minutes is enough to start.` : 'Five minutes is enough to start.',
+      sub: firstReminder ? `Begin with ${firstReminder}.` : 'Five minutes is enough to start.',
     };
   }
   if (totalToday > 0) return { title: 'All done today', sub: 'Everything’s ticked. Enjoy the quiet.' };
@@ -39,11 +39,13 @@ export function dayHeadline({
 
 export function DayHeadline({ title, sub }: { title: string; sub: string }) {
   return (
-    <View style={{ gap: space.sm, marginTop: space.sm }}>
-      <Text variant="display" accessibilityRole="header" style={{ fontSize: 58, lineHeight: 62, letterSpacing: -1.2 }}>
+    <View style={{ gap: 6, marginTop: space.xs }}>
+      <Text variant="display" accessibilityRole="header" numberOfLines={2} adjustsFontSizeToFit style={{ fontSize: 54, lineHeight: 58, letterSpacing: -1.2 }}>
         {title}
       </Text>
-      <Text tone="muted">{sub}</Text>
+      <Text tone="muted" numberOfLines={1} style={{ fontSize: 15 }}>
+        {sub}
+      </Text>
     </View>
   );
 }

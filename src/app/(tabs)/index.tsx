@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Banner, Empty, Fab, Icon, Press, Screen, Section, Text } from '@/components/ui';
+import { Empty, Icon, Press, Screen, Section, Text } from '@/components/ui';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { FocusNowCard } from '@/features/focus/FocusNowCard';
 import { GoalCard } from '@/features/goals/GoalCard';
@@ -18,6 +18,7 @@ import { TaskList } from '@/features/tasks/TaskList';
 import { addDays, formatDay } from '@/lib/dates';
 import { occurrencesOn } from '@/features/tasks/logic';
 import { DayHeadline, dayHeadline } from '@/features/today/DayHeadline';
+import { NudgeStrip, type Nudge } from '@/features/today/NudgeStrip';
 import { StatCard } from '@/features/today/StatCard';
 import { UpNext } from '@/features/today/UpNext';
 import { useCountdowns, useGoals, useHabits, useSettings, useTasks } from '@/store/hooks';
@@ -43,6 +44,7 @@ export default function TodayScreen() {
     (o) => !overdueIds.has(o.task.id) && !dismissed.has(`${o.task.id}:${n.today}`),
   );
   const needsAttention = !n.planned || n.overdue.length > 0;
+  const timerIdle = useStore((s) => s.timer.status === 'idle');
   const tasks = useTasks();
   const activeGoals = useGoals().filter((g) => !g.completedAt);
   const sessions = useStore((s) => s.sessions);
@@ -57,61 +59,18 @@ export default function TodayScreen() {
   });
   const initials = (name.trim() || 'Me').slice(0, 2).toUpperCase();
   const addTask = () => router.push({ pathname: '/task', params: { date: n.today } });
-  const timerIdle = useStore((s) => s.timer.status === 'idle');
 
   const plural = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
-  const nudges: React.ReactNode[] = [];
-  // On web this card is the reminder; on native it backs up the notification.
+  // Most important first. Only the first shows at the top, as one slim line.
+  const nudges: Nudge[] = [];
   for (const o of reminders) {
-    nudges.push(
-      <ReminderCard
-        key={o.task.id}
-        occ={o}
-        onDismiss={() => {
-          dismissed.add(`${o.task.id}:${n.today}`);
-          force((x) => x + 1);
-        }}
-      />,
-    );
+    nudges.push({ key: `r:${o.task.id}`, kind: 'warning', icon: 'alarm-outline', title: `Reminder: ${o.task.title}`, onPress: () => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } }) });
   }
-  if (!n.planned) {
-    nudges.push(
-      <Banner key="plan" icon="sunny-outline" title="Plan your day" body={pick('planPrompt', tone, n.today)} action="Plan my day" onPress={() => router.push('/plan')} />,
-    );
-  }
-  if (n.overdue.length > 0) {
-    nudges.push(
-      <Banner
-        key="overdue"
-        kind="danger"
-        icon="time-outline"
-        title={`${plural(n.overdue.length, 'task')} still waiting`}
-        body={pick('overdue', tone, n.today)}
-        action="Review"
-        onPress={() => router.push('/plan')}
-      />,
-    );
-  }
-  if (n.evening && n.open.length > 0 && n.planned) {
-    nudges.push(<Banner key="open" kind="warning" icon="moon-outline" title={`${n.open.length} left for today`} body={pick('unfinished', tone, n.today)} />);
-  }
-  if (n.evening && habitsLeft.length > 0) {
-    nudges.push(
-      <Banner
-        key="habits"
-        kind="warning"
-        icon="flame-outline"
-        title={`${plural(habitsLeft.length, 'habit')} still open today`}
-        body={habitsLeft.map((h) => h.name).join(', ')}
-        onPress={() => router.push('/habits')}
-      />,
-    );
-  }
-  if (n.streakAtRisk) {
-    nudges.push(
-      <Banner key="streak" kind="warning" icon="flame-outline" title={`Keep your ${n.streak}-day streak going`} body={pick('streakRisk', tone, n.today)} onPress={() => router.push('/streaks')} />,
-    );
-  }
+  if (!n.planned) nudges.push({ key: 'plan', kind: 'accent', icon: 'sunny-outline', title: 'Plan your day', onPress: () => router.push('/plan') });
+  if (n.overdue.length > 0) nudges.push({ key: 'overdue', kind: 'danger', icon: 'time-outline', title: `${plural(n.overdue.length, 'task')} still waiting`, onPress: () => router.push('/plan') });
+  if (n.evening && n.open.length > 0 && n.planned) nudges.push({ key: 'open', kind: 'warning', icon: 'moon-outline', title: `${n.open.length} left for today`, onPress: () => router.push('/planner') });
+  if (n.streakAtRisk) nudges.push({ key: 'streak', kind: 'warning', icon: 'flame-outline', title: `Keep your ${n.streak}-day streak going`, onPress: () => router.push('/streaks') });
+  const timerRunning = !timerIdle;
 
   const progressLine =
     n.open.length === 0
@@ -122,10 +81,10 @@ export default function TodayScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Screen>
-        <View style={{ paddingTop: space.xl, gap: space.md }}>
+      <Screen contentStyle={{ gap: space.md + 2 }}>
+        <View style={{ paddingTop: space.sm, gap: space.sm }}>
           <View style={styles.top}>
-            <Text variant="display" accessibilityRole="header" style={{ flex: 1, fontFamily: LOGO, letterSpacing: -0.8 }}>
+            <Text variant="display" accessibilityRole="header" style={{ flex: 1, fontFamily: LOGO, fontSize: 36, lineHeight: 42, letterSpacing: -0.8 }}>
               Do It
             </Text>
             <Press onPress={() => router.push('/plan')} hitSlop={10} accessibilityLabel="Plan your day" style={styles.bell}>
@@ -142,10 +101,10 @@ export default function TodayScreen() {
               </Text>
             </Press>
           </View>
-          <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', letterSpacing: 3 }}>
+          <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', letterSpacing: 2.6, fontSize: 11, marginTop: 4 }}>
             {formatDay(n.today, { relative: false, long: true }).replace(',', '')}
           </Text>
-          <Text style={{ fontSize: 18 }}>
+          <Text style={{ fontSize: 17, marginTop: -2 }}>
             {greeting(n.now.getHours())}
             {name.trim() ? `, ${name.trim()}` : ''}
           </Text>
@@ -153,23 +112,30 @@ export default function TodayScreen() {
 
         <DayHeadline {...headline} />
 
-        {/* One quiet nudge at a time, most important first. */}
-        {nudges[0]}
-        {nudges.length > 1 && (
-          <Press onPress={() => router.push('/plan')} hitSlop={8} style={{ alignSelf: 'center', marginTop: -space.sm }}>
-            <Text variant="small" tone="muted">
-              and {nudges.length - 1} more in your plan
-            </Text>
-          </Press>
-        )}
+        {timerRunning ? (
+          <FocusNowCard compact />
+        ) : nudges[0] ? (
+          <NudgeStrip nudge={nudges[0]} more={nudges.length - 1} onMore={() => router.push('/plan')} />
+        ) : null}
 
-        <FocusNowCard />
-
-        {upNext.length > 0 && (
-          <Section title="Up next">
+        <Section
+          title="Up next"
+          right={
+            <Press onPress={addTask} hitSlop={10} accessibilityLabel="Add reminder" style={styles.add}>
+              <Icon name="add" size={16} color={c.accent} />
+              <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
+                Add
+              </Text>
+            </Press>
+          }>
+          {upNext.length > 0 ? (
             <UpNext items={upNext} />
-          </Section>
-        )}
+          ) : (
+            <Text variant="small" tone="muted">
+              Nothing coming up. Tap Add for anything you might forget.
+            </Text>
+          )}
+        </Section>
 
         <View style={{ flexDirection: 'row', gap: space.md - 2 }}>
           <StatCard value={n.streak} unit="day streak" note={`Best ${n.bestStreak}`} href="/streaks" />
@@ -196,13 +162,13 @@ export default function TodayScreen() {
                 </Text>
               </Press>
             }>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.lg, paddingHorizontal: 4, paddingBottom: 4 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingHorizontal: 2, paddingBottom: 2 }}>
               {habits.map((h) => {
                 const streak = habitStreak(h, n.today, weekStartsOn);
                 return (
-                  <View key={h.id} style={{ alignItems: 'center', gap: 6, width: 84 }}>
-                    <HabitRing habit={h} size={68} onPress={() => tickHabit(h, n.today, tone, weekStartsOn)} />
-                    <Text variant="small" tone="muted" numberOfLines={1} style={{ marginTop: 4 }}>
+                  <View key={h.id} style={{ alignItems: 'center', gap: 4, width: 72 }}>
+                    <HabitRing habit={h} size={58} onPress={() => tickHabit(h, n.today, tone, weekStartsOn)} />
+                    <Text variant="small" tone="muted" numberOfLines={1} style={{ marginTop: 2, fontSize: 12 }}>
                       {h.name}
                     </Text>
                     <Text variant="small" color={streak > 0 ? c.flame : c.textFaint} style={{ fontSize: 12 }}>
@@ -212,6 +178,23 @@ export default function TodayScreen() {
                 );
               })}
             </ScrollView>
+          </Section>
+        )}
+
+        {reminders.length > 0 && (
+          <Section title="Due now">
+            <View style={{ gap: space.sm }}>
+              {reminders.map((o) => (
+                <ReminderCard
+                  key={o.task.id}
+                  occ={o}
+                  onDismiss={() => {
+                    dismissed.add(`${o.task.id}:${n.today}`);
+                    force((x) => x + 1);
+                  }}
+                />
+              ))}
+            </View>
           </Section>
         )}
 
@@ -273,14 +256,14 @@ export default function TodayScreen() {
 
         {next && <CountdownCard item={next} hero />}
       </Screen>
-      <Fab label="Add reminder" onPress={addTask} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  bell: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
+  bell: { width: 34, height: 42, alignItems: 'center', justifyContent: 'center' },
   bellDot: { position: 'absolute', top: 8, right: 4, width: 11, height: 11, borderRadius: 6, borderWidth: 2 },
-  avatar: { width: 46, height: 46, borderRadius: 23, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  add: { flexDirection: 'row', alignItems: 'center', gap: 2, paddingVertical: 4 },
+  avatar: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });
