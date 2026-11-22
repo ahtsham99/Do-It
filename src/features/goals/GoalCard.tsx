@@ -6,7 +6,7 @@ import { deleteGoalWithUndo } from '@/features/delete/deleteWithUndo';
 import type { Goal } from '@/store/types';
 import { SERIF, hexAlpha, radius, space, useTheme } from '@/theme';
 
-import { daysLeftLabel, goalProgress, goalStatus } from './logic';
+import { daysLeftLabel, goalProgress, goalStatus, isSimple } from './logic';
 
 export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
   const { c, paint } = useTheme();
@@ -15,10 +15,11 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
   const pct = Math.round(p * 100);
   const left = daysLeftLabel(goal);
   const done = !!goal.completedAt;
+  const simple = isSimple(goal);
   return (
     <SwipeToDelete onDelete={() => deleteGoalWithUndo(goal)}>
     <Press haptic={false} onPress={() => router.push({ pathname: '/goal', params: { id: goal.id } })}>
-      <Card style={{ gap: space.md, padding: compact ? space.lg : space.xl - 4, opacity: done ? 0.75 : 1 }}>
+      <Card style={{ gap: space.md, padding: compact || simple ? space.lg : space.xl - 4, opacity: done ? 0.75 : 1 }}>
         <View style={styles.top}>
           <View style={[styles.tile, { backgroundColor: hexAlpha(color, 0.16), borderColor: hexAlpha(color, 0.5) }]}>
             <Glyph value={goal.icon} size={compact ? 20 : 24} color={color} />
@@ -27,10 +28,29 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
             <Text style={{ fontSize: compact ? 17 : 19, fontWeight: '500' }} numberOfLines={2}>
               {goal.title}
             </Text>
-            <Text variant="small" tone="muted" numberOfLines={1}>
-              {goalStatus(goal)}
-            </Text>
+            {simple ? (
+              goal.why?.trim() || done ? (
+                <Text variant="small" tone="muted" numberOfLines={1} style={{ fontStyle: done ? 'normal' : 'italic' }}>
+                  {done ? 'Achieved' : `“${goal.why!.trim()}”`}
+                </Text>
+              ) : null
+            ) : (
+              <Text variant="small" tone="muted" numberOfLines={1}>
+                {goalStatus(goal)}
+              </Text>
+            )}
           </View>
+          {simple ? (
+            left ? (
+              <Text variant="small" tone={left.includes('past') ? 'danger' : 'muted'} style={{ fontWeight: '500' }}>
+                {left}
+              </Text>
+            ) : done ? (
+              <Text variant="small" color={c.success} style={{ fontWeight: '600' }}>
+                ✓
+              </Text>
+            ) : null
+          ) : (
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={{ fontFamily: SERIF, fontSize: compact ? 30 : 38, lineHeight: compact ? 34 : 42 }}>
               {pct}
@@ -39,11 +59,14 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
               </Text>
             </Text>
           </View>
+          )}
         </View>
-        <View style={[styles.track, { backgroundColor: c.surfaceAlt }]}>
-          <View style={{ width: `${Math.max(pct, p > 0 ? 3 : 0)}%`, height: '100%', borderRadius: radius.pill, backgroundColor: done ? c.success : color }} />
-        </View>
-        {!compact && (left || goal.why) ? (
+        {!simple && (
+          <View style={[styles.track, { backgroundColor: c.surfaceAlt }]}>
+            <View style={{ width: `${Math.max(pct, p > 0 ? 3 : 0)}%`, height: '100%', borderRadius: radius.pill, backgroundColor: done ? c.success : color }} />
+          </View>
+        )}
+        {!simple && !compact && (left || goal.why) ? (
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space.md }}>
             <Text variant="small" tone="muted" numberOfLines={1} style={{ flex: 1, fontStyle: goal.why ? 'italic' : 'normal' }}>
               {goal.why ? `“${goal.why}”` : ''}

@@ -5,9 +5,9 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View
 import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, DateTimeField, IconPicker } from '@/components/pickers';
 import { Button, Card, Checkbox, Chip, Field, Glyph, Icon, IconButton, Label, Press, Segmented, SheetHeader, Text, Toggle, showDialog, showToast } from '@/components/ui';
-import { GOAL_ICONS, GOAL_TEMPLATES, daysLeftLabel, goalProgress } from '@/features/goals/logic';
+import { GOAL_ICONS, GOAL_TEMPLATES, daysLeftLabel, goalProgress, isSimple } from '@/features/goals/logic';
 import { addDays, todayKey } from '@/lib/dates';
-import { addGoal, deleteGoal, linkHabit, logProgress, newStep, toggleStep, updateGoal, type GoalInput } from '@/store/actions/goals';
+import { addGoal, deleteGoal, linkHabit, logProgress, newStep, setAchieved, toggleStep, updateGoal, type GoalInput } from '@/store/actions/goals';
 import { addTask } from '@/store/actions/tasks';
 import { useHabits } from '@/store/hooks';
 import { useStore } from '@/store/store';
@@ -92,6 +92,7 @@ export default function GoalScreen() {
 
   const col = paint(g.color);
   const p = goalProgress(g as Goal);
+  const simple = isSimple(g);
   const left = daysLeftLabel(g as Goal);
   const linked = habits.filter((h) => existing && h.goalId === existing.id);
   const unlinked = habits.filter((h) => !h.goalId);
@@ -126,8 +127,22 @@ export default function GoalScreen() {
           </View>
         )}
 
-        {/* Progress */}
-        <Card style={{ gap: space.lg }}>
+        {/* Progress — only once there's something to measure */}
+        <Card style={{ gap: simple ? space.sm : space.lg }}>
+          {simple && (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
+                Small steps · optional
+              </Text>
+              {left && (
+                <Text variant="small" tone={left.includes('past') ? 'danger' : 'muted'} style={{ fontWeight: '500' }}>
+                  {left}
+                </Text>
+              )}
+            </View>
+          )}
+          {!simple && (
+          <>
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <View>
               <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
@@ -147,12 +162,14 @@ export default function GoalScreen() {
           <View style={[styles.track, { backgroundColor: c.surfaceAlt }]}>
             <View style={{ width: `${Math.max(p * 100, p > 0 ? 3 : 0)}%`, height: '100%', borderRadius: radius.pill, backgroundColor: col }} />
           </View>
+          </>
+          )}
 
           {g.kind === 'steps' ? (
             <View>
               {g.steps.length === 0 && (
-                <Text variant="small" tone="muted" style={{ marginBottom: space.sm }}>
-                  Break it into small steps, each something you could start in 10 minutes.
+                <Text variant="small" tone="muted" style={{ marginBottom: space.xs }}>
+                  If it helps, break it into steps you could start in 10 minutes. Progress shows once you add one.
                 </Text>
               )}
               {g.steps.map((s, i) => (
@@ -290,6 +307,20 @@ export default function GoalScreen() {
         </View>
 
         {!existing && <Button label="Set this goal" icon="flag-outline" onPress={save} disabled={!canSave} />}
+        {existing && simple && (
+          existing.completedAt ? (
+            <Button kind="secondary" icon="refresh" label="Reopen this goal" onPress={() => setAchieved(existing.id, false)} />
+          ) : (
+            <Button
+              icon="trophy-outline"
+              label="Mark as achieved"
+              onPress={() => {
+                setAchieved(existing.id, true);
+                celebrate(existing.title);
+              }}
+            />
+          )
+        )}
         {existing && (
           <Button
             kind="secondary"

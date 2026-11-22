@@ -14,6 +14,8 @@ const progressOf = (g: Goal) =>
 
 /** Sets/clears completedAt to match progress. Returns true if it just became achieved. */
 function settle(g: Goal): { goal: Goal; justAchieved: boolean } {
+  // A goal with no steps has nothing to measure: it's achieved only by hand.
+  if (g.kind === 'steps' && g.steps.length === 0) return { goal: g, justAchieved: false };
   const full = progressOf(g);
   if (full && !g.completedAt) return { goal: { ...g, completedAt: Date.now() }, justAchieved: true };
   if (!full && g.completedAt) return { goal: { ...g, completedAt: null }, justAchieved: false };
@@ -99,3 +101,11 @@ export function linkHabit(habitId: string, goalId: string | null) {
 }
 
 export const newStep = (title: string): GoalStep => ({ id: uid('s_'), title: title.trim(), doneAt: null });
+
+/** Finish (or reopen) a goal by hand — used for goals without steps. */
+export function setAchieved(goalId: string, achieved: boolean) {
+  setState((s) => ({
+    goals: s.goals.map((g) => (g.id === goalId ? { ...g, completedAt: achieved ? Date.now() : null, updatedAt: Date.now() } : g)),
+  }));
+  if (achieved) markActive(todayKey());
+}

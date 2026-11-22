@@ -7,8 +7,12 @@ export const GOAL_ICONS = [
   '✍️', '💻', '🗣️', '🚭', '😴', '🧹', '📸', '🏆',
 ];
 
+/** Steps goal with no steps: nothing to measure, so no %, no bar; finished by hand. */
+export const isSimple = (g: Pick<Goal, 'kind' | 'steps'>) => g.kind === 'steps' && g.steps.length === 0;
+
 /** Share done, 0–1. */
 export function goalProgress(g: Goal): number {
+  if (isSimple(g)) return g.completedAt ? 1 : 0;
   if (g.kind === 'number') {
     const t = g.target ?? 0;
     return t > 0 ? Math.min(1, Math.max(0, (g.current ?? 0) / t)) : 0;
@@ -32,7 +36,7 @@ export function goalStatus(g: Goal): string {
   }
   const next = nextStep(g);
   if (next) return `Next: ${next.title}`;
-  return g.steps.length ? 'All steps done' : 'Add a first small step';
+  return g.steps.length ? 'All steps done' : g.why?.trim() ? `“${g.why.trim()}”` : 'In progress';
 }
 
 export function daysLeftLabel(g: Goal, today = todayKey()): string | null {
