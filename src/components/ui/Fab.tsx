@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTabBarBottom } from '@/hooks/useTopInset';
 import { TAB_BAR_SPACE, useTheme } from '@/theme';
 
 import { Icon, type IconName } from './Icon';
@@ -8,7 +8,7 @@ import { Press } from './Pressable';
 
 export function Fab({ onPress, icon = 'add', label }: { onPress: () => void; icon?: IconName; label: string }) {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const tabBottom = useTabBarBottom();
   return (
     <Press
       onPress={onPress}
@@ -16,7 +16,7 @@ export function Fab({ onPress, icon = 'add', label }: { onPress: () => void; ico
       accessibilityRole="button"
       style={[
         styles.fab,
-        { backgroundColor: c.accent, bottom: TAB_BAR_SPACE + Math.max(insets.bottom, 12) - 4, boxShadow: `0px 8px 20px ${c.shadow}` },
+        { backgroundColor: c.accent, bottom: TAB_BAR_SPACE + tabBottom - 4, boxShadow: `0px 8px 20px ${c.shadow}` },
       ]}>
       <Icon name={icon} size={28} color={c.accentText} />
     </Press>

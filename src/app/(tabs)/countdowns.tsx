@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Empty, Field, Icon, IconButton, Press, Screen, Section, Segmented, Text, showDialog } from '@/components/ui';
+import { useTabBarBottom } from '@/hooks/useTopInset';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { groupCountdowns } from '@/features/countdowns/logic';
 import { todayKey } from '@/lib/dates';
@@ -14,7 +14,7 @@ type When = 'future' | 'past';
 
 export default function CountdownsScreen() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const tabBottom = useTabBarBottom();
   const items = useCountdowns();
   const today = todayKey();
   const [when, setWhen] = useState<When>('future');
@@ -51,7 +51,7 @@ export default function CountdownsScreen() {
       <Screen
         title="Countdowns"
         subtitle="The days worth watching"
-        contentStyle={{ paddingBottom: TAB_BAR_SPACE + insets.bottom + 110 }}
+        contentStyle={{ paddingBottom: TAB_BAR_SPACE + tabBottom + 96 }}
         right={
           <>
             <IconButton
@@ -101,7 +101,7 @@ export default function CountdownsScreen() {
       </Screen>
 
       {items.length > 0 && (
-        <View pointerEvents="box-none" style={[styles.when, { bottom: TAB_BAR_SPACE + Math.max(insets.bottom, 12) - 2 }]}>
+        <View pointerEvents="box-none" style={[styles.when, { bottom: TAB_BAR_SPACE + tabBottom - 2 }]}>
           <View style={{ width: '100%', maxWidth: 600 }}>
             <Segmented
               tone="ink"

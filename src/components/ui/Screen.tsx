@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View, type ScrollViewProps } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTopInset } from '@/hooks/useTopInset';
+import { useTabBarBottom, useTopInset } from '@/hooks/useTopInset';
 import { TAB_BAR_SPACE, space, useTheme } from '@/theme';
 
 import { Glow } from './Glow';
@@ -29,7 +28,7 @@ export function Screen({
   contentStyle?: ScrollViewProps['contentContainerStyle'];
 } & ScrollViewProps) {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const tabBottom = useTabBarBottom();
   const top = useTopInset();
   return (
     <View style={[styles.root, { backgroundColor: c.bg, paddingTop: top }]}>
@@ -37,7 +36,7 @@ export function Screen({
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingBottom: TAB_BAR_SPACE + insets.bottom + space.xxl }, contentStyle]}
+        contentContainerStyle={[styles.content, { paddingBottom: TAB_BAR_SPACE + tabBottom + space.lg }, contentStyle]}
         {...scrollProps}>
         {(title || right) && (
           <View style={styles.header}>

@@ -27,3 +27,12 @@ export function useSheetTopInset() {
   const top = useTopInset();
   return Platform.OS === 'web' ? top : 0;
 }
+
+/**
+ * Gap between the floating tab bar and the bottom of the screen: sits just
+ * above the iPhone home bar instead of a full home-bar height above it.
+ */
+export function useTabBarBottom() {
+  const bottom = useSafeAreaInsets().bottom;
+  return Math.max(bottom - 14, 10);
+}

@@ -92,6 +92,16 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     () => ({ dark: isDark, c: isDark ? darkFor(night as NightColor) : light, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied }),
     [isDark, applied, night],
   );
+  // Web: paint the page behind the app (e.g. under Safari's bars) the same colour,
+  // so there's never a differently-coloured band at the top or bottom.
+  const bg = value.c.bg;
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.documentElement.style.backgroundColor = bg;
+    document.body.style.backgroundColor = bg;
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', bg));
+  }, [bg]);
+
   return <ThemeCtx.Provider value={value}>{children}</ThemeCtx.Provider>;
 }
 

@@ -1,9 +1,9 @@
 import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from 'expo-router/tabs';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, Press, Text, type IconName } from '@/components/ui';
+import { useTabBarBottom } from '@/hooks/useTopInset';
 import { radius, useTheme } from '@/theme';
 
 export const TAB_META: Record<string, { title: string; icon: IconName }> = {
@@ -17,10 +17,10 @@ export const TAB_META: Record<string, { title: string; icon: IconName }> = {
 /** Floating, pill-shaped tab bar. */
 export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const { c, dark } = useTheme();
-  const insets = useSafeAreaInsets();
+  const tabBottom = useTabBarBottom();
   const active = c.accent;
   return (
-    <View pointerEvents="box-none" style={[styles.outer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+    <View pointerEvents="box-none" style={[styles.outer, { paddingBottom: tabBottom }]}>
       <View style={[styles.bar, { borderColor: c.border, boxShadow: `0px 10px 30px ${c.shadow}` }]}>
         {/* Frosted glass: blurred content behind a translucent tint. */}
         <BlurView intensity={60} tint={dark ? 'dark' : 'light'} style={[StyleSheet.absoluteFill, styles.glass, { backgroundColor: c.tabBar }]} />
