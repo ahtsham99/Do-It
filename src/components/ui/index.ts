@@ -19,3 +19,4 @@ export { ToastHost, showToast } from './Toast';
 export { ListRow } from './ListRow';
 export { Glyph } from './Glyph';
 export { Glow } from './Glow';
+export { SwipeToDelete } from './SwipeToDelete';

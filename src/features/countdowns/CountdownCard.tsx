@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Glyph, Press, Text } from '@/components/ui';
+import { Glyph, Press, SwipeToDelete, Text } from '@/components/ui';
+import { deleteCountdownWithUndo } from '@/features/delete/deleteWithUndo';
 import { formatDay } from '@/lib/dates';
 import type { Countdown } from '@/store/types';
 import { SERIF, radius, space, useTheme } from '@/theme';
@@ -47,6 +48,7 @@ export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean 
   }
 
   return (
+    <SwipeToDelete onDelete={() => deleteCountdownWithUndo(item)}>
     <Press onPress={open} style={[styles.row, { backgroundColor: item.color, opacity: past ? 0.7 : 1 }, shadow]}>
       <View style={styles.tile}>
         <Glyph value={item.icon} size={26} />
@@ -70,6 +72,7 @@ export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean 
         ) : null}
       </View>
     </Press>
+    </SwipeToDelete>
   );
 }
 

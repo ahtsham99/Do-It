@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Card, Glyph, Icon, Press, Text, showToast, tap } from '@/components/ui';
+import { Card, Glyph, Icon, Press, SwipeToDelete, Text, showToast, tap } from '@/components/ui';
+import { deleteHabitWithUndo } from '@/features/delete/deleteWithUndo';
 import { randomLine } from '@/features/nudges/messages';
 import { range, startOfWeek, todayKey, weekdayShort } from '@/lib/dates';
 import { toggleHabit } from '@/store/actions/habits';
@@ -63,6 +64,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
   const open = () => router.push({ pathname: '/habit', params: { id: habit.id } });
 
   return (
+    <SwipeToDelete onDelete={() => deleteHabitWithUndo(habit)}>
     <Card style={{ gap: space.md, paddingVertical: space.lg }}>
       <View style={styles.top}>
         <HabitRing habit={habit} size={54} onPress={() => tickHabit(habit, today, tone, weekStartsOn)} />
@@ -106,6 +108,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
         })}
       </View>
     </Card>
+    </SwipeToDelete>
   );
 }
 

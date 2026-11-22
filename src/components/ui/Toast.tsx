@@ -5,26 +5,35 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { radius, space, useTheme } from '@/theme';
 
 import { Icon, type IconName } from './Icon';
+import { Press } from './Pressable';
 import { Text } from './Text';
 
+interface ToastAction {
+  label: string;
+  onPress: () => void;
+}
 interface Toast {
   id: number;
   text: string;
   icon?: IconName;
+  action?: ToastAction;
 }
 let current: Toast | null = null;
 let timer: ReturnType<typeof setTimeout> | null = null;
 const subs = new Set<() => void>();
 const emit = () => subs.forEach((f) => f());
 
-export function showToast(text: string, icon: IconName = 'checkmark-circle') {
-  current = { id: Date.now(), text, icon };
+/** Brief message at the top. With an action (e.g. Undo) it stays a little longer. */
+export function showToast(text: string, icon: IconName = 'checkmark-circle', action?: ToastAction) {
+  current = { id: Date.now(), text, icon, action };
   emit();
   if (timer) clearTimeout(timer);
-  timer = setTimeout(() => {
-    current = null;
-    emit();
-  }, 2400);
+  timer = setTimeout(hide, action ? 5000 : 2400);
+}
+
+function hide() {
+  current = null;
+  emit();
 }
 
 export function ToastHost() {
@@ -42,8 +51,9 @@ export function ToastHost() {
   }, [t, anim]);
 
   return (
-    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { alignItems: 'center' }]}>
+    <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, { alignItems: 'center' }]}>
       <Animated.View
+        pointerEvents={t?.action ? 'auto' : 'none'}
         style={[
           styles.toast,
           {
@@ -57,6 +67,21 @@ export function ToastHost() {
         <Text variant="bodyStrong" color={c.inkText} style={{ flexShrink: 1 }}>
           {t?.text ?? ''}
         </Text>
+        {t?.action && (
+          <Press
+            onPress={() => {
+              const a = t.action!;
+              hide();
+              a.onPress();
+            }}
+            hitSlop={10}
+            accessibilityRole="button"
+            style={{ marginLeft: space.sm, paddingHorizontal: space.md, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: 'rgba(127,127,127,0.25)' }}>
+            <Text variant="bodyStrong" color={c.inkText}>
+              {t.action.label}
+            </Text>
+          </Press>
+        )}
       </Animated.View>
     </View>
   );

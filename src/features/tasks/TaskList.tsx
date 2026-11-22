@@ -25,7 +25,7 @@ export function TaskList({
     ) : null;
   }
   return (
-    <Card padded={false} style={{ paddingHorizontal: space.lg }}>
+    <Card padded={false} style={{ paddingHorizontal: space.lg, overflow: 'hidden' }}>
       <View style={{ marginBottom: -1 }}>
         {items.map((o) => (
           <TaskRow key={`${o.task.id}:${o.day}`} occ={o} showDate={showDate} overdue={overdue} />

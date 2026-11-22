@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Card, Glyph, Press, Text } from '@/components/ui';
+import { Card, Glyph, Press, SwipeToDelete, Text } from '@/components/ui';
+import { deleteGoalWithUndo } from '@/features/delete/deleteWithUndo';
 import type { Goal } from '@/store/types';
 import { SERIF, hexAlpha, radius, space, useTheme } from '@/theme';
 
@@ -14,6 +15,7 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
   const left = daysLeftLabel(goal);
   const done = !!goal.completedAt;
   return (
+    <SwipeToDelete onDelete={() => deleteGoalWithUndo(goal)}>
     <Press haptic={false} onPress={() => router.push({ pathname: '/goal', params: { id: goal.id } })}>
       <Card style={{ gap: space.md, padding: compact ? space.lg : space.xl - 4, opacity: done ? 0.75 : 1 }}>
         <View style={styles.top}>
@@ -54,6 +56,7 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
         ) : null}
       </Card>
     </Press>
+    </SwipeToDelete>
   );
 }
 

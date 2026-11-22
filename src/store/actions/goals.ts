@@ -41,10 +41,20 @@ export function updateGoal(id: string, patch: Partial<Goal>): boolean {
   return achieved;
 }
 
-export function deleteGoal(id: string) {
+/** Deletes a goal and unlinks its habits. Returns the unlinked habit ids (for undo). */
+export function deleteGoal(id: string): string[] {
+  const linked = getState().habits.filter((h) => h.goalId === id).map((h) => h.id);
   updateGoal(id, { deletedAt: Date.now() });
   // Unlink habits so they don't point at a deleted goal.
   setState((s) => ({ habits: s.habits.map((h) => (h.goalId === id ? { ...h, goalId: null, updatedAt: Date.now() } : h)) }));
+  return linked;
+}
+
+/** Undo a delete, relinking any habits that were linked. */
+export function restoreGoal(id: string, habitIds: string[] = []) {
+  updateGoal(id, { deletedAt: null });
+  const set = new Set(habitIds);
+  setState((s) => ({ habits: s.habits.map((h) => (set.has(h.id) ? { ...h, goalId: id, updatedAt: Date.now() } : h)) }));
 }
 
 const find = (id: string) => getState().goals.find((g) => g.id === id);

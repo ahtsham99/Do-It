@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Checkbox, Icon, Press, Text } from '@/components/ui';
+import { Checkbox, Icon, Press, SwipeToDelete, Text } from '@/components/ui';
+import { deleteTaskWithUndo } from '@/features/delete/deleteWithUndo';
 import { formatDay, formatTime, nowTime, todayKey } from '@/lib/dates';
 import { completeTask } from '@/features/nudges/celebrate';
 import { useSettings } from '@/store/hooks';
@@ -31,7 +32,8 @@ export function TaskRow({
   ].filter(Boolean);
 
   return (
-    <View style={[styles.row, { borderBottomColor: c.border }]}>
+    <SwipeToDelete onDelete={() => deleteTaskWithUndo(task, day)} borderRadius={0}>
+    <View style={[styles.row, { borderBottomColor: c.border, backgroundColor: c.surface }]}>
       <Checkbox checked={done} onToggle={() => completeTask(task, day)} label={`Complete ${task.title}`} />
       <Press
         haptic={false}
@@ -56,6 +58,7 @@ export function TaskRow({
         )}
       </Press>
     </View>
+    </SwipeToDelete>
   );
 }
 
