@@ -17,7 +17,7 @@ import { TaskList } from '@/features/tasks/TaskList';
 import { formatDay } from '@/lib/dates';
 import { useCountdowns, useHabits, useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
-import { space, useTheme } from '@/theme';
+import { LOGO, space, useTheme } from '@/theme';
 
 // Dismissed reminder banners, remembered until the app reloads.
 const dismissed = new Set<string>();
@@ -108,7 +108,7 @@ export default function TodayScreen() {
       <Screen>
         <View style={{ paddingTop: space.xl, gap: space.md }}>
           <View style={styles.top}>
-            <Text variant="display" style={{ flex: 1 }}>
+            <Text variant="display" accessibilityRole="header" style={{ flex: 1, fontFamily: LOGO, letterSpacing: -0.8 }}>
               Do It
             </Text>
             <Press onPress={() => router.push('/plan')} hitSlop={10} accessibilityLabel="Plan your day" style={styles.bell}>

@@ -94,6 +94,10 @@ export interface Settings {
   plan: Plan;
   focusMinutes: number;
   breakMinutes: number;
+  /** Font ids from src/theme/fonts.ts. */
+  displayFont: string;
+  textFont: string;
+  logoFont: string;
 }
 
 export interface Stats {
@@ -129,6 +133,9 @@ export const DEFAULT_SETTINGS: Settings = {
   plan: 'free',
   focusMinutes: 25,
   breakMinutes: 5,
+  displayFont: 'instrument',
+  textFont: 'system',
+  logoFont: 'newsreader',
 };
 
 export const DEFAULT_TIMER: TimerState = {

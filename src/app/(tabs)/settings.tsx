@@ -12,6 +12,7 @@ import { useSettings } from '@/store/hooks';
 import { resetAll } from '@/store/store';
 import type { ThemePreference, Tone } from '@/store/types';
 import { radius, space, useTheme } from '@/theme';
+import { displayFont, textFont } from '@/theme/fonts';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
   { value: 'gentle', label: 'Gentle', blurb: 'Soft reminders, no pressure.' },
@@ -61,6 +62,15 @@ export default function SettingsScreen() {
       <Card style={{ gap: space.md }}>
         <Text style={styles.label}>Appearance</Text>
         <Segmented tone="accent" options={THEMES} value={s.theme} onChange={(theme) => updateSettings({ theme })} />
+        <Press onPress={() => router.push('/fonts')} accessibilityRole="button" style={[styles.fontsRow, { borderTopColor: c.border }]}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={styles.label}>Fonts</Text>
+            <Text variant="small" tone="muted">
+              {displayFont(s.logoFont).label} logo · {displayFont(s.displayFont).label} headings · {textFont(s.textFont).label} text
+            </Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={c.textFaint} />
+        </Press>
       </Card>
 
       <Card style={{ gap: space.md }}>
@@ -210,4 +220,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   radio: { width: 10, height: 10, borderRadius: 5 },
+  fontsRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderTopWidth: 1, paddingTop: space.lg, marginTop: space.xs, minHeight: 56 },
 });

@@ -1,21 +1,27 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import * as Font from 'expo-font';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { useStore } from '@/store/store';
 
 import { dark, light, type ThemeColors } from './colors';
+import { displayFont, faceForWeight, facesFor, textFont, type FontChoice } from './fonts';
 
 export { SWATCHES } from './colors';
 export type { ThemeColors } from './colors';
 
-/** Loaded in the root layout (Instrument Serif). */
-export const SERIF = 'InstrumentSerif_400Regular';
+/**
+ * Font tokens. Put `fontFamily: SERIF` (headings) or `fontFamily: LOGO` in a
+ * Text style and the Text component swaps in the user's chosen font.
+ */
+export const SERIF = '$display';
+export const LOGO = '$logo';
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 export const radius = { sm: 10, md: 16, lg: 22, xl: 28, pill: 999 } as const;
 export const font = {
-  display: { fontFamily: SERIF, fontSize: 42, fontWeight: '400' as const, letterSpacing: -0.6, lineHeight: 46 },
-  title: { fontFamily: SERIF, fontSize: 30, fontWeight: '400' as const, letterSpacing: -0.3, lineHeight: 34 },
+  display: { fontFamily: SERIF, fontSize: 42, fontWeight: '400' as const, letterSpacing: -0.6, lineHeight: 48 },
+  title: { fontFamily: SERIF, fontSize: 30, fontWeight: '400' as const, letterSpacing: -0.3, lineHeight: 36 },
   heading: { fontSize: 18, fontWeight: '500' as const, letterSpacing: -0.1 },
   body: { fontSize: 16, fontWeight: '400' as const },
   bodyStrong: { fontSize: 16, fontWeight: '500' as const },
@@ -31,18 +37,60 @@ export function cardShadow(c: ThemeColors) {
 /** Height reserved at the bottom of screens for the floating tab bar. */
 export const TAB_BAR_SPACE = 104;
 
+export interface ResolvedFonts {
+  /** Family for headings, or undefined for the system font. */
+  display?: string;
+  logo?: string;
+  /** Family for body text at a given weight, or undefined for the system font. */
+  text: (weight: number) => string | undefined;
+}
+
 interface Theme {
   dark: boolean;
   c: ThemeColors;
+  fonts: ResolvedFonts;
+  fontsReady: boolean;
 }
 
-const ThemeCtx = createContext<Theme>({ dark: false, c: light });
+const resolve = (choice: FontChoice): ResolvedFonts => {
+  const t = textFont(choice.text);
+  return {
+    display: displayFont(choice.display).face?.family,
+    logo: displayFont(choice.logo).face?.family,
+    text: (w) => faceForWeight(t, w)?.family,
+  };
+};
+
+const SYSTEM: ResolvedFonts = { text: () => undefined };
+const ThemeCtx = createContext<Theme>({ dark: false, c: light, fonts: SYSTEM, fontsReady: false });
 
 export function AppThemeProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme();
   const pref = useStore((s) => s.settings.theme);
+  const hydrated = useStore((s) => s.hydrated);
+  const display = useStore((s) => s.settings.displayFont);
+  const text = useStore((s) => s.settings.textFont);
+  const logo = useStore((s) => s.settings.logoFont);
+  // Fonts switch only once the new files have loaded, so text never flashes.
+  const [applied, setApplied] = useState<FontChoice | null>(null);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let cancelled = false;
+    const choice = { display, text, logo };
+    Font.loadAsync(facesFor(choice))
+      .catch((e) => console.warn('[fonts] failed to load', e))
+      .finally(() => !cancelled && setApplied(choice));
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, display, text, logo]);
+
   const isDark = pref === 'system' ? system === 'dark' : pref === 'dark';
-  const value = useMemo(() => ({ dark: isDark, c: isDark ? dark : light }), [isDark]);
+  const value = useMemo(
+    () => ({ dark: isDark, c: isDark ? dark : light, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied }),
+    [isDark, applied],
+  );
   return <ThemeCtx.Provider value={value}>{children}</ThemeCtx.Provider>;
 }
 

@@ -76,7 +76,8 @@ rewrites and the caching headers. You don't need to configure anything by hand.
 | **Nudges** | Daily "Plan your day" ritual, completion toasts, Gentle / Firm / Relentless strength in calm language. Native: morning prompt, evening check-in, reminders and timer end |
 | **Streak & Profile** | Streak count, best, six-week calendar and habit streaks; profile with name, who you are and totals |
 | **Onboarding** | Asks who you are (student / professional / athlete / other) **only** to suggest habits and reminders |
-| **Settings** | Opened from your initials on Today. Profile, nudge strength, notification times, focus and break length, light/dark/auto, week start, 24h clock, erase data |
+| **Fonts** | Settings → Appearance → Fonts: choose the logo font, heading font and text font separately, with a live preview. Options include Classic (Newsreader, the logo default), Editorial (Instrument Serif), Book, Soft, Elegant, Bold, Modern and System for logo/headings; System, Inter, DM Sans, Rounded, Easy to read (Atkinson Hyperlegible) and Serif for text. Only the chosen fonts load at start-up |
+| **Settings** | Opened from your initials on Today. Profile, appearance and fonts, nudge strength, notification times, focus and break length, light/dark/auto, week start, 24h clock, erase data |
 
 ## Project structure
 
@@ -100,7 +101,7 @@ src/
     dates.ts                timezone-safe YYYY-MM-DD helpers
   components/ui/            design system (Text, Button, Card, Banner, Dialog, Toast, …)
   components/TabBar.tsx     floating tab bar
-  theme/                    light/dark tokens, serif font, shadows
+  theme/                    light/dark tokens, font registry + loading (fonts.ts), shadows
 public/                     index.html (PWA meta), manifest.json, sw.js, icons
 ```
 

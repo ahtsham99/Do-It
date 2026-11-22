@@ -5,7 +5,7 @@ import { font, radius, space, useTheme } from '@/theme';
 import { Text } from './Text';
 
 export function Field({ label, style, ...rest }: TextInputProps & { label?: string }) {
-  const { c } = useTheme();
+  const { c, fonts } = useTheme();
   return (
     <View style={{ gap: space.xs }}>
       {label && <Label>{label}</Label>}
@@ -14,6 +14,7 @@ export function Field({ label, style, ...rest }: TextInputProps & { label?: stri
         {...rest}
         style={[
           font.body,
+          { fontFamily: fonts.text(400) },
           styles.input,
           { color: c.text, backgroundColor: c.surface, borderColor: c.border },
           rest.multiline && { minHeight: 88, textAlignVertical: 'top', paddingTop: 14 },

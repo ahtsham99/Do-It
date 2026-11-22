@@ -8,7 +8,7 @@ import { font, radius, space, useTheme } from '@/theme';
 
 /** One-line task entry: type, hit return, done. */
 export function QuickAdd({ date, placeholder = 'Add something to remember todayâ€¦' }: { date: DayKey; placeholder?: string }) {
-  const { c } = useTheme();
+  const { c, fonts } = useTheme();
   const [title, setTitle] = useState('');
   const submit = () => {
     const t = title.trim();
@@ -27,7 +27,7 @@ export function QuickAdd({ date, placeholder = 'Add something to remember todayâ
         onSubmitEditing={submit}
         returnKeyType="done"
         submitBehavior="submit"
-        style={[font.body, styles.input, { color: c.text }]}
+        style={[font.body, styles.input, { color: c.text, fontFamily: fonts.text(400) }]}
       />
       {title.trim().length > 0 && (
         <Press onPress={submit} style={[styles.go, { backgroundColor: c.accent }]} accessibilityLabel="Add">

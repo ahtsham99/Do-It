@@ -1,5 +1,3 @@
-import { InstrumentSerif_400Regular } from '@expo-google-fonts/instrument-serif';
-import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -18,22 +16,27 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 export default function RootLayout() {
   const hydrated = useStore((s) => s.hydrated);
 
-  const [fontsLoaded, fontError] = useFonts({ InstrumentSerif_400Regular });
-  const ready = hydrated && (fontsLoaded || !!fontError);
-
   useEffect(() => {
     hydrate();
   }, []);
 
+  return (
+    <SafeAreaProvider>
+      <AppThemeProvider>
+        <Gate hydrated={hydrated} />
+      </AppThemeProvider>
+    </SafeAreaProvider>
+  );
+}
+
+/** Waits for saved data and the chosen fonts, then shows the app. */
+function Gate({ hydrated }: { hydrated: boolean }) {
+  const { fontsReady } = useTheme();
+  const ready = hydrated && fontsReady;
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
-
-  return (
-    <SafeAreaProvider>
-      <AppThemeProvider>{ready ? <Navigator /> : <Blank />}</AppThemeProvider>
-    </SafeAreaProvider>
-  );
+  return ready ? <Navigator /> : <Blank />;
 }
 
 function Blank() {
@@ -60,6 +63,7 @@ function Navigator() {
         <Stack.Screen name="suggestions" options={{ presentation: 'modal' }} />
         <Stack.Screen name="streaks" options={{ presentation: 'modal' }} />
         <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="fonts" options={{ presentation: 'modal' }} />
         <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
       </Stack>
       <NotificationSync />
