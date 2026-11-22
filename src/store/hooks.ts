@@ -21,3 +21,8 @@ export function useCountdowns() {
 export function useSettings() {
   return useStore((s) => s.settings);
 }
+
+export function useGoals() {
+  const goals = useStore((s) => s.goals);
+  return useMemo(() => goals.filter((g) => !g.deletedAt), [goals]);
+}

@@ -34,6 +34,34 @@ export interface Habit extends SyncMeta {
   timesPerWeek: number;
   history: DayKey[];
   archived?: boolean;
+  /** Optional goal this habit helps with. */
+  goalId?: string | null;
+}
+
+export type GoalKind = 'steps' | 'number';
+
+export interface GoalStep {
+  id: string;
+  title: string;
+  doneAt?: number | null;
+}
+
+/**
+ * A bigger outcome ("Run a 5K", "Read 12 books"). Progress comes from small
+ * steps or from a number, so it can be broken into pieces you can start today.
+ */
+export interface Goal extends SyncMeta {
+  title: string;
+  why?: string;
+  icon: string;
+  color: string;
+  kind: GoalKind;
+  targetDate?: DayKey | null;
+  steps: GoalStep[];
+  target?: number;
+  current?: number;
+  unit?: string;
+  completedAt?: number | null;
 }
 
 export interface Countdown extends SyncMeta {
@@ -119,6 +147,7 @@ export interface AppState {
   stats: Stats;
   timer: TimerState;
   sessions: FocusSession[];
+  goals: Goal[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {

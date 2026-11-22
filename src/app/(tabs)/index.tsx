@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Banner, Empty, Fab, Icon, Press, Screen, Section, Text } from '@/components/ui';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { FocusNowCard } from '@/features/focus/FocusNowCard';
+import { GoalCard } from '@/features/goals/GoalCard';
 import { HabitRing, tickHabit } from '@/features/habits/HabitCard';
 import { habitStreak, isDueToday } from '@/features/habits/logic';
 import { greeting, pick } from '@/features/nudges/messages';
@@ -19,7 +20,7 @@ import { occurrencesOn } from '@/features/tasks/logic';
 import { DayHeadline, dayHeadline } from '@/features/today/DayHeadline';
 import { StatCard } from '@/features/today/StatCard';
 import { UpNext } from '@/features/today/UpNext';
-import { useCountdowns, useHabits, useSettings, useTasks } from '@/store/hooks';
+import { useCountdowns, useGoals, useHabits, useSettings, useTasks } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import { LOGO, space, useTheme } from '@/theme';
 
@@ -43,6 +44,7 @@ export default function TodayScreen() {
   );
   const needsAttention = !n.planned || n.overdue.length > 0;
   const tasks = useTasks();
+  const activeGoals = useGoals().filter((g) => !g.completedAt);
   const sessions = useStore((s) => s.sessions);
   const focusToday = sessions.filter((x) => x.mode === 'focus' && x.day === n.today && !x.deletedAt).reduce((m, x) => m + x.minutes, 0);
   const upNext = [...n.open, ...occurrencesOn(tasks, addDays(n.today, 1)).filter((o) => !o.done)].slice(0, 2);
@@ -244,6 +246,30 @@ export default function TodayScreen() {
             </Press>
           )}
         </Section>
+
+        {activeGoals.length > 0 ? (
+          <Section
+            title="Goals"
+            right={
+              <Press onPress={() => router.push({ pathname: '/habits', params: { view: 'goals' } })} hitSlop={10}>
+                <Text variant="small" tone="muted">
+                  All
+                </Text>
+              </Press>
+            }>
+            <View style={{ gap: space.sm }}>
+              {activeGoals.slice(0, 2).map((g) => (
+                <GoalCard key={g.id} goal={g} compact />
+              ))}
+            </View>
+          </Section>
+        ) : (
+          <Press onPress={() => router.push('/goal')} style={{ alignSelf: 'center', padding: space.sm }}>
+            <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
+              Set a goal to work towards
+            </Text>
+          </Press>
+        )}
 
         {next && <CountdownCard item={next} hero />}
       </Screen>

@@ -10,9 +10,9 @@ import { DEFAULT_SETTINGS, DEFAULT_STATS, DEFAULT_TIMER, type AppState } from '.
  * write through the action modules in `src/store/actions/*`.
  */
 
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 type Slice = Exclude<keyof AppState, 'hydrated'>;
-const SLICES: Slice[] = ['tasks', 'habits', 'countdowns', 'settings', 'stats', 'timer', 'sessions'];
+const SLICES: Slice[] = ['tasks', 'habits', 'countdowns', 'settings', 'stats', 'timer', 'sessions', 'goals'];
 
 function initialState(hydrated: boolean): AppState {
   return {
@@ -24,6 +24,7 @@ function initialState(hydrated: boolean): AppState {
     stats: DEFAULT_STATS,
     timer: DEFAULT_TIMER,
     sessions: [],
+    goals: [],
   };
 }
 
@@ -69,7 +70,7 @@ export async function hydrate() {
   if (state.hydrated) return;
   const version = await storage.read<number>('schemaVersion', SCHEMA_VERSION);
   const base = initialState(true);
-  const [tasks, habits, countdowns, settings, stats, timer, sessions] = await Promise.all([
+  const [tasks, habits, countdowns, settings, stats, timer, sessions, goals] = await Promise.all([
     storage.read('tasks', base.tasks),
     storage.read('habits', base.habits),
     storage.read('countdowns', base.countdowns),
@@ -77,6 +78,7 @@ export async function hydrate() {
     storage.read('stats', base.stats),
     storage.read('timer', base.timer),
     storage.read('sessions', base.sessions),
+    storage.read('goals', base.goals),
   ]);
   state = migrate(version, {
     hydrated: true,
@@ -88,12 +90,13 @@ export async function hydrate() {
     stats: { ...DEFAULT_STATS, ...stats },
     timer: { ...DEFAULT_TIMER, ...timer },
     sessions,
+    goals,
   });
   await storage.write('schemaVersion', SCHEMA_VERSION);
   listeners.forEach((l) => l());
 }
 
-/** Hook for future data shape changes. v1 → v2 only added slices with defaults. */
+/** Hook for future data shape changes. v2 and v3 only added slices with defaults. */
 function migrate(_from: number, s: AppState): AppState {
   return s;
 }

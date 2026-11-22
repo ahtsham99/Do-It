@@ -67,17 +67,19 @@ rewrites and the caching headers. You don't need to configure anything by hand.
 
 | Area | What it does |
 | --- | --- |
-| **Today** | Greeting, streak, one reminder or nudge at a time, the live focus timer, habit rings, today's reminders, quick add, next countdown |
+| **Today** | Big headline ("2 habits left"), greeting, streak, one reminder or nudge at a time, Up next cards with a Next tag, streak and focus stat cards, goals, the live focus timer, habit rings, today's reminders, quick add, next countdown |
 | **Habits** | Daily or N-times-per-week habits, emoji ring to tick, streaks, week circles (tap to backfill), consistency chart, history |
 | **Reminders** | Anything to remember, with date, optional time, reminder and repeat (daily / weekdays / weekly / monthly). **List · Day · Week · Month** views. A timed reminder pings you at that time by default |
 | **Due reminders** | Card on Today with **Done**, **Later** (15 min / 1 hour / 3 hours / tomorrow) and **Focus** (start a 5-minute session on it). Native: notification, also for snoozes. Web: the card is the reminder |
 | **Focus timer** | Countdown timer with a ring: 5 ("just start") / 15 / 25 / 45 min or custom, pick what you're working on, pause, +5 min, end early. Keeps running when the app is closed. When it ends: chime/haptic, then break or keep going; a linked habit is ticked and the session counts toward your streak. Today / week stats and recent sessions |
+| **Goals** | Habits tab → Goals. A goal is a bigger outcome tracked by small steps (tick them, or send one to today's reminders) or by a number (e.g. 2 of 12 books). Optional why, target date with days left, emoji and colour, linked habits, quick-start ideas. Reaching 100% marks it achieved. Top goals show on Today; weekly check-in and day-before-target notifications on native |
 | **Countdowns** | Events grouped by category; "days left" / "days ago"; emoji icon + colour; Future / Past; search |
 | **Nudges** | Daily "Plan your day" ritual, completion toasts, Gentle / Firm / Relentless strength in calm language. Native: morning prompt, evening check-in, reminders and timer end |
 | **Streak & Profile** | Streak count, best, six-week calendar and habit streaks; profile with name, who you are and totals |
 | **Onboarding** | Asks who you are (student / professional / athlete / other) **only** to suggest habits and reminders |
 | **Fonts** | Settings → Appearance → Fonts: choose the logo font, heading font and text font separately, with a live preview. Options include Classic (Newsreader, the logo default), Editorial (Instrument Serif), Book, Soft, Elegant, Bold, Modern and System for logo/headings; System, Inter, DM Sans, Rounded, Easy to read (Atkinson Hyperlegible) and Serif for text. Only the chosen fonts load at start-up |
-| **Settings** | Opened from your initials on Today. Profile, appearance and fonts, nudge strength, notification times, focus and break length, light/dark/auto, week start, 24h clock, erase data |
+| **Look** | Day mode: the original warm off-white with a faint green glow and light dots. Night mode: true black, dark cards and a colour glow with a dotted texture; choose Forest, Ember, Electric, Violet or Mono |
+| **Settings** | Opened from your initials on Today. Profile, appearance (light/dark/auto, night colour) and fonts, nudge strength, notification times, focus and break length, light/dark/auto, week start, 24h clock, erase data |
 
 ## Project structure
 

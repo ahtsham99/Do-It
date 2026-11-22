@@ -1,6 +1,6 @@
 import { pick } from '@/features/nudges/messages';
 import { isDone, occurrencesOn, occursOn } from '@/features/tasks/logic';
-import { addDays, combine, formatTime, todayKey } from '@/lib/dates';
+import { addDays, combine, diffDays, formatTime, fromKey, todayKey } from '@/lib/dates';
 import type { AppState } from '@/store/types';
 
 export interface PlannedNotification {
@@ -68,6 +68,34 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
           : 'Ready for another round?',
       url: '/focus',
     });
+  }
+
+  // Goals: a weekly check-in on the first day of the week, and a nudge the day before a target date.
+  const goals = state.goals.filter((g) => !g.deletedAt && !g.completedAt);
+  if (goals.length) {
+    for (let i = 0; i < 7; i++) {
+      const day = addDays(today, i);
+      if (fromKey(day).getDay() !== settings.weekStartsOn) continue;
+      const at = combine(day, settings.dailyPromptTime);
+      at.setMinutes(at.getMinutes() + 5);
+      if (at <= now) continue;
+      const g = goals[0];
+      const next = g.kind === 'steps' ? g.steps.find((s) => !s.doneAt)?.title : null;
+      out.push({
+        id: `goals-${day}`,
+        date: at,
+        title: `This week: ${g.title}`,
+        body: next ? `Next small step: ${next}.` : 'A little progress this week is enough.',
+        url: `/goal?id=${g.id}`,
+      });
+    }
+    for (const g of goals) {
+      if (!g.targetDate) continue;
+      const at = combine(addDays(g.targetDate, -1), settings.dailyPromptTime);
+      if (at > now && diffDays(today, g.targetDate) <= 14) {
+        out.push({ id: `goal-due-${g.id}`, date: at, title: `Tomorrow: ${g.title}`, body: 'Your target date is tomorrow. One more step today?', url: `/goal?id=${g.id}` });
+      }
+    }
   }
 
   // Snoozed reminders.

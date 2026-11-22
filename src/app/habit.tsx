@@ -4,11 +4,11 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ColorPicker, IconPicker } from '@/components/pickers';
-import { Button, Card, Field, Glyph, IconButton, Label, Segmented, SheetHeader, Text, showDialog } from '@/components/ui';
+import { Button, Card, Chip, Field, Glyph, IconButton, Label, Segmented, SheetHeader, Text, showDialog } from '@/components/ui';
 import { HistoryGrid } from '@/features/habits/HistoryGrid';
 import { HABIT_ICONS, habitStreak, streakLabel } from '@/features/habits/logic';
 import { addHabit, deleteHabit, updateHabit } from '@/store/actions/habits';
-import { useSettings } from '@/store/hooks';
+import { useGoals, useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import type { HabitFrequency } from '@/store/types';
 import { SWATCHES, space, useTheme } from '@/theme';
@@ -25,12 +25,14 @@ export default function HabitEditor() {
   const [color, setColor] = useState(existing?.color ?? SWATCHES[0]);
   const [frequency, setFrequency] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [timesPerWeek, setTimes] = useState(existing?.timesPerWeek ?? 3);
+  const goals = useGoals().filter((g) => !g.completedAt);
+  const [goalId, setGoalId] = useState<string | null>(existing?.goalId ?? null);
 
   const canSave = name.trim().length > 0;
   const close = () => (router.canGoBack() ? router.back() : router.replace('/habits'));
   const save = () => {
     if (!canSave) return;
-    const data = { name: name.trim(), icon, color, frequency, timesPerWeek: frequency === 'weekly' ? timesPerWeek : 1 };
+    const data = { name: name.trim(), icon, color, frequency, timesPerWeek: frequency === 'weekly' ? timesPerWeek : 1, goalId };
     if (existing) updateHabit(existing.id, data);
     else addHabit(data);
     close();
@@ -88,6 +90,18 @@ export default function HabitEditor() {
             </Card>
           )}
         </View>
+
+        {goals.length > 0 && (
+          <View style={{ gap: space.sm }}>
+            <Label>Helps with a goal</Label>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+              <Chip label="None" selected={!goalId} onPress={() => setGoalId(null)} />
+              {goals.map((g) => (
+                <Chip key={g.id} label={`${g.icon}  ${g.title}`} selected={goalId === g.id} onPress={() => setGoalId(g.id)} />
+              ))}
+            </View>
+          </View>
+        )}
 
         <View style={{ gap: space.sm }}>
           <Label>Colour</Label>

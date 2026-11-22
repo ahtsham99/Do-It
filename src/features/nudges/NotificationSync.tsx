@@ -10,13 +10,14 @@ export function NotificationSync() {
   const settings = useStore((s) => s.settings);
   const stats = useStore((s) => s.stats);
   const timer = useStore((s) => s.timer);
+  const goals = useStore((s) => s.goals);
 
   useEffect(() => configureNotifications(), []);
 
   useEffect(() => {
     const id = setTimeout(() => rescheduleAll(getState()).catch((e) => console.warn('[notifications]', e)), 800);
     return () => clearTimeout(id);
-  }, [tasks, settings, stats, timer]);
+  }, [tasks, settings, stats, timer, goals]);
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', (s) => {
