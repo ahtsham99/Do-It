@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, DateTimeField, IconPicker } from '@/components/pickers';
 import { Button, Card, Chip, Field, Glyph, Label, SheetHeader, Text, showDialog } from '@/components/ui';
 import { CATEGORY_DEFAULTS, COUNTDOWN_ICONS, DEFAULT_CATEGORIES, countdownLabel, daysUntil } from '@/features/countdowns/logic';
@@ -14,7 +14,7 @@ import { SWATCHES, radius, space, useTheme } from '@/theme';
 
 export default function CountdownEditor() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const existing = useStore((s) => s.countdowns.find((x) => x.id === id));
   const all = useCountdowns();
@@ -56,7 +56,7 @@ export default function CountdownEditor() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title={existing ? 'Edit countdown' : 'New countdown'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView

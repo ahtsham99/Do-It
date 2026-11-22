@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View, type ScrollViewProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTopInset } from '@/hooks/useTopInset';
 import { TAB_BAR_SPACE, space, useTheme } from '@/theme';
 
 import { Glow } from './Glow';
@@ -29,8 +30,9 @@ export function Screen({
 } & ScrollViewProps) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const top = useTopInset();
   return (
-    <View style={[styles.root, { backgroundColor: c.bg, paddingTop: insets.top }]}>
+    <View style={[styles.root, { backgroundColor: c.bg, paddingTop: top }]}>
       <Glow />
       <ScrollView
         keyboardShouldPersistTaps="handled"

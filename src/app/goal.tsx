@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, DateTimeField, IconPicker } from '@/components/pickers';
 import { Button, Card, Checkbox, Chip, Field, Glyph, Icon, IconButton, Label, Press, Segmented, SheetHeader, Text, Toggle, showDialog, showToast } from '@/components/ui';
 import { GOAL_ICONS, GOAL_TEMPLATES, daysLeftLabel, goalProgress } from '@/features/goals/logic';
@@ -28,7 +28,7 @@ function celebrate(title: string) {
  */
 export default function GoalScreen() {
   const { c, fonts } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const params = useLocalSearchParams<{ id?: string; template?: string }>();
   const existing = useStore((s) => s.goals.find((g) => g.id === params.id && !g.deletedAt));
   const habits = useHabits();
@@ -97,7 +97,7 @@ export default function GoalScreen() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title={existing ? 'Goal' : 'New goal'} onSave={save} saveLabel={existing ? 'Done' : 'Save'} canSave={canSave} cancelLabel={existing ? 'Close' : 'Cancel'} />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>

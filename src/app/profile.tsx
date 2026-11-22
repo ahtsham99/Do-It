@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { Card, Chip, Field, Label, ListRow, SheetHeader, Text } from '@/components/ui';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { useNudges } from '@/features/nudges/useNudges';
@@ -12,7 +12,7 @@ import { SERIF, space, useTheme } from '@/theme';
 /** Profile: who you are, and a quiet summary of what you've done. */
 export default function ProfileScreen() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const s = useSettings();
   const n = useNudges();
   const tasks = useTasks();
@@ -23,7 +23,7 @@ export default function ProfileScreen() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title="Profile" cancelLabel="Close" />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { Button, Card, Checkbox, Icon, Press, Section, SheetHeader, Text, showToast } from '@/components/ui';
 import { completeTask } from '@/features/nudges/celebrate';
 import { pick } from '@/features/nudges/messages';
@@ -18,7 +18,7 @@ import { radius, space, useTheme } from '@/theme';
 /** The daily "plan your day" ritual. */
 export default function PlanScreen() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const n = useNudges();
   const { tone } = useSettings();
 
@@ -34,7 +34,7 @@ export default function PlanScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title="Plan your day" />
       </View>
       <ScrollView

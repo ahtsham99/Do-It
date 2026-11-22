@@ -1,7 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTopInset } from '@/hooks/useTopInset';
 import { radius, space, useTheme } from '@/theme';
 
 import { Icon, type IconName } from './Icon';
@@ -43,7 +43,7 @@ export function ToastHost() {
     () => current,
   );
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const top = useTopInset();
   const [anim] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function ToastHost() {
         style={[
           styles.toast,
           {
-            top: insets.top + space.sm,
+            top: top + space.sm,
             backgroundColor: c.ink,
             opacity: anim,
             transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-30, 0] }) }],

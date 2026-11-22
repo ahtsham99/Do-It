@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { DateTimeField } from '@/components/pickers';
 import { Button, Card, Chip, Field, Label, SheetHeader, Text, Toggle, showDialog } from '@/components/ui';
 import { REMINDER_OPTIONS, REPEAT_LABELS } from '@/features/tasks/logic';
@@ -17,7 +17,7 @@ const REPEATS = Object.keys(REPEAT_LABELS) as Repeat[];
 
 export default function TaskEditor() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const params = useLocalSearchParams<{ id?: string; date?: string; day?: string; title?: string }>();
   const existing = useStore((s) => s.tasks.find((t) => t.id === params.id));
   const { use24h, notificationsEnabled } = useSettings();
@@ -66,7 +66,7 @@ export default function TaskEditor() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title={existing ? 'Edit reminder' : 'New reminder'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView

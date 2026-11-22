@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTopInset } from '@/hooks/useTopInset';
 import { Button, Card, Field, Icon, Press, Segmented, Text } from '@/components/ui';
 import { applySuggestions } from '@/features/onboarding/applySuggestions';
 import { SuggestionPicker } from '@/features/onboarding/SuggestionPicker';
@@ -25,6 +26,7 @@ function isStandaloneWeb() {
 export default function Onboarding() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const top = useTopInset();
   const settings = useSettings();
   const [step, setStep] = useState<Step>('welcome');
   const [name, setName] = useState(settings.name);
@@ -186,7 +188,7 @@ export default function Onboarding() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ flex: 1, paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.lg, width: '100%', maxWidth: 560, alignSelf: 'center' }}>
+      <View style={{ flex: 1, paddingTop: top + space.md, paddingBottom: insets.bottom + space.lg, width: '100%', maxWidth: 560, alignSelf: 'center' }}>
         <View style={[styles.top, { paddingHorizontal: space.lg }]}>
           {idx > 0 ? (
             <Press onPress={back} hitSlop={12} accessibilityLabel="Back">

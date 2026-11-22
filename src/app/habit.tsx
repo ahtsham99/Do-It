@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, IconPicker } from '@/components/pickers';
 import { Button, Card, Chip, Field, Glyph, IconButton, Label, Segmented, SheetHeader, Text, showDialog } from '@/components/ui';
 import { HistoryGrid } from '@/features/habits/HistoryGrid';
@@ -15,7 +15,7 @@ import { SWATCHES, space, useTheme } from '@/theme';
 
 export default function HabitEditor() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const params = useLocalSearchParams<{ id?: string; name?: string; icon?: string }>();
   const existing = useStore((s) => s.habits.find((h) => h.id === params.id));
   const { weekStartsOn } = useSettings();
@@ -42,7 +42,7 @@ export default function HabitEditor() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title={existing ? 'Habit' : 'New habit'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView

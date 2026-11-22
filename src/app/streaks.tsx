@@ -1,6 +1,6 @@
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { Card, Glyph, Icon, Section, SheetHeader, Text } from '@/components/ui';
 import { bestHabitStreak, habitStreak, streakLabel } from '@/features/habits/logic';
 import { useNudges } from '@/features/nudges/useNudges';
@@ -14,7 +14,7 @@ const WEEKS = 6;
 /** Your streak: how many days in a row you've shown up. */
 export default function StreaksScreen() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const n = useNudges();
   const { weekStartsOn } = useSettings();
   const stats = useStore((s) => s.stats);
@@ -30,7 +30,7 @@ export default function StreaksScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title="Streak" cancelLabel="Close" />
       </View>
       <ScrollView contentContainerStyle={styles.content}>

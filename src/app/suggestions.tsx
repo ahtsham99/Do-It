@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, View } from 'react-native';
 
+import { useSheetTopInset } from '@/hooks/useTopInset';
 import { Button, Chip, SheetHeader, Text, showToast } from '@/components/ui';
 import { applySuggestions } from '@/features/onboarding/applySuggestions';
 import { SuggestionPicker } from '@/features/onboarding/SuggestionPicker';
@@ -15,7 +15,7 @@ import { space, useTheme } from '@/theme';
 /** Change persona and browse its suggestions at any time. */
 export default function SuggestionsScreen() {
   const { c } = useTheme();
-  const insets = useSafeAreaInsets();
+  const sheetTop = useSheetTopInset();
   const settings = useSettings();
   const [persona, setPersona] = useState<Persona>(settings.persona ?? 'other');
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -29,7 +29,7 @@ export default function SuggestionsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
+      <View style={{ paddingTop: sheetTop }}>
         <SheetHeader title="Suggestions" />
       </View>
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
