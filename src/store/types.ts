@@ -98,6 +98,8 @@ export interface Settings {
   displayFont: string;
   textFont: string;
   logoFont: string;
+  /** Night-mode glow colour (src/theme/colors.ts NIGHT_COLORS). */
+  nightColor: 'forest' | 'ember' | 'electric' | 'violet' | 'mono';
 }
 
 export interface Stats {
@@ -136,6 +138,7 @@ export const DEFAULT_SETTINGS: Settings = {
   displayFont: 'instrument',
   textFont: 'system',
   logoFont: 'newsreader',
+  nightColor: 'forest',
 };
 
 export const DEFAULT_TIMER: TimerState = {

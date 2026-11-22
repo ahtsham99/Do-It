@@ -18,3 +18,4 @@ export { Toggle } from './Toggle';
 export { ToastHost, showToast } from './Toast';
 export { ListRow } from './ListRow';
 export { Glyph } from './Glyph';
+export { Glow } from './Glow';

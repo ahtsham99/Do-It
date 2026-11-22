@@ -18,7 +18,7 @@ export const TAB_META: Record<string, { title: string; icon: IconName }> = {
 export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
-  const active = dark ? c.text : c.accent;
+  const active = c.accent;
   return (
     <View pointerEvents="box-none" style={[styles.outer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
       <View style={[styles.bar, { borderColor: c.border, boxShadow: `0px 10px 30px ${c.shadow}` }]}>

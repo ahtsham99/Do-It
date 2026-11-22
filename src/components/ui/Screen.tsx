@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TAB_BAR_SPACE, space, useTheme } from '@/theme';
 
+import { Glow } from './Glow';
 import { Text } from './Text';
 
 export const MAX_WIDTH = 640;
@@ -30,6 +31,7 @@ export function Screen({
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.root, { backgroundColor: c.bg, paddingTop: insets.top }]}>
+      <Glow />
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}

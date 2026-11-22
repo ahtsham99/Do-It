@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Platform, StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { DateTimeField } from '@/components/pickers';
 import { Button, Card, Icon, IconButton, ListRow, Press, Screen, Segmented, Text, Toggle, showDialog, showToast } from '@/components/ui';
@@ -11,7 +12,7 @@ import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { resetAll } from '@/store/store';
 import type { ThemePreference, Tone } from '@/store/types';
-import { radius, space, useTheme } from '@/theme';
+import { NIGHT_COLORS, radius, space, useTheme, type NightColor } from '@/theme';
 import { displayFont, textFont } from '@/theme/fonts';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
@@ -62,6 +63,33 @@ export default function SettingsScreen() {
       <Card style={{ gap: space.md }}>
         <Text style={styles.label}>Appearance</Text>
         <Segmented tone="accent" options={THEMES} value={s.theme} onChange={(theme) => updateSettings({ theme })} />
+        <View style={{ gap: space.sm, marginTop: space.xs }}>
+          <Text variant="small" tone="muted">
+            Night mode colour
+          </Text>
+          <View style={styles.swatches}>
+            {(Object.keys(NIGHT_COLORS) as NightColor[]).map((k) => {
+              const n = NIGHT_COLORS[k];
+              const on = s.nightColor === k;
+              return (
+                <Press
+                  key={k}
+                  onPress={() => updateSettings({ nightColor: k })}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: on }}
+                  accessibilityLabel={`${n.label} night colour`}
+                  style={{ alignItems: 'center', gap: 6 }}>
+                  <View style={[styles.swatch, { borderColor: on ? c.text : 'transparent' }]}>
+                    <GradientSwatch from={n.swatch[0]} to={n.swatch[1]} id={k} />
+                  </View>
+                  <Text variant="small" tone={on ? 'default' : 'muted'} style={{ fontSize: 12, fontWeight: on ? '600' : '400' }}>
+                    {n.label}
+                  </Text>
+                </Press>
+              );
+            })}
+          </View>
+        </View>
         <Press onPress={() => router.push('/fonts')} accessibilityRole="button" style={[styles.fontsRow, { borderTopColor: c.border }]}>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.label}>Fonts</Text>
@@ -198,6 +226,22 @@ export default function SettingsScreen() {
   );
 }
 
+function GradientSwatch({ from, to, id }: { from: string; to: string; id: string }) {
+  return (
+    <View style={styles.swatchInner}>
+      <Svg width="100%" height="100%">
+        <Defs>
+          <LinearGradient id={`sw-${id}`} x1="0" y1="0" x2="0.4" y2="1">
+            <Stop offset="0" stopColor={from} />
+            <Stop offset="1" stopColor={to} />
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height="100%" rx="12" fill={`url(#sw-${id})`} />
+      </Svg>
+    </View>
+  );
+}
+
 function Stepper({ value, min, max, step, onChange }: { value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
@@ -220,5 +264,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   radio: { width: 10, height: 10, borderRadius: 5 },
+  swatches: { flexDirection: 'row', justifyContent: 'space-between' },
+  swatch: { width: 50, height: 50, borderRadius: 16, borderWidth: 2, padding: 3 },
+  swatchInner: { flex: 1, borderRadius: 12, overflow: 'hidden' },
   fontsRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderTopWidth: 1, paddingTop: space.lg, marginTop: space.xs, minHeight: 56 },
 });

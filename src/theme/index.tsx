@@ -4,11 +4,11 @@ import { useColorScheme } from 'react-native';
 
 import { useStore } from '@/store/store';
 
-import { dark, light, type ThemeColors } from './colors';
+import { darkFor, light, type NightColor, type ThemeColors } from './colors';
 import { displayFont, faceForWeight, facesFor, textFont, type FontChoice } from './fonts';
 
-export { SWATCHES } from './colors';
-export type { ThemeColors } from './colors';
+export { NIGHT_COLORS, SWATCHES, hexAlpha } from './colors';
+export type { NightColor, ThemeColors } from './colors';
 
 /**
  * Font tokens. Put `fontFamily: SERIF` (headings) or `fontFamily: LOGO` in a
@@ -71,6 +71,7 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
   const display = useStore((s) => s.settings.displayFont);
   const text = useStore((s) => s.settings.textFont);
   const logo = useStore((s) => s.settings.logoFont);
+  const night = useStore((s) => s.settings.nightColor);
   // Fonts switch only once the new files have loaded, so text never flashes.
   const [applied, setApplied] = useState<FontChoice | null>(null);
 
@@ -88,8 +89,8 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
 
   const isDark = pref === 'system' ? system === 'dark' : pref === 'dark';
   const value = useMemo(
-    () => ({ dark: isDark, c: isDark ? dark : light, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied }),
-    [isDark, applied],
+    () => ({ dark: isDark, c: isDark ? darkFor(night as NightColor) : light, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied }),
+    [isDark, applied, night],
   );
   return <ThemeCtx.Provider value={value}>{children}</ThemeCtx.Provider>;
 }

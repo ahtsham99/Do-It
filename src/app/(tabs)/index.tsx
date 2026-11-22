@@ -14,8 +14,12 @@ import { StreakPill } from '@/features/nudges/StreakPill';
 import { useNudges } from '@/features/nudges/useNudges';
 import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { TaskList } from '@/features/tasks/TaskList';
-import { formatDay } from '@/lib/dates';
-import { useCountdowns, useHabits, useSettings } from '@/store/hooks';
+import { addDays, formatDay } from '@/lib/dates';
+import { occurrencesOn } from '@/features/tasks/logic';
+import { DayHeadline, dayHeadline } from '@/features/today/DayHeadline';
+import { StatCard } from '@/features/today/StatCard';
+import { UpNext } from '@/features/today/UpNext';
+import { useCountdowns, useHabits, useSettings, useTasks } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import { LOGO, space, useTheme } from '@/theme';
 
@@ -38,6 +42,17 @@ export default function TodayScreen() {
     (o) => !overdueIds.has(o.task.id) && !dismissed.has(`${o.task.id}:${n.today}`),
   );
   const needsAttention = !n.planned || n.overdue.length > 0;
+  const tasks = useTasks();
+  const sessions = useStore((s) => s.sessions);
+  const focusToday = sessions.filter((x) => x.mode === 'focus' && x.day === n.today && !x.deletedAt).reduce((m, x) => m + x.minutes, 0);
+  const upNext = [...n.open, ...occurrencesOn(tasks, addDays(n.today, 1)).filter((o) => !o.done)].slice(0, 2);
+  const headline = dayHeadline({
+    habitsLeft: habitsLeft.length,
+    remindersLeft: n.open.length,
+    totalToday: n.todays.length + habits.length,
+    firstHabit: habitsLeft[0]?.name,
+    firstReminder: n.open[0]?.task.title,
+  });
   const initials = (name.trim() || 'Me').slice(0, 2).toUpperCase();
   const addTask = () => router.push({ pathname: '/task', params: { date: n.today } });
   const timerIdle = useStore((s) => s.timer.status === 'idle');
@@ -134,6 +149,8 @@ export default function TodayScreen() {
           </Text>
         </View>
 
+        <DayHeadline {...headline} />
+
         {/* One quiet nudge at a time, most important first. */}
         {nudges[0]}
         {nudges.length > 1 && (
@@ -145,6 +162,17 @@ export default function TodayScreen() {
         )}
 
         <FocusNowCard />
+
+        {upNext.length > 0 && (
+          <Section title="Up next">
+            <UpNext items={upNext} />
+          </Section>
+        )}
+
+        <View style={{ flexDirection: 'row', gap: space.md - 2 }}>
+          <StatCard value={n.streak} unit="day streak" note={`Best ${n.bestStreak}`} href="/streaks" />
+          <StatCard value={focusToday} unit="min" note="Focused today" href="/focus" />
+        </View>
 
         {habits.length === 0 && (
           <Empty
