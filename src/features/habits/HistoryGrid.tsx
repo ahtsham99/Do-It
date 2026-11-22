@@ -7,7 +7,7 @@ import { useTheme } from '@/theme';
 
 /** GitHub-style grid: 16 weeks × 7 days. */
 export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit; weekStartsOn: 0 | 1; weeks?: number }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
   const today = todayKey();
   const set = new Set(habit.history);
   const first = addDays(startOfWeek(today, weekStartsOn), -(weeks - 1) * 7);
@@ -31,7 +31,7 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
               style={{
                 height: 14,
                 borderRadius: 3,
-                backgroundColor: d > today ? 'transparent' : set.has(d) ? habit.color : c.surfaceAlt,
+                backgroundColor: d > today ? 'transparent' : set.has(d) ? paint(habit.color) : c.surfaceAlt,
               }}
             />
           ))}

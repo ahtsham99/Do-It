@@ -13,7 +13,7 @@ const WEEKS = 6;
 
 /** Your streak: how many days in a row you've shown up. */
 export default function StreaksScreen() {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
   const sheetTop = useSheetTopInset();
   const n = useNudges();
   const { weekStartsOn } = useSettings();
@@ -94,7 +94,7 @@ export default function StreaksScreen() {
                 const s = habitStreak(h, n.today, weekStartsOn);
                 return (
                   <View key={h.id} style={[styles.habit, i < habits.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.border }]}>
-                    <Glyph value={h.icon} size={22} color={h.color} />
+                    <Glyph value={h.icon} size={22} color={paint(h.color)} />
                     <Text style={{ flex: 1, fontSize: 17 }} numberOfLines={1}>
                       {h.name}
                     </Text>

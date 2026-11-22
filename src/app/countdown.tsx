@@ -13,7 +13,7 @@ import { useStore } from '@/store/store';
 import { SWATCHES, radius, space, useTheme } from '@/theme';
 
 export default function CountdownEditor() {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
   const sheetTop = useSheetTopInset();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const existing = useStore((s) => s.countdowns.find((x) => x.id === id));
@@ -63,8 +63,8 @@ export default function CountdownEditor() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-          <View style={{ width: 58, height: 58, borderRadius: 29, borderWidth: 3, borderColor: color, backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
-            <Glyph value={icon} size={26} color={color} />
+          <View style={{ width: 58, height: 58, borderRadius: 29, borderWidth: 3, borderColor: paint(color), backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
+            <Glyph value={icon} size={26} color={paint(color)} />
           </View>
           <View style={{ flex: 1 }}>
             <Field placeholder="What are you counting down to?" value={title} onChangeText={setTitle} autoFocus={!existing} />
@@ -103,7 +103,7 @@ export default function CountdownEditor() {
 
         <View style={{ gap: space.sm }}>
           <Label>Icon</Label>
-          <IconPicker icons={COUNTDOWN_ICONS} value={icon} color={color} onChange={(v) => (setIcon(v), setTouchedLook(true))} />
+          <IconPicker icons={COUNTDOWN_ICONS} value={icon} color={paint(color)} onChange={(v) => (setIcon(v), setTouchedLook(true))} />
         </View>
 
         <Button label={existing ? 'Save changes' : 'Add countdown'} onPress={save} disabled={!canSave} />

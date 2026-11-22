@@ -96,14 +96,15 @@ export function darkFor(choice: NightColor): ThemeColors {
     textFaint: 'rgba(244,243,238,0.36)',
     accent: n.accent,
     accentText: n.accentText,
-    accentSoft: hexAlpha(n.accent, 0.16),
+    accentSoft: hexAlpha(n.accent, 0.22),
     ink: '#F4F3EE',
     inkText: '#050505',
     flame: '#FF8A5C',
     danger: '#FF7A66',
     dangerSoft: '#2A1210',
-    success: '#4FCB8C',
-    successSoft: '#10241A',
+    // "Done" follows the chosen night colour instead of always being green.
+    success: n.accent,
+    successSoft: hexAlpha(n.accent, 0.18),
     warning: '#F2C14E',
     warningSoft: '#2A2210',
     tabBar: 'rgba(30,30,30,0.78)',
@@ -126,3 +127,41 @@ export function hexAlpha(hex: string, a: number) {
 }
 
 export const dark = darkFor('forest');
+
+// ---------- Night-mode colour boost ----------
+
+function hexToHsl(hex: string): [number, number, number] {
+  const h = hex.replace('#', '');
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const hue = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [hue * 60, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number) {
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return '#' + [f(0), f(8), f(4)].map((x) => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
+}
+
+/** The default item colour; at night it follows the chosen night colour. */
+export const DEFAULT_ITEM_COLOR = '#2F4F40';
+
+/**
+ * Night mode: make an item colour (habit, goal, countdown) vivid enough for a
+ * black background. 'line' = rings, dots, text; 'fill' = big coloured cards.
+ */
+export function vivid(hex: string, mode: 'line' | 'fill', accent: string) {
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+  const base = hex.toLowerCase() === DEFAULT_ITEM_COLOR.toLowerCase() ? accent : hex;
+  const [h, s, l] = hexToHsl(base);
+  if (s < 0.12) return hslToHex(h, s, mode === 'line' ? Math.max(l, 0.74) : Math.min(Math.max(l, 0.28), 0.36));
+  const sat = Math.min(0.95, s * 1.8 + 0.15);
+  return hslToHex(h, sat, mode === 'line' ? 0.62 : 0.46);
+}

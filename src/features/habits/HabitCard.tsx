@@ -24,7 +24,8 @@ export function tickHabit(habit: Habit, day: string, tone: Parameters<typeof ran
 
 /** Ring with the habit's emoji; filled in the habit colour once ticked today. */
 export function HabitRing({ habit, size = 64, onPress }: { habit: Habit; size?: number; onPress?: () => void }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
+  const color = paint(habit.color);
   const done = habit.history.includes(todayKey());
   return (
     <Press
@@ -39,14 +40,14 @@ export function HabitRing({ habit, size = 64, onPress }: { habit: Habit; size?: 
         height: size,
         borderRadius: size / 2,
         borderWidth: 3,
-        borderColor: done ? habit.color : c.border,
+        borderColor: done ? color : c.border,
         backgroundColor: done ? c.accentSoft : c.surface,
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-      <Glyph value={habit.icon} size={size * 0.42} color={habit.color} />
+      <Glyph value={habit.icon} size={size * 0.42} color={color} />
       {done && (
-        <View style={[styles.badge, { backgroundColor: habit.color, borderColor: c.surface }]}>
+        <View style={[styles.badge, { backgroundColor: color, borderColor: c.surface }]}>
           <Icon name="checkmark" size={11} color="#fff" />
         </View>
       )}
@@ -55,7 +56,8 @@ export function HabitRing({ habit, size = 64, onPress }: { habit: Habit; size?: 
 }
 
 export function HabitCard({ habit }: { habit: Habit }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
+  const color = paint(habit.color);
   const { weekStartsOn, tone } = useSettings();
   const today = todayKey();
   const streak = habitStreak(habit, today, weekStartsOn);
@@ -95,8 +97,8 @@ export function HabitCard({ habit }: { habit: Habit }) {
               style={[
                 styles.day,
                 {
-                  borderColor: hit ? habit.color : d === today ? c.textMuted : c.border,
-                  backgroundColor: hit ? habit.color : 'transparent',
+                  borderColor: hit ? color : d === today ? c.textMuted : c.border,
+                  backgroundColor: hit ? color : 'transparent',
                   opacity: future ? 0.4 : 1,
                 },
               ]}>

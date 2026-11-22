@@ -14,7 +14,8 @@ const SOFT = 'rgba(255,255,255,0.72)';
 
 /** Coloured countdown card. `hero` is the large "Next up" version on Today. */
 export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
+  const fill = paint(item.color, 'fill');
   const days = daysUntil(item);
   const past = days < 0;
   const { big, small } = countdownLabel(days);
@@ -23,7 +24,7 @@ export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean 
 
   if (hero) {
     return (
-      <Press onPress={open} style={[styles.hero, { backgroundColor: item.color }, shadow]}>
+      <Press onPress={open} style={[styles.hero, { backgroundColor: fill }, shadow]}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Text variant="caption" color={SOFT} style={{ textTransform: 'uppercase' }}>
             Next up
@@ -49,7 +50,7 @@ export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean 
 
   return (
     <SwipeToDelete onDelete={() => deleteCountdownWithUndo(item)}>
-    <Press onPress={open} style={[styles.row, { backgroundColor: item.color, opacity: past ? 0.7 : 1 }, shadow]}>
+    <Press onPress={open} style={[styles.row, { backgroundColor: fill, opacity: past ? 0.7 : 1 }, shadow]}>
       <View style={styles.tile}>
         <Glyph value={item.icon} size={26} />
       </View>

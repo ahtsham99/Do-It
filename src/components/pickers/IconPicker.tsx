@@ -35,7 +35,7 @@ export function IconPicker({
 }
 
 export function ColorPicker({ colors, value, onChange }: { colors: string[]; value: string; onChange: (c: string) => void }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
   return (
     <View style={styles.grid}>
       {colors.map((col) => (
@@ -44,7 +44,7 @@ export function ColorPicker({ colors, value, onChange }: { colors: string[]; val
           onPress={() => onChange(col)}
           accessibilityLabel={`Colour ${col}`}
           style={[styles.swatch, { borderColor: col === value ? c.text : 'transparent' }]}>
-          <View style={[styles.swatchInner, { backgroundColor: col }]} />
+          <View style={[styles.swatchInner, { backgroundColor: paint(col) }]} />
         </Press>
       ))}
     </View>

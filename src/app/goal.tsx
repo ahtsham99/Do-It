@@ -27,7 +27,7 @@ function celebrate(title: string) {
  * away, so ticking a step or logging progress feels instant.
  */
 export default function GoalScreen() {
-  const { c, fonts } = useTheme();
+  const { c, fonts, paint } = useTheme();
   const sheetTop = useSheetTopInset();
   const params = useLocalSearchParams<{ id?: string; template?: string }>();
   const existing = useStore((s) => s.goals.find((g) => g.id === params.id && !g.deletedAt));
@@ -90,6 +90,7 @@ export default function GoalScreen() {
     } else apply({ current: Math.max(0, (g.current ?? 0) + delta) });
   };
 
+  const col = paint(g.color);
   const p = goalProgress(g as Goal);
   const left = daysLeftLabel(g as Goal);
   const linked = habits.filter((h) => existing && h.goalId === existing.id);
@@ -102,8 +103,8 @@ export default function GoalScreen() {
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-          <View style={[styles.icon, { borderColor: g.color, backgroundColor: hexAlpha(g.color, 0.12) }]}>
-            <Glyph value={g.icon} size={28} color={g.color} />
+          <View style={[styles.icon, { borderColor: col, backgroundColor: hexAlpha(col, 0.12) }]}>
+            <Glyph value={g.icon} size={28} color={col} />
           </View>
           <View style={{ flex: 1 }}>
             <Field placeholder="What do you want to achieve?" value={g.title} onChangeText={(title) => apply({ title })} autoFocus={!existing && !template} />
@@ -144,7 +145,7 @@ export default function GoalScreen() {
             )}
           </View>
           <View style={[styles.track, { backgroundColor: c.surfaceAlt }]}>
-            <View style={{ width: `${Math.max(p * 100, p > 0 ? 3 : 0)}%`, height: '100%', borderRadius: radius.pill, backgroundColor: g.color }} />
+            <View style={{ width: `${Math.max(p * 100, p > 0 ? 3 : 0)}%`, height: '100%', borderRadius: radius.pill, backgroundColor: col }} />
           </View>
 
           {g.kind === 'steps' ? (
@@ -156,7 +157,7 @@ export default function GoalScreen() {
               )}
               {g.steps.map((s, i) => (
                 <View key={s.id} style={[styles.step, i < g.steps.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.border }]}>
-                  <Checkbox checked={!!s.doneAt} onToggle={() => tick(s)} color={g.color} label={`Complete ${s.title}`} />
+                  <Checkbox checked={!!s.doneAt} onToggle={() => tick(s)} color={col} label={`Complete ${s.title}`} />
                   <Text style={[{ flex: 1 }, !!s.doneAt && { textDecorationLine: 'line-through' }]} tone={s.doneAt ? 'faint' : 'default'}>
                     {s.title}
                   </Text>
@@ -285,7 +286,7 @@ export default function GoalScreen() {
         </View>
         <View style={{ gap: space.sm }}>
           <Label>Icon</Label>
-          <IconPicker icons={GOAL_ICONS} value={g.icon} color={g.color} onChange={(icon) => apply({ icon })} />
+          <IconPicker icons={GOAL_ICONS} value={g.icon} color={col} onChange={(icon) => apply({ icon })} />
         </View>
 
         {!existing && <Button label="Set this goal" icon="flag-outline" onPress={save} disabled={!canSave} />}

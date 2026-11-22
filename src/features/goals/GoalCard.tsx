@@ -9,7 +9,8 @@ import { SERIF, hexAlpha, radius, space, useTheme } from '@/theme';
 import { daysLeftLabel, goalProgress, goalStatus } from './logic';
 
 export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
+  const color = paint(goal.color);
   const p = goalProgress(goal);
   const pct = Math.round(p * 100);
   const left = daysLeftLabel(goal);
@@ -19,8 +20,8 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
     <Press haptic={false} onPress={() => router.push({ pathname: '/goal', params: { id: goal.id } })}>
       <Card style={{ gap: space.md, padding: compact ? space.lg : space.xl - 4, opacity: done ? 0.75 : 1 }}>
         <View style={styles.top}>
-          <View style={[styles.tile, { backgroundColor: hexAlpha(goal.color, 0.16), borderColor: hexAlpha(goal.color, 0.5) }]}>
-            <Glyph value={goal.icon} size={compact ? 20 : 24} color={goal.color} />
+          <View style={[styles.tile, { backgroundColor: hexAlpha(color, 0.16), borderColor: hexAlpha(color, 0.5) }]}>
+            <Glyph value={goal.icon} size={compact ? 20 : 24} color={color} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={{ fontSize: compact ? 17 : 19, fontWeight: '500' }} numberOfLines={2}>
@@ -40,7 +41,7 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
           </View>
         </View>
         <View style={[styles.track, { backgroundColor: c.surfaceAlt }]}>
-          <View style={{ width: `${Math.max(pct, p > 0 ? 3 : 0)}%`, height: '100%', borderRadius: radius.pill, backgroundColor: done ? c.success : goal.color }} />
+          <View style={{ width: `${Math.max(pct, p > 0 ? 3 : 0)}%`, height: '100%', borderRadius: radius.pill, backgroundColor: done ? c.success : color }} />
         </View>
         {!compact && (left || goal.why) ? (
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space.md }}>

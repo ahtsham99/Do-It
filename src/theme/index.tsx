@@ -4,10 +4,10 @@ import { useColorScheme } from 'react-native';
 
 import { useStore } from '@/store/store';
 
-import { darkFor, light, type NightColor, type ThemeColors } from './colors';
+import { darkFor, light, vivid, type NightColor, type ThemeColors } from './colors';
 import { displayFont, faceForWeight, facesFor, textFont, type FontChoice } from './fonts';
 
-export { NIGHT_COLORS, SWATCHES, hexAlpha } from './colors';
+export { DEFAULT_ITEM_COLOR, NIGHT_COLORS, SWATCHES, hexAlpha } from './colors';
 export type { NightColor, ThemeColors } from './colors';
 
 /**
@@ -48,6 +48,8 @@ export interface ResolvedFonts {
 interface Theme {
   dark: boolean;
   c: ThemeColors;
+  /** An item colour as it should appear now (brighter at night). */
+  paint: (color: string, mode?: 'line' | 'fill') => string;
   fonts: ResolvedFonts;
   fontsReady: boolean;
 }
@@ -62,7 +64,7 @@ const resolve = (choice: FontChoice): ResolvedFonts => {
 };
 
 const SYSTEM: ResolvedFonts = { text: () => undefined };
-const ThemeCtx = createContext<Theme>({ dark: false, c: light, fonts: SYSTEM, fontsReady: false });
+const ThemeCtx = createContext<Theme>({ dark: false, c: light, paint: (x) => x, fonts: SYSTEM, fontsReady: false });
 
 export function AppThemeProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme();
@@ -89,7 +91,11 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
 
   const isDark = pref === 'system' ? system === 'dark' : pref === 'dark';
   const value = useMemo(
-    () => ({ dark: isDark, c: isDark ? darkFor(night as NightColor) : light, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied }),
+    () => {
+      const c = isDark ? darkFor(night as NightColor) : light;
+      const paint = isDark ? (color: string, mode: 'line' | 'fill' = 'line') => vivid(color, mode, c.accent) : (color: string) => color;
+      return { dark: isDark, c, paint, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied };
+    },
     [isDark, applied, night],
   );
   // Web: paint the page behind the app (e.g. under Safari's bars) the same colour,
