@@ -4,16 +4,19 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Banner, Empty, Fab, Icon, Press, Screen, Section, Text } from '@/components/ui';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
+import { FocusNowCard } from '@/features/focus/FocusNowCard';
 import { HabitRing, tickHabit } from '@/features/habits/HabitCard';
 import { habitStreak, isDueToday } from '@/features/habits/logic';
 import { greeting, pick } from '@/features/nudges/messages';
 import { ProgressCard } from '@/features/nudges/ProgressCard';
+import { ReminderCard } from '@/features/nudges/ReminderCard';
 import { StreakPill } from '@/features/nudges/StreakPill';
 import { useNudges } from '@/features/nudges/useNudges';
 import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { TaskList } from '@/features/tasks/TaskList';
-import { formatDay, formatTime } from '@/lib/dates';
+import { formatDay } from '@/lib/dates';
 import { useCountdowns, useHabits, useSettings } from '@/store/hooks';
+import { useStore } from '@/store/store';
 import { space, useTheme } from '@/theme';
 
 // Dismissed reminder banners, remembered until the app reloads.
@@ -22,7 +25,7 @@ const dismissed = new Set<string>();
 export default function TodayScreen() {
   const { c } = useTheme();
   const n = useNudges();
-  const { tone, name, use24h, weekStartsOn } = useSettings();
+  const { tone, name, weekStartsOn } = useSettings();
   const habits = useHabits();
   const countdowns = useCountdowns();
   const [, force] = useState(0);
@@ -37,19 +40,16 @@ export default function TodayScreen() {
   const needsAttention = !n.planned || n.overdue.length > 0;
   const initials = (name.trim() || 'Me').slice(0, 2).toUpperCase();
   const addTask = () => router.push({ pathname: '/task', params: { date: n.today } });
+  const timerIdle = useStore((s) => s.timer.status === 'idle');
 
   const plural = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
   const nudges: React.ReactNode[] = [];
   // On web this card is the reminder; on native it backs up the notification.
   for (const o of reminders) {
     nudges.push(
-      <Banner
+      <ReminderCard
         key={o.task.id}
-        kind="warning"
-        icon="notifications-outline"
-        title={o.task.title}
-        body={`${pick('reminder', tone, o.task.id)} ${o.task.time ? `planned for ${formatTime(o.task.time, use24h)}` : 'planned for today'}.`}
-        onPress={() => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } })}
+        occ={o}
         onDismiss={() => {
           dismissed.add(`${o.task.id}:${n.today}`);
           force((x) => x + 1);
@@ -117,8 +117,8 @@ export default function TodayScreen() {
             </Press>
             <StreakPill streak={n.streak} activeToday={n.activeToday} />
             <Press
-              onPress={() => router.push('/profile')}
-              accessibilityLabel="Profile"
+              onPress={() => router.push('/settings')}
+              accessibilityLabel="Settings and profile"
               style={[styles.avatar, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
               <Text variant="small" tone="muted" style={{ fontWeight: '500', letterSpacing: 0.5 }}>
                 {initials}
@@ -144,7 +144,17 @@ export default function TodayScreen() {
           </Press>
         )}
 
-        {next && <CountdownCard item={next} hero />}
+        <FocusNowCard />
+
+        {habits.length === 0 && (
+          <Empty
+            icon="flame-outline"
+            title="Start one small habit"
+            body="Something you can do in two minutes, every day. Small steps add up."
+            action="Add a habit"
+            onAction={() => router.push('/habit')}
+          />
+        )}
 
         {habits.length > 0 && (
           <Section
@@ -178,10 +188,10 @@ export default function TodayScreen() {
         <Section title="Today">
           {n.todays.length === 0 ? (
             <Empty
-              icon="sunny-outline"
-              title="Today is clear"
-              body="Nothing is waiting on you. Add a task when the day asks for one."
-              action="Add a task"
+              icon="alarm-outline"
+              title="Nothing to remember today"
+              body="Add anything you might forget. We’ll remind you at the right moment."
+              action="Add a reminder"
               onAction={addTask}
             />
           ) : (
@@ -191,6 +201,13 @@ export default function TodayScreen() {
             </>
           )}
           <QuickAdd date={n.today} />
+          {n.open.length > 0 && timerIdle && (
+            <Press onPress={() => router.push('/focus')} style={{ alignSelf: 'center', padding: space.sm }}>
+              <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
+                Putting something off? Focus on it for 5 minutes
+              </Text>
+            </Press>
+          )}
           {n.todays.length === 0 && (
             <Press onPress={() => router.push('/suggestions')} style={{ alignSelf: 'center', padding: space.sm }}>
               <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
@@ -199,8 +216,10 @@ export default function TodayScreen() {
             </Press>
           )}
         </Section>
+
+        {next && <CountdownCard item={next} hero />}
       </Screen>
-      <Fab label="Add task" onPress={addTask} />
+      <Fab label="Add reminder" onPress={addTask} />
     </View>
   );
 }

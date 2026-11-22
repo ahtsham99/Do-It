@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Platform, StyleSheet, View } from 'react-native';
 
 import { DateTimeField } from '@/components/pickers';
-import { Button, Card, Icon, ListRow, Press, Screen, Segmented, Text, Toggle, showDialog, showToast } from '@/components/ui';
+import { Button, Card, Icon, IconButton, ListRow, Press, Screen, Segmented, Text, Toggle, showDialog, showToast } from '@/components/ui';
 import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
@@ -37,7 +37,10 @@ export default function SettingsScreen() {
   };
 
   return (
-    <Screen title="Settings" subtitle="Just enough, nothing more.">
+    <Screen
+      title="Settings"
+      subtitle="Just enough, nothing more."
+      right={<IconButton icon="close" label="Close settings" size={20} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />}>
       <Press onPress={() => router.push('/profile')} accessibilityLabel="Profile">
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
           <View style={[styles.avatar, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
@@ -94,7 +97,7 @@ export default function SettingsScreen() {
           label="Notifications"
           detail={
             supportsLocalNotifications
-              ? 'Morning prompt, evening check-in and task reminders'
+              ? 'Morning prompt, evening check-in, reminders and focus timer'
               : 'In the web app, nudges show as banners on Today. Push notifications come with the native app.'
           }
           right={supportsLocalNotifications ? <Toggle value={s.notificationsEnabled} onValueChange={toggleNotifications} /> : undefined}
@@ -108,6 +111,18 @@ export default function SettingsScreen() {
           detail="When we check in on what’s left"
           last
           right={<DateTimeField mode="time" value={s.eveningCheckTime} onChange={(eveningCheckTime) => updateSettings({ eveningCheckTime })} use24h={s.use24h} />}
+        />
+      </Card>
+
+      <Card padded={false} style={styles.group}>
+        <ListRow
+          label="Focus length"
+          right={<Stepper value={s.focusMinutes} min={5} max={120} step={5} onChange={(focusMinutes) => updateSettings({ focusMinutes })} />}
+        />
+        <ListRow
+          label="Break length"
+          last
+          right={<Stepper value={s.breakMinutes} min={1} max={30} step={1} onChange={(breakMinutes) => updateSettings({ breakMinutes })} />}
         />
       </Card>
 
@@ -159,7 +174,7 @@ export default function SettingsScreen() {
           onPress={() =>
             showDialog({
               title: 'Erase everything?',
-              message: 'All tasks, habits, countdowns and streaks will be deleted. This can’t be undone.',
+              message: 'All reminders, habits, countdowns, focus history and streaks will be deleted. This can’t be undone.',
               actions: [{ label: 'Erase all data', destructive: true, onPress: () => resetAll() }],
             })
           }
@@ -170,6 +185,16 @@ export default function SettingsScreen() {
         Do It · v1.0
       </Text>
     </Screen>
+  );
+}
+
+function Stepper({ value, min, max, step, onChange }: { value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+      <IconButton icon="remove" label="Less" size={16} diameter={34} onPress={() => onChange(Math.max(min, value - step))} />
+      <Text style={{ minWidth: 52, textAlign: 'center' }}>{value} min</Text>
+      <IconButton icon="add" label="More" size={16} diameter={34} onPress={() => onChange(Math.min(max, value + step))} />
+    </View>
   );
 }
 

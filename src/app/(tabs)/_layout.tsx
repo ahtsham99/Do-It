@@ -16,6 +16,8 @@ export default function TabLayout() {
       {Object.entries(TAB_META).map(([name, meta]) => (
         <Tabs.Screen key={name} name={name} options={{ title: meta.title }} />
       ))}
+      {/* Not in the tab bar; opened from your avatar on Today. */}
+      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>
   );
 }

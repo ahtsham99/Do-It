@@ -36,10 +36,16 @@ export function useNudges(): NudgeState {
     const todays = occurrencesOn(tasks, today);
     const open = todays.filter((o) => !o.done);
     const late = overdue(tasks, today, time);
+    const nowMs = now.getTime();
     const dueReminders = open.filter((o) => {
+      if (isDone(o.task, today)) return false;
+      const snooze = o.task.snoozedUntil;
+      // Snoozed: hidden until the snooze ends, then it comes back even without a reminder set.
+      if (snooze && snooze > nowMs) return false;
+      if (snooze && toKey(new Date(snooze)) === today) return true;
       if (o.task.reminder == null) return false;
       const at = combine(today, o.task.time ?? '09:00').getTime() - o.task.reminder * 60_000;
-      return at <= now.getTime() && !isDone(o.task, today);
+      return at <= nowMs;
     });
     const activeToday = stats.activeDays.includes(today);
     const streak = currentStreak(stats.activeDays, today);

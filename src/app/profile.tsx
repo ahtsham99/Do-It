@@ -37,7 +37,7 @@ export default function ProfileScreen() {
         </View>
 
         <View style={{ flexDirection: 'row', gap: space.md }}>
-          <Stat label="Tasks done" value={tasksDone} />
+          <Stat label="Reminders done" value={tasksDone} />
           <Stat label="Habit check-ins" value={checkIns} />
           <Stat label="Day streak" value={n.streak} />
         </View>
@@ -52,12 +52,12 @@ export default function ProfileScreen() {
             ))}
           </View>
           <Text variant="small" tone="muted">
-            Only used to suggest tasks and habits. The app works the same for everyone.
+            Only used to suggest habits and reminders. The app works the same for everyone.
           </Text>
         </View>
 
         <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
-          <ListRow label="Suggested tasks and habits" onPress={() => router.push('/suggestions')} />
+          <ListRow label="Suggested habits and reminders" onPress={() => router.push('/suggestions')} />
           <ListRow label="Your streak" last onPress={() => router.push('/streaks')} />
         </Card>
       </ScrollView>

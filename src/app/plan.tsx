@@ -111,7 +111,7 @@ function Leftover({ occ }: { occ: Occurrence }) {
       <Press
         onPress={() => (task.repeat === 'none' ? deleteTask(task.id) : skipOccurrence(task, day))}
         style={[styles.act, { backgroundColor: c.surfaceAlt }]}
-        accessibilityLabel="Drop task">
+        accessibilityLabel="Drop reminder">
         <Icon name="trash-outline" size={16} color={c.textMuted} />
       </Press>
     </View>

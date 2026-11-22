@@ -74,12 +74,12 @@ export default function PlannerScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Screen
-        title="Planner"
+        title="Reminders"
         subtitle={`${openCount} open · ${doneCount} done`}
         right={
           <>
             {day !== today && view !== 'list' && <Button small kind="secondary" label="Today" onPress={() => setDay(today)} style={{ height: 46 }} />}
-            <IconButton icon="add" label="Add task" onPress={add} />
+            <IconButton icon="add" label="Add reminder" onPress={add} />
           </>
         }>
         <Segmented options={VIEWS} value={view} onChange={setView} />
@@ -100,7 +100,7 @@ export default function PlannerScreen() {
           <>
             <MonthGrid month={day} selected={day} onSelect={setDay} tasks={tasks} weekStartsOn={weekStartsOn} />
             <Section title={formatDay(day)}>
-              <TaskList items={occurrencesOn(tasks, day)} emptyText="Nothing planned. Tap + to add." />
+              <TaskList items={occurrencesOn(tasks, day)} emptyText="Nothing planned for this day." />
             </Section>
           </>
         )}
@@ -118,7 +118,7 @@ function DayView({ day, setDay, weekStartsOn }: { day: DayKey; setDay: (d: DayKe
     <>
       <WeekStrip selected={day} onSelect={setDay} tasks={tasks} weekStartsOn={weekStartsOn} />
       <Section title={items.length ? `${open} to do · ${items.length - open} done` : undefined}>
-        <TaskList items={items} emptyText="A blank page. Tap + and give this day a purpose." />
+        <TaskList items={items} emptyText="Nothing planned for this day." />
       </Section>
     </>
   );
@@ -132,7 +132,7 @@ function WeekView({ start, onAdd }: { start: DayKey; onAdd: (d: DayKey) => void 
         <Section
           key={d}
           title={formatDay(d)}
-          right={<IconButton icon="add" label={`Add task on ${formatDay(d)}`} size={16} diameter={32} onPress={() => onAdd(d)} />}>
+          right={<IconButton icon="add" label={`Add reminder on ${formatDay(d)}`} size={16} diameter={32} onPress={() => onAdd(d)} />}>
           <TaskList items={occurrencesOn(tasks, d)} emptyText="—" />
         </Section>
       ))}
@@ -175,9 +175,9 @@ function ListView({ onAdd }: { onAdd: () => void }) {
       {groups.byDay.length === 0 && groups.late.length === 0 && (
         <Empty
           icon="list-outline"
-          title="Today is clear"
-          body="Nothing is waiting on you. Add a task when the day asks for one."
-          action="Add a task"
+          title="Nothing to remember"
+          body="Add anything you don’t want to forget. We’ll remind you at the right moment."
+          action="Add a reminder"
           onAction={onAdd}
         />
       )}

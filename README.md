@@ -1,8 +1,9 @@
-# Do It — the planner that won't let you quit
+# Do It — habits, reminders and focus for people who forget and put things off
 
-A planner, habit tracker and countdown app for people who start things and
-don't finish them, or forget them. It nags you like Duolingo, and it looks
-calm and minimal while doing it: warm paper background, deep green accent,
+A calm habit planner and reminder app for people who tend to forget things
+and procrastinate, and want to do better. Small daily habits, reminders you
+can snooze instead of ignore, a focus timer for when starting is the hard
+part, and countdowns to the days that matter. The look is quiet and premium: warm paper background, deep green accent,
 serif headings (Instrument Serif) and a floating frosted-glass tab bar.
 
 One codebase (Expo SDK 58, React Native, TypeScript, Expo Router) for
@@ -66,14 +67,16 @@ rewrites and the caching headers. You don't need to configure anything by hand.
 
 | Area | What it does |
 | --- | --- |
-| **Today** | Greeting, streak flame, progress, today's tasks, quick add, habits, upcoming countdowns, and big nudge banners |
-| **Planner** | Tasks with date, optional time, reminder and repeat (daily / weekdays / weekly / monthly). One-tap **Day · Week · Month · List** views |
-| **Nudges** | Daily "Plan your day" ritual and one quiet nudge card at a time on Today (reminder, plan, waiting tasks, unfinished, habits, streak), completion toasts, and Gentle / Firm / Relentless strength, all in calm, encouraging language. Native: local notifications (morning prompt, evening check-in, task reminders). Web: in-app banners instead |
-| **Countdowns** | Events grouped by category; "days left" / "days ago"; icon + colour per event |
-| **Habits** | Daily or N-times-per-week habits, big tick, streaks, last-7-days dots (tap to backfill), 16-week history grid |
-| **Onboarding** | Asks who you are (student / professional / athlete / other) **only** to suggest habits and tasks |
-| **Streak & Profile** | Dedicated screens: streak count, best, six-week calendar and habit streaks; profile with name, who you are and totals |
-| **Settings** | Profile link, nudge strength, notification times, light/dark/auto, week start, 24h clock, erase data |
+| **Today** | Greeting, streak, one reminder or nudge at a time, the live focus timer, habit rings, today's reminders, quick add, next countdown |
+| **Habits** | Daily or N-times-per-week habits, emoji ring to tick, streaks, week circles (tap to backfill), consistency chart, history |
+| **Reminders** | Anything to remember, with date, optional time, reminder and repeat (daily / weekdays / weekly / monthly). **List · Day · Week · Month** views. A timed reminder pings you at that time by default |
+| **Due reminders** | Card on Today with **Done**, **Later** (15 min / 1 hour / 3 hours / tomorrow) and **Focus** (start a 5-minute session on it). Native: notification, also for snoozes. Web: the card is the reminder |
+| **Focus timer** | Countdown timer with a ring: 5 ("just start") / 15 / 25 / 45 min or custom, pick what you're working on, pause, +5 min, end early. Keeps running when the app is closed. When it ends: chime/haptic, then break or keep going; a linked habit is ticked and the session counts toward your streak. Today / week stats and recent sessions |
+| **Countdowns** | Events grouped by category; "days left" / "days ago"; emoji icon + colour; Future / Past; search |
+| **Nudges** | Daily "Plan your day" ritual, completion toasts, Gentle / Firm / Relentless strength in calm language. Native: morning prompt, evening check-in, reminders and timer end |
+| **Streak & Profile** | Streak count, best, six-week calendar and habit streaks; profile with name, who you are and totals |
+| **Onboarding** | Asks who you are (student / professional / athlete / other) **only** to suggest habits and reminders |
+| **Settings** | Opened from your initials on Today. Profile, nudge strength, notification times, focus and break length, light/dark/auto, week start, 24h clock, erase data |
 
 ## Project structure
 
@@ -81,10 +84,10 @@ rewrites and the caching headers. You don't need to configure anything by hand.
 src/
   app/                      Expo Router routes (screens only)
     _layout.tsx             root: hydrate store, theme, stack, dialogs/toasts, notification sync
-    (tabs)/                 Today · Tasks (Planner) · Habits · Countdowns · Settings
+    (tabs)/                 Today · Habits · Reminders (planner.tsx) · Focus · Countdowns  (+ settings, hidden from the bar)
     task.tsx habit.tsx countdown.tsx plan.tsx suggestions.tsx streaks.tsx profile.tsx onboarding.tsx   (modals/flows)
   features/                 domain logic + feature components
-    tasks/ habits/ countdowns/ nudges/ onboarding/
+    tasks/ habits/ countdowns/ focus/ nudges/ onboarding/
   store/
     types.ts                data model (every record has id/createdAt/updatedAt/deletedAt)
     store.ts                tiny local-first store, one storage key per slice, schema version + migrate()
@@ -121,7 +124,9 @@ development build (they aren't all in Expo Go).
 
 ## Manual test checklist
 - First launch → onboarding → pick a persona → starter kit gets added.
-- Today: add a task with quick add, tick it (toast), see the streak flame light up.
+- Today: add a reminder with quick add, tick it (toast), see the streak flame light up.
+- Reminder with a time → when due, a card on Today: try **Later → In 15 minutes** (card hides, comes back), **Done**, **Focus**.
+- Focus: pick 5 min and a habit, start, leave the app, come back after it ends → "Session complete", the habit is ticked.
 - Planner: switch Day/Week/Month/List, create a repeating task, delete one occurrence.
 - Make a task for yesterday → "still waiting" card on Today → **Review** → Move to today.
 - Tap the streak pill → Streak screen; tap your initials → Profile.

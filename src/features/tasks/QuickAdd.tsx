@@ -7,7 +7,7 @@ import { addTask } from '@/store/actions/tasks';
 import { font, radius, space, useTheme } from '@/theme';
 
 /** One-line task entry: type, hit return, done. */
-export function QuickAdd({ date, placeholder = 'Add a task for today…' }: { date: DayKey; placeholder?: string }) {
+export function QuickAdd({ date, placeholder = 'Add something to remember today…' }: { date: DayKey; placeholder?: string }) {
   const { c } = useTheme();
   const [title, setTitle] = useState('');
   const submit = () => {

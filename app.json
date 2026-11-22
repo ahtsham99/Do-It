@@ -25,9 +25,9 @@
       "output": "single",
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png",
-      "name": "Do It — Planner",
+      "name": "Do It — Habits & Reminders",
       "shortName": "Do It",
-      "description": "The planner that won't let you quit.",
+      "description": "Habits, reminders and a focus timer for people who forget and put things off.",
       "themeColor": "#14120F",
       "backgroundColor": "#14120F"
     },

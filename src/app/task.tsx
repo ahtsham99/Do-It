@@ -67,13 +67,13 @@ export default function TaskEditor() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={{ paddingTop: Platform.OS === 'web' ? insets.top : 0 }}>
-        <SheetHeader title={existing ? 'Edit task' : 'New task'} onSave={save} canSave={canSave} />
+        <SheetHeader title={existing ? 'Edit reminder' : 'New reminder'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <Field
-          placeholder="What needs doing?"
+          placeholder="What do you want to remember?"
           value={title}
           onChangeText={setTitle}
           autoFocus={!existing}
@@ -96,7 +96,14 @@ export default function TaskEditor() {
             <Row label="Time">
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
                 {time && <DateTimeField mode="time" value={time} onChange={setTime} use24h={use24h} />}
-                <Toggle value={time != null} onValueChange={(v) => setTime(v ? '09:00' : null)} />
+                <Toggle
+                  value={time != null}
+                  onValueChange={(v) => {
+                    setTime(v ? '09:00' : null);
+                    // Forgetful by default: a timed reminder pings you at that time.
+                    if (v && reminder == null && !existing) setReminder(0);
+                  }}
+                />
               </View>
             </Row>
           </Card>
@@ -138,8 +145,19 @@ export default function TaskEditor() {
 
         <Field label="Notes" placeholder="Details, links, sub-steps…" value={notes} onChangeText={setNotes} multiline />
 
-        <Button label={existing ? 'Save changes' : 'Add task'} onPress={save} disabled={!canSave} />
-        {existing && <Button kind="danger" icon="trash-outline" label="Delete task" onPress={remove} />}
+        <Button label={existing ? 'Save changes' : 'Add reminder'} onPress={save} disabled={!canSave} />
+        {existing && (
+          <Button
+            kind="secondary"
+            icon="timer-outline"
+            label="Focus on this for 5 minutes"
+            onPress={() => {
+              close();
+              router.push({ pathname: '/focus', params: { taskId: existing.id } });
+            }}
+          />
+        )}
+        {existing && <Button kind="danger" icon="trash-outline" label="Delete" onPress={remove} />}
       </ScrollView>
     </KeyboardAvoidingView>
   );

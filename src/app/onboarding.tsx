@@ -66,10 +66,10 @@ export default function Onboarding() {
             <Icon name="checkmark" size={44} color="#fff" />
           </View>
           <Text style={{ fontFamily: SERIF, fontSize: 56, letterSpacing: -1, lineHeight: 58 }}>
-            Start it.{'\n'}Finish it.
+            Remember it.{'\n'}Start it.
           </Text>
           <Text variant="body" tone="muted" style={{ fontSize: 18, lineHeight: 26 }}>
-            A calm place for your tasks, habits and the days you’re counting down to. It will keep you company until things are done.
+            A calm habit planner for people who forget things and put things off. Small daily habits, gentle reminders, and a focus timer for when starting is the hard part.
           </Text>
         </View>
       );
@@ -86,7 +86,7 @@ export default function Onboarding() {
       canNext = !!persona;
       body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="Who are you?" sub="We’ll suggest tasks and habits that fit. Everything else stays the same." />
+          <Heading title="Who are you?" sub="We’ll suggest habits and reminders that fit. Everything else stays the same." />
           <View style={{ gap: space.sm }}>
             {PERSONAS.map((p) => {
               const sel = persona === p.value;
@@ -118,7 +118,7 @@ export default function Onboarding() {
       cta = selected.size ? `Add ${selected.size} & continue` : 'Skip for now';
       body = persona && (
         <View style={{ gap: space.lg }}>
-          <Heading title="A starter kit" sub="Pick a few. Start small; you can add more any time." />
+          <Heading title="A starter kit" sub="Pick one or two habits. Start small; you can add more any time." />
           <SuggestionPicker
             items={SUGGESTIONS[persona]}
             selected={selected}

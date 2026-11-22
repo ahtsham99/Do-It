@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DialogHost, ToastHost } from '@/components/ui';
+import { TimerWatcher } from '@/features/focus/TimerWatcher';
 import { NotificationSync } from '@/features/nudges/NotificationSync';
 import { hydrate, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme';
@@ -62,6 +63,7 @@ function Navigator() {
         <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
       </Stack>
       <NotificationSync />
+      <TimerWatcher />
       <ToastHost />
       <DialogHost />
     </ThemeProvider>

@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 
 import { storage } from '@/lib/storage';
 
-import { DEFAULT_SETTINGS, DEFAULT_STATS, type AppState } from './types';
+import { DEFAULT_SETTINGS, DEFAULT_STATS, DEFAULT_TIMER, type AppState } from './types';
 
 /**
  * Tiny local-first store. State lives in memory, every slice is persisted to
@@ -10,18 +10,24 @@ import { DEFAULT_SETTINGS, DEFAULT_STATS, type AppState } from './types';
  * write through the action modules in `src/store/actions/*`.
  */
 
-const SCHEMA_VERSION = 1;
-type Slice = 'tasks' | 'habits' | 'countdowns' | 'settings' | 'stats';
-const SLICES: Slice[] = ['tasks', 'habits', 'countdowns', 'settings', 'stats'];
+const SCHEMA_VERSION = 2;
+type Slice = Exclude<keyof AppState, 'hydrated'>;
+const SLICES: Slice[] = ['tasks', 'habits', 'countdowns', 'settings', 'stats', 'timer', 'sessions'];
 
-let state: AppState = {
-  hydrated: false,
-  tasks: [],
-  habits: [],
-  countdowns: [],
-  settings: DEFAULT_SETTINGS,
-  stats: DEFAULT_STATS,
-};
+function initialState(hydrated: boolean): AppState {
+  return {
+    hydrated,
+    tasks: [],
+    habits: [],
+    countdowns: [],
+    settings: DEFAULT_SETTINGS,
+    stats: DEFAULT_STATS,
+    timer: DEFAULT_TIMER,
+    sessions: [],
+  };
+}
+
+let state: AppState = initialState(false);
 
 const listeners = new Set<() => void>();
 const dirty = new Set<Slice>();
@@ -40,7 +46,7 @@ export function setState(updater: (s: AppState) => Partial<AppState>) {
   const patch = updater(state);
   state = { ...state, ...patch };
   for (const key of Object.keys(patch) as (keyof AppState)[]) {
-    if (key !== 'hydrated') dirty.add(key as Slice);
+    if (key !== 'hydrated') dirty.add(key);
   }
   listeners.forEach((l) => l());
   scheduleFlush();
@@ -62,42 +68,40 @@ export async function flush() {
 export async function hydrate() {
   if (state.hydrated) return;
   const version = await storage.read<number>('schemaVersion', SCHEMA_VERSION);
-  const [tasks, habits, countdowns, settings, stats] = await Promise.all([
-    storage.read('tasks', state.tasks),
-    storage.read('habits', state.habits),
-    storage.read('countdowns', state.countdowns),
-    storage.read('settings', state.settings),
-    storage.read('stats', state.stats),
+  const base = initialState(true);
+  const [tasks, habits, countdowns, settings, stats, timer, sessions] = await Promise.all([
+    storage.read('tasks', base.tasks),
+    storage.read('habits', base.habits),
+    storage.read('countdowns', base.countdowns),
+    storage.read('settings', base.settings),
+    storage.read('stats', base.stats),
+    storage.read('timer', base.timer),
+    storage.read('sessions', base.sessions),
   ]);
   state = migrate(version, {
     hydrated: true,
     tasks,
     habits,
     countdowns,
-    // Merge with defaults so newly added settings get sensible values.
+    // Merge with defaults so newly added fields get sensible values.
     settings: { ...DEFAULT_SETTINGS, ...settings },
     stats: { ...DEFAULT_STATS, ...stats },
+    timer: { ...DEFAULT_TIMER, ...timer },
+    sessions,
   });
   await storage.write('schemaVersion', SCHEMA_VERSION);
   listeners.forEach((l) => l());
 }
 
-/** Hook for future data shape changes. */
+/** Hook for future data shape changes. v1 → v2 only added slices with defaults. */
 function migrate(_from: number, s: AppState): AppState {
   return s;
 }
 
-/** Danger zone: wipe everything (used by Settings → Reset). */
+/** Danger zone: wipe everything (used by Settings → Erase everything). */
 export async function resetAll() {
   await Promise.all(SLICES.map((s) => storage.remove(s)));
-  state = {
-    hydrated: true,
-    tasks: [],
-    habits: [],
-    countdowns: [],
-    settings: DEFAULT_SETTINGS,
-    stats: DEFAULT_STATS,
-  };
+  state = initialState(true);
   listeners.forEach((l) => l());
 }
 

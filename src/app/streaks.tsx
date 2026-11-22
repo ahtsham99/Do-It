@@ -25,8 +25,8 @@ export default function StreaksScreen() {
   const line = n.activeToday
     ? 'You showed up today. Come back tomorrow to keep it going.'
     : n.streak > 0
-      ? 'One task, one habit, or planning your day keeps it going today.'
-      : 'Plan your day, tick a habit or finish one task to begin a streak.';
+      ? 'One reminder, one habit or one focus session keeps it going today.'
+      : 'Plan your day, tick a habit or finish one reminder to begin a streak.';
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>

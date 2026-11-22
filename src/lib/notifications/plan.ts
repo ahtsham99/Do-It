@@ -11,7 +11,7 @@ export interface PlannedNotification {
   url?: string;
 }
 
-const MAX = 60; // iOS keeps at most 64 pending local notifications.
+const MAX = 60; // timer and snoozes are added first so they always fit // iOS keeps at most 64 pending local notifications.
 
 /**
  * Pure function: decides which local notifications should exist for the next
@@ -55,6 +55,34 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
     }
   }
 
+  // The focus timer, if one is running.
+  const { timer } = state;
+  if (timer.status === 'running' && timer.endsAt && timer.endsAt > now.getTime()) {
+    out.push({
+      id: 'timer',
+      date: new Date(timer.endsAt),
+      title: timer.mode === 'focus' ? 'Focus session complete' : 'Break’s over',
+      body:
+        timer.mode === 'focus'
+          ? `${timer.label ? `${timer.label}: ` : ''}nicely done. Take a short break, or keep going.`
+          : 'Ready for another round?',
+      url: '/focus',
+    });
+  }
+
+  // Snoozed reminders.
+  for (const task of tasks) {
+    if (task.snoozedUntil && task.snoozedUntil > now.getTime()) {
+      out.push({
+        id: `snooze-${task.id}`,
+        date: new Date(task.snoozedUntil),
+        title: task.title,
+        body: `${pick('reminder', settings.tone, task.id)} you asked to be reminded again.`,
+        url: `/task?id=${task.id}`,
+      });
+    }
+  }
+
   // Task reminders over the next 14 days.
   for (let i = 0; i < 14 && out.length < MAX; i++) {
     const day = addDays(today, i);
@@ -62,12 +90,13 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
       if (task.reminder == null || !occursOn(task, day) || isDone(task, day)) continue;
       const at = new Date(combine(day, task.time ?? '09:00').getTime() - task.reminder * 60_000);
       if (at <= now) continue;
+      if (task.snoozedUntil && i === 0 && task.snoozedUntil > now.getTime()) continue;
       out.push({
         id: `task-${task.id}-${day}`,
         date: at,
         title: task.title,
         body: task.time
-          ? `${task.reminder === 0 ? 'Now' : `At ${formatTime(task.time, settings.use24h)}`} · ${pick('reminder', settings.tone, task.id)} don’t let this slide.`
+          ? `${task.reminder === 0 ? 'Now' : `At ${formatTime(task.time, settings.use24h)}`} · ${pick('reminder', settings.tone, task.id)} worth doing now.`
           : `${pick('reminder', settings.tone, task.id)} this is on today’s list.`,
         url: `/task?id=${task.id}&day=${day}`,
       });

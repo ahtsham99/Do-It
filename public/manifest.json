@@ -1,7 +1,7 @@
 {
-  "name": "Do It — Planner",
+  "name": "Do It — Habits & Reminders",
   "short_name": "Do It",
-  "description": "The planner that won't let you quit.",
+  "description": "Habits, reminders and a focus timer for people who forget and put things off.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

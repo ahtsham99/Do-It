@@ -45,7 +45,7 @@ export const MESSAGES = {
   },
   streakRisk: {
     gentle: ['One small thing today keeps your streak going.'],
-    balanced: ['Your streak is waiting. One task or habit keeps it going.'],
+    balanced: ['Your streak is waiting. One habit or one reminder keeps it going.'],
     savage: ['Your streak ends at midnight. One small thing saves it.'],
   },
   done: {

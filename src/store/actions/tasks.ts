@@ -42,6 +42,7 @@ export function toggleTask(task: Task, day: DayKey) {
   const done = task.completedDates.includes(key);
   updateTask(task.id, {
     completedDates: done ? task.completedDates.filter((d) => d !== key) : [...task.completedDates, key],
+    snoozedUntil: null,
   });
   if (!done) markActive(todayKey());
   return !done;
@@ -56,4 +57,9 @@ export function moveToToday(ids: string[]) {
       set.has(x.id) && x.repeat === 'none' ? { ...x, date: t, time: null, updatedAt: Date.now() } : x,
     ),
   }));
+}
+
+/** "Remind me later": hide the reminder now and bring it back after `minutes`. */
+export function snoozeTask(id: string, minutes: number) {
+  updateTask(id, { snoozedUntil: Date.now() + minutes * 60_000 });
 }

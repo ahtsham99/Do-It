@@ -19,6 +19,8 @@ export interface Task extends SyncMeta {
   completedDates: DayKey[];
   /** Occurrences of a repeating task the user removed ("delete this one"). */
   skippedDates?: DayKey[];
+  /** Snoozed reminder: show/notify again at this epoch ms. */
+  snoozedUntil?: number | null;
 }
 
 export type HabitFrequency = 'daily' | 'weekly';
@@ -43,6 +45,37 @@ export interface Countdown extends SyncMeta {
   notes?: string;
 }
 
+export type TimerMode = 'focus' | 'break';
+
+/** The one live timer. Running timers store an end time so they survive the app closing. */
+export interface TimerState {
+  status: 'idle' | 'running' | 'paused';
+  mode: TimerMode;
+  /** Planned length in seconds. */
+  durationSec: number;
+  /** When running: epoch ms when it finishes. */
+  endsAt: number | null;
+  /** When paused: seconds left. */
+  remainingSec: number;
+  startedAt: number | null;
+  label: string;
+  taskId?: string | null;
+  habitId?: string | null;
+}
+
+/** A finished (or abandoned) focus session, kept for history and stats. */
+export interface FocusSession extends SyncMeta {
+  mode: TimerMode;
+  label: string;
+  plannedMin: number;
+  /** Minutes actually focused. */
+  minutes: number;
+  completed: boolean;
+  day: DayKey;
+  taskId?: string | null;
+  habitId?: string | null;
+}
+
 export type ThemePreference = 'system' | 'light' | 'dark';
 export type Tone = 'gentle' | 'balanced' | 'savage';
 export type Plan = 'free' | 'premium';
@@ -59,6 +92,8 @@ export interface Settings {
   weekStartsOn: 0 | 1;
   use24h: boolean;
   plan: Plan;
+  focusMinutes: number;
+  breakMinutes: number;
 }
 
 export interface Stats {
@@ -76,6 +111,8 @@ export interface AppState {
   countdowns: Countdown[];
   settings: Settings;
   stats: Stats;
+  timer: TimerState;
+  sessions: FocusSession[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -90,6 +127,20 @@ export const DEFAULT_SETTINGS: Settings = {
   weekStartsOn: 1,
   use24h: false,
   plan: 'free',
+  focusMinutes: 25,
+  breakMinutes: 5,
+};
+
+export const DEFAULT_TIMER: TimerState = {
+  status: 'idle',
+  mode: 'focus',
+  durationSec: 25 * 60,
+  endsAt: null,
+  remainingSec: 25 * 60,
+  startedAt: null,
+  label: '',
+  taskId: null,
+  habitId: null,
 };
 
 export const DEFAULT_STATS: Stats = { activeDays: [], plannedDays: [], bestStreak: 0 };

@@ -101,6 +101,17 @@ export default function HabitEditor() {
         <Button label={existing ? 'Save changes' : 'Add habit'} onPress={save} disabled={!canSave} />
         {existing && (
           <Button
+            kind="secondary"
+            icon="timer-outline"
+            label="Start a focus session for this"
+            onPress={() => {
+              close();
+              router.push({ pathname: '/focus', params: { habitId: existing.id } });
+            }}
+          />
+        )}
+        {existing && (
+          <Button
             kind="danger"
             icon="trash-outline"
             label="Delete habit"
