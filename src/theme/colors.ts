@@ -74,14 +74,37 @@ export const light: ThemeColors = {
 
 export type NightColor = 'forest' | 'ember' | 'electric' | 'violet' | 'mono';
 
-/** Night-mode colour choices: glow stops plus a bright accent that reads on black. */
-export const NIGHT_COLORS: Record<NightColor, { label: string; glow: [string, string, string]; accent: string; accentText: string; swatch: [string, string] }> = {
-  forest: { label: 'Forest', glow: ['#2F8A5F', '#155537', '#07170F'], accent: '#4FCB8C', accentText: '#04140B', swatch: ['#2F8A5F', '#06140D'] },
-  ember: { label: 'Ember', glow: ['#FF3B1F', '#B5140C', '#2C0503'], accent: '#FF6A4D', accentText: '#FFFFFF', swatch: ['#FF3B1F', '#3A0604'] },
-  electric: { label: 'Electric', glow: ['#4F6BFF', '#2433E6', '#0B0F55'], accent: '#7B91FF', accentText: '#FFFFFF', swatch: ['#4F6BFF', '#0B0F55'] },
-  violet: { label: 'Violet', glow: ['#A35BFF', '#6A22D6', '#24074F'], accent: '#B98AFF', accentText: '#14052E', swatch: ['#A35BFF', '#24074F'] },
-  mono: { label: 'Mono', glow: ['#8A8A8A', '#3A3A3A', '#141414'], accent: '#EDEDED', accentText: '#0B0B0B', swatch: ['#9A9A9A', '#141414'] },
+/**
+ * App colour choices. Each has the night glow, and a UI colour ("accent") for
+ * buttons, the timer ring, the active tab and checkmarks: the chosen colour
+ * made just a little darker, never a different shade. Day mode gets a deeper
+ * accent and a faint tint of the same colour.
+ */
+export const NIGHT_COLORS: Record<
+  NightColor,
+  { label: string; glow: [string, string, string]; accent: string; accentText: string; swatch: [string, string]; day: { accent: string; glow: [string, string] } }
+> = {
+  forest: { label: 'Forest', glow: ['#2F8A5F', '#155537', '#07170F'], accent: '#287A53', accentText: '#FFFFFF', swatch: ['#2F8A5F', '#06140D'], day: { accent: '#2F4F40', glow: ['#B9CFC2', '#DCE6DF'] } },
+  ember: { label: 'Ember', glow: ['#FF3B1F', '#B5140C', '#2C0503'], accent: '#E0301A', accentText: '#FFFFFF', swatch: ['#FF3B1F', '#3A0604'], day: { accent: '#C42B18', glow: ['#F5C4BB', '#F9E2DD'] } },
+  electric: { label: 'Electric', glow: ['#4F6BFF', '#2433E6', '#0B0F55'], accent: '#3F5BF0', accentText: '#FFFFFF', swatch: ['#4F6BFF', '#0B0F55'], day: { accent: '#2B3FD6', glow: ['#C6CEF9', '#E3E7FB'] } },
+  violet: { label: 'Violet', glow: ['#A35BFF', '#6A22D6', '#24074F'], accent: '#9246F2', accentText: '#FFFFFF', swatch: ['#A35BFF', '#24074F'], day: { accent: '#7A30D9', glow: ['#DCC9F8', '#EEE4FB'] } },
+  mono: { label: 'Mono', glow: ['#8A8A8A', '#3A3A3A', '#141414'], accent: '#C8C8C8', accentText: '#0B0B0B', swatch: ['#9A9A9A', '#141414'], day: { accent: '#1E1C19', glow: ['#D9D7D2', '#EBE9E4'] } },
 };
+
+/** Day mode with the chosen app colour. */
+export function lightFor(choice: NightColor): ThemeColors {
+  const d = (NIGHT_COLORS[choice] ?? NIGHT_COLORS.forest).day;
+  return {
+    ...light,
+    accent: d.accent,
+    accentSoft: hexAlpha(d.accent, 0.12),
+    success: d.accent,
+    successSoft: hexAlpha(d.accent, 0.12),
+    tag: d.accent,
+    glow: [d.glow[0], d.glow[1], light.bg],
+    dots: d.accent,
+  };
+}
 
 /** Night mode: true black, dark cards, and the chosen glow colour. */
 export function darkFor(choice: NightColor): ThemeColors {
@@ -128,40 +151,10 @@ export function hexAlpha(hex: string, a: number) {
 
 export const dark = darkFor('forest');
 
-// ---------- Night-mode colour boost ----------
-
-function hexToHsl(hex: string): [number, number, number] {
-  const h = hex.replace('#', '');
-  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return [0, 0, l];
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  const hue = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  return [hue * 60, s, l];
-}
-
-function hslToHex(h: number, s: number, l: number) {
-  const k = (n: number) => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  return '#' + [f(0), f(8), f(4)].map((x) => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
-}
-
 /** The default item colour; at night it follows the chosen night colour. */
 export const DEFAULT_ITEM_COLOR = '#2F4F40';
 
-/**
- * Night mode: make an item colour (habit, goal, countdown) vivid enough for a
- * black background. 'line' = rings, dots, text; 'fill' = big coloured cards.
- */
-export function vivid(hex: string, mode: 'line' | 'fill', accent: string) {
-  if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
-  const base = hex.toLowerCase() === DEFAULT_ITEM_COLOR.toLowerCase() ? accent : hex;
-  const [h, s, l] = hexToHsl(base);
-  if (s < 0.12) return hslToHex(h, s, mode === 'line' ? Math.max(l, 0.74) : Math.min(Math.max(l, 0.28), 0.36));
-  const sat = Math.min(0.95, s * 1.8 + 0.15);
-  return hslToHex(h, sat, mode === 'line' ? 0.62 : 0.46);
+/** Item colours keep their own colour; the default one follows the app colour. */
+export function itemColor(hex: string, accent: string) {
+  return hex.toLowerCase() === DEFAULT_ITEM_COLOR.toLowerCase() ? accent : hex;
 }

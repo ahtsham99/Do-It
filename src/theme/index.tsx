@@ -4,7 +4,7 @@ import { useColorScheme } from 'react-native';
 
 import { useStore } from '@/store/store';
 
-import { darkFor, light, vivid, type NightColor, type ThemeColors } from './colors';
+import { darkFor, itemColor, light, lightFor, type NightColor, type ThemeColors } from './colors';
 import { displayFont, faceForWeight, facesFor, textFont, type FontChoice } from './fonts';
 
 export { DEFAULT_ITEM_COLOR, NIGHT_COLORS, SWATCHES, hexAlpha } from './colors';
@@ -48,7 +48,7 @@ export interface ResolvedFonts {
 interface Theme {
   dark: boolean;
   c: ThemeColors;
-  /** An item colour as it should appear now (brighter at night). */
+  /** An item colour as shown: its own colour, or the app colour for the default one. */
   paint: (color: string, mode?: 'line' | 'fill') => string;
   fonts: ResolvedFonts;
   fontsReady: boolean;
@@ -92,8 +92,8 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
   const isDark = pref === 'system' ? system === 'dark' : pref === 'dark';
   const value = useMemo(
     () => {
-      const c = isDark ? darkFor(night as NightColor) : light;
-      const paint = isDark ? (color: string, mode: 'line' | 'fill' = 'line') => vivid(color, mode, c.accent) : (color: string) => color;
+      const c = isDark ? darkFor(night as NightColor) : lightFor(night as NightColor);
+      const paint = (color: string) => itemColor(color, c.accent);
       return { dark: isDark, c, paint, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied };
     },
     [isDark, applied, night],

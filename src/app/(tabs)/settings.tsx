@@ -65,7 +65,7 @@ export default function SettingsScreen() {
         <Segmented tone="accent" options={THEMES} value={s.theme} onChange={(theme) => updateSettings({ theme })} />
         <View style={{ gap: space.sm, marginTop: space.xs }}>
           <Text variant="small" tone="muted">
-            Night mode colour
+            App colour
           </Text>
           <View style={styles.swatches}>
             {(Object.keys(NIGHT_COLORS) as NightColor[]).map((k) => {
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
                   onPress={() => updateSettings({ nightColor: k })}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: on }}
-                  accessibilityLabel={`${n.label} night colour`}
+                  accessibilityLabel={`${n.label} app colour`}
                   style={{ alignItems: 'center', gap: 6 }}>
                   <View style={[styles.swatch, { borderColor: on ? c.text : 'transparent' }]}>
                     <GradientSwatch from={n.swatch[0]} to={n.swatch[1]} id={k} />
