@@ -76,7 +76,7 @@ export default function PlannerScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Screen
-        title="Calendar"
+        title="Reminders"
         subtitle={`${openCount} open · ${doneCount} done`}
         right={
           <>
