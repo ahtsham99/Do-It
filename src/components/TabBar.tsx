@@ -9,7 +9,7 @@ import { radius, useTheme } from '@/theme';
 export const TAB_META: Record<string, { title: string; icon: IconName }> = {
   index: { title: 'Today', icon: 'sunny-outline' },
   habits: { title: 'Habits', icon: 'flame-outline' },
-  planner: { title: 'Reminders', icon: 'alarm-outline' },
+  planner: { title: 'Calendar', icon: 'calendar-outline' },
   focus: { title: 'Focus', icon: 'timer-outline' },
   countdowns: { title: 'Countdowns', icon: 'hourglass-outline' },
 };

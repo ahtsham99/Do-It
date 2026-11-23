@@ -5,7 +5,9 @@ import { View } from 'react-native';
 import { Button, Empty, IconButton, Screen, Section, Segmented, Text, type IconName } from '@/components/ui';
 import { MonthGrid } from '@/features/tasks/MonthGrid';
 import { TaskList } from '@/features/tasks/TaskList';
+import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
+import { DayPlan } from '@/features/today/DayPlan';
 import {
   isDone,
   nextOccurrence,
@@ -74,7 +76,7 @@ export default function PlannerScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Screen
-        title="Reminders"
+        title="Calendar"
         subtitle={`${openCount} open · ${doneCount} done`}
         right={
           <>
@@ -118,7 +120,8 @@ function DayView({ day, setDay, weekStartsOn }: { day: DayKey; setDay: (d: DayKe
     <>
       <WeekStrip selected={day} onSelect={setDay} tasks={tasks} weekStartsOn={weekStartsOn} />
       <Section title={items.length ? `${open} to do · ${items.length - open} done` : undefined}>
-        <TaskList items={items} emptyText="Nothing planned for this day." />
+        <DayPlan day={day} items={items} />
+        <QuickAdd date={day} placeholder="Add to this day… e.g. Dentist 3pm" />
       </Section>
     </>
   );
