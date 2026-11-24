@@ -27,13 +27,13 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
   if (weeks <= 1) {
     const days = range(startOfWeek(today, weekStartsOn), 7);
     return (
-      <View style={{ flexDirection: 'row', gap: 6 }}>
+      <View style={{ flexDirection: 'row', gap: 6, justifyContent: 'center' }}>
         {days.map((d) => (
           <View key={d} style={{ flex: 1, alignItems: 'center', gap: 4 }}>
             <Text variant="caption" tone={d === today ? 'default' : 'faint'} style={{ fontSize: 10 }}>
               {weekdayShort(d).slice(0, 1)}
             </Text>
-            <View style={[{ width: '100%', aspectRatio: 1, maxWidth: 40, borderRadius: 999 }, fill(d)]} />
+            <View style={[{ width: '100%', aspectRatio: 1, maxWidth: 28, borderRadius: 999 }, fill(d)]} />
           </View>
         ))}
       </View>
@@ -42,11 +42,12 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
 
   const first = addDays(startOfWeek(today, weekStartsOn), -(weeks - 1) * 7);
   const cols = Array.from({ length: weeks }, (_, i) => addDays(first, i * 7));
-  const long = weeks > 53;
-  const gap = weeks > 26 ? 2 : weeks > 13 ? 3 : 5;
+  // A year or more scrolls sideways (opening at today) so the dots can stay a readable size.
+  const long = weeks > 26;
+  const gap = long ? 3 : weeks > 13 ? 3 : 5;
   // Round dots: the size comes from the available width so every dot is a true circle.
   const fit = (width - gap * (weeks - 1)) / weeks;
-  const size = long ? 7 : Math.max(4, Math.min(30, fit));
+  const size = long ? 9 : Math.max(4, Math.min(weeks <= 5 ? 20 : 30, fit));
 
   const grid = (
     <View style={{ flexDirection: 'row', gap }}>
