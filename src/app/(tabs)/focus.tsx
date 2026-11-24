@@ -113,6 +113,10 @@ export default function FocusScreen() {
       actions: [{ label: 'End session', destructive: true, onPress: () => (stopSound(), stopTimer()) }],
     });
 
+  // Fit the clock inside the ring whatever its length (25:00 … 10:00:00) and font.
+  const clockText = formatClock(left);
+  const clockSize = Math.round(Math.min(58, 158 / (clockText.length * 0.64)));
+
   const status = idle ? 'Ready' : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
 
   return (
@@ -125,7 +129,7 @@ export default function FocusScreen() {
             {status}
           </Text>
           <Press haptic={false} disabled={!idle} onPress={() => setEditing(true)} accessibilityRole="button" accessibilityLabel="Tap to choose a length">
-            <Text accessibilityRole="timer" style={{ fontFamily: SERIF, fontSize: left >= 3600 ? 46 : 58, lineHeight: 64, fontVariant: ['tabular-nums'] }}>
+            <Text accessibilityRole="timer" numberOfLines={1} style={{ fontFamily: SERIF, fontSize: clockSize, lineHeight: clockSize + 8, fontVariant: ['tabular-nums'] }}>
               {formatClock(left)}
             </Text>
           </Press>
