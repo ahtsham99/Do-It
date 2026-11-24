@@ -1,10 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Button, Card, Chip, Field, Glyph, IconButton, Label, Press, Screen, Section, Text, showDialog } from '@/components/ui';
 import { SOUNDS, playSound, soundsSupported, stopSound, type SoundId } from '@/features/focus/sounds';
-import { parseLength } from '@/features/focus/parseLength';
+import { DurationSheet } from '@/features/focus/DurationSheet';
 import { TimerRing } from '@/features/focus/TimerRing';
 import { formatClock, useTick } from '@/features/focus/useTick';
 import { isDueToday } from '@/features/habits/logic';
@@ -23,7 +23,7 @@ const PRESETS = [5, 15, 25, 45];
 type Target = { kind: 'task' | 'habit' | 'none'; id: string | null; label: string; icon?: string };
 
 export default function FocusScreen() {
-  const { c, fonts } = useTheme();
+  const { c } = useTheme();
   const timer = useStore((s) => s.timer);
   const sessions = useStore((s) => s.sessions);
   const settings = useSettings();
@@ -36,12 +36,6 @@ export default function FocusScreen() {
   const [target, setTarget] = useState<Target>({ kind: 'none', id: null, label: '' });
   const [custom, setCustom] = useState('');
   const [editing, setEditing] = useState(false);
-  const [typed, setTyped] = useState('');
-  const applyTyped = () => {
-    const m = parseLength(typed);
-    if (m) setMinutes(m);
-    setEditing(false);
-  };
   const params = useLocalSearchParams<{ taskId?: string; habitId?: string }>();
 
   // Opened from a reminder or habit: preselect it (once per link).
@@ -122,36 +116,22 @@ export default function FocusScreen() {
   const status = idle ? 'Ready' : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
 
   return (
+    <>
+    {editing && <DurationSheet visible minutes={minutes} onClose={() => setEditing(false)} onSet={setMinutes} />}
     <Screen title="Focus" subtitle="Can’t get started? Just do five minutes.">
       <Card style={{ alignItems: 'center', gap: space.md, paddingVertical: space.xl }}>
         <TimerRing size={212} stroke={9} progress={total ? left / total : 0} color={isBreak ? c.warning : c.accent}>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
             {status}
           </Text>
-          {editing ? (
-            <TextInput
-              autoFocus
-              value={typed}
-              onChangeText={setTyped}
-              onSubmitEditing={applyTyped}
-              onBlur={applyTyped}
-              placeholder="e.g. 90 or 1:30"
-              placeholderTextColor={c.textFaint}
-              keyboardType="numbers-and-punctuation"
-              returnKeyType="done"
-              accessibilityLabel="Type a length"
-              style={{ fontFamily: fonts.display, fontSize: 34, textAlign: 'center', color: c.text, width: 170, paddingVertical: 6, borderBottomWidth: 2, borderBottomColor: c.accent, outlineStyle: 'none' } as object}
-            />
-          ) : (
-            <Press haptic={false} disabled={!idle} onPress={() => (setTyped(''), setEditing(true))} accessibilityRole="button" accessibilityLabel="Tap to type a length">
-              <Text accessibilityRole="timer" style={{ fontFamily: SERIF, fontSize: left >= 3600 ? 46 : 58, lineHeight: 64, fontVariant: ['tabular-nums'] }}>
-                {formatClock(left)}
-              </Text>
-            </Press>
-          )}
-          {idle && !editing && (
+          <Press haptic={false} disabled={!idle} onPress={() => setEditing(true)} accessibilityRole="button" accessibilityLabel="Tap to choose a length">
+            <Text accessibilityRole="timer" style={{ fontFamily: SERIF, fontSize: left >= 3600 ? 46 : 58, lineHeight: 64, fontVariant: ['tabular-nums'] }}>
+              {formatClock(left)}
+            </Text>
+          </Press>
+          {idle && (
             <Text variant="small" tone="faint" style={{ fontSize: 11 }}>
-              Tap to type
+              Tap to change
             </Text>
           )}
           {!idle && timer.label ? (
@@ -283,6 +263,7 @@ export default function FocusScreen() {
         </Section>
       )}
     </Screen>
+    </>
   );
 }
 
