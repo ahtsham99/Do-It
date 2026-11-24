@@ -1,15 +1,19 @@
+import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { useSheetTopInset } from '@/hooks/useTopInset';
 import { Card, Glyph, Icon, Section, SheetHeader, Text } from '@/components/ui';
 import { bestHabitStreak, habitStreak, streakLabel } from '@/features/habits/logic';
 import { useNudges } from '@/features/nudges/useNudges';
-import { addDays, fromKey, range, startOfWeek, weekdayLetters } from '@/lib/dates';
+import { addDays, diffDays, fromKey, range, startOfWeek, weekdayLetters } from '@/lib/dates';
+import { HistoryGrid } from '@/features/habits/HistoryGrid';
+import { HISTORY_RANGES, type HistoryRange } from '@/features/habits/historyRanges';
+import { RangePicker } from '@/features/habits/RangePicker';
+import type { Habit } from '@/store/types';
 import { useHabits, useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
 
-const WEEKS = 6;
 
 /** Your streak: how many days in a row you've shown up. */
 export default function StreaksScreen() {
@@ -20,7 +24,28 @@ export default function StreaksScreen() {
   const stats = useStore((s) => s.stats);
   const habits = useHabits();
   const active = new Set(stats.activeDays);
-  const first = addDays(startOfWeek(n.today, weekStartsOn), -(WEEKS - 1) * 7);
+  const [r, setR] = useState<HistoryRange>('1M');
+  // Max = since your first active day.
+  const weeks =
+    r === 'Max'
+      ? Math.max(2, Math.ceil((diffDays([...stats.activeDays].sort()[0] ?? n.today, n.today) + 1) / 7) + 1)
+      : HISTORY_RANGES.find((x) => x.id === r)!.weeks;
+  const first = addDays(startOfWeek(n.today, weekStartsOn), -(weeks - 1) * 7);
+  const inRange = useMemo(() => {
+    const days = diffDays(first, n.today) + 1;
+    const act = stats.activeDays.filter((d) => d >= first && d <= n.today).sort();
+    let best = 0;
+    let run = 0;
+    let prev = '';
+    for (const d of act) {
+      run = prev && addDays(prev, 1) === d ? run + 1 : 1;
+      best = Math.max(best, run);
+      prev = d;
+    }
+    return { days, active: act.length, best, planned: stats.plannedDays.filter((d) => d >= first && d <= n.today).length };
+  }, [first, n.today, stats.activeDays, stats.plannedDays]);
+  // The compact grid draws "a habit"; active days are its history.
+  const activeAsHabit = { id: 'active', name: 'Active', icon: '', color: c.accent, frequency: 'daily', timesPerWeek: 1, history: stats.activeDays, createdAt: 0, updatedAt: 0 } as Habit;
 
   const line = n.activeToday
     ? 'You showed up today. Come back tomorrow to keep it going.'
@@ -45,13 +70,20 @@ export default function StreaksScreen() {
           </Text>
         </View>
 
+        <RangePicker value={r} onChange={setR} />
+
         <View style={{ flexDirection: 'row', gap: space.md }}>
-          <Stat label="Best streak" value={String(n.bestStreak)} />
-          <Stat label="Days active" value={String(stats.activeDays.length)} />
-          <Stat label="Days planned" value={String(stats.plannedDays.length)} />
+          <Stat label="Days active" value={`${inRange.active}/${inRange.days}`} />
+          <Stat label="Best streak" value={String(inRange.best)} />
+          <Stat label="Days planned" value={String(inRange.planned)} />
         </View>
 
-        <Section title="Last six weeks">
+        <Section title={HISTORY_RANGES.find((x) => x.id === r)!.title}>
+          {weeks > 5 ? (
+            <Card>
+              <HistoryGrid habit={activeAsHabit} weekStartsOn={weekStartsOn} weeks={weeks} />
+            </Card>
+          ) : (
           <Card style={{ gap: space.sm }}>
             <View style={styles.week}>
               {weekdayLetters(weekStartsOn).map((l, i) => (
@@ -62,7 +94,7 @@ export default function StreaksScreen() {
                 </View>
               ))}
             </View>
-            {Array.from({ length: WEEKS }, (_, w) => (
+            {Array.from({ length: weeks }, (_, w) => (
               <View key={w} style={styles.week}>
                 {range(addDays(first, w * 7), 7).map((d) => {
                   const on = active.has(d);
@@ -85,6 +117,7 @@ export default function StreaksScreen() {
               </View>
             ))}
           </Card>
+          )}
         </Section>
 
         {habits.length > 0 && (
