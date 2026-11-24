@@ -1,10 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Button, Card, Chip, Field, Glyph, IconButton, Label, Press, Screen, Section, Text, showDialog } from '@/components/ui';
 import { SOUNDS, playSound, soundsSupported, stopSound, type SoundId } from '@/features/focus/sounds';
-import { DurationSheet } from '@/features/focus/DurationSheet';
+import { DurationSheet, nativeDurationWheel } from '@/features/focus/DurationSheet';
+import { parseLength } from '@/features/focus/parseLength';
 import { TimerRing } from '@/features/focus/TimerRing';
 import { formatClock, useTick } from '@/features/focus/useTick';
 import { isDueToday } from '@/features/habits/logic';
@@ -23,7 +24,7 @@ const PRESETS = [5, 15, 25, 45];
 type Target = { kind: 'task' | 'habit' | 'none'; id: string | null; label: string; icon?: string };
 
 export default function FocusScreen() {
-  const { c } = useTheme();
+  const { c, fonts } = useTheme();
   const timer = useStore((s) => s.timer);
   const sessions = useStore((s) => s.sessions);
   const settings = useSettings();
@@ -35,7 +36,22 @@ export default function FocusScreen() {
   const [minutes, setMinutes] = useState(settings.focusMinutes);
   const [target, setTarget] = useState<Target>({ kind: 'none', id: null, label: '' });
   const [custom, setCustom] = useState('');
+  // iPhone app: the system timer wheel. Web and Android: type the length.
   const [editing, setEditing] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [typed, setTyped] = useState('');
+  const openLength = () => {
+    if (nativeDurationWheel) setEditing(true);
+    else {
+      setTyped('');
+      setTyping(true);
+    }
+  };
+  const applyTyped = () => {
+    const m = parseLength(typed);
+    if (m) setMinutes(m);
+    setTyping(false);
+  };
   const params = useLocalSearchParams<{ taskId?: string; habitId?: string }>();
 
   // Opened from a reminder or habit: preselect it (once per link).
@@ -128,14 +144,30 @@ export default function FocusScreen() {
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
             {status}
           </Text>
-          <Press haptic={false} disabled={!idle} onPress={() => setEditing(true)} accessibilityRole="button" accessibilityLabel="Tap to choose a length">
-            <Text accessibilityRole="timer" numberOfLines={1} style={{ fontFamily: SERIF, fontSize: clockSize, lineHeight: clockSize + 8, fontVariant: ['tabular-nums'] }}>
-              {formatClock(left)}
-            </Text>
-          </Press>
-          {idle && (
+          {typing ? (
+            <TextInput
+              autoFocus
+              value={typed}
+              onChangeText={setTyped}
+              onSubmitEditing={applyTyped}
+              onBlur={applyTyped}
+              placeholder="e.g. 90 or 1:30"
+              placeholderTextColor={c.textFaint}
+              keyboardType="numbers-and-punctuation"
+              returnKeyType="done"
+              accessibilityLabel="Type a length"
+              style={{ fontFamily: fonts.display, fontSize: 32, textAlign: 'center', color: c.text, width: 170, paddingVertical: 6, borderBottomWidth: 2, borderBottomColor: c.accent, outlineStyle: 'none' } as object}
+            />
+          ) : (
+            <Press haptic={false} disabled={!idle} onPress={openLength} accessibilityRole="button" accessibilityLabel="Tap to change the length">
+              <Text accessibilityRole="timer" numberOfLines={1} style={{ fontFamily: SERIF, fontSize: clockSize, lineHeight: clockSize + 8, fontVariant: ['tabular-nums'] }}>
+                {formatClock(left)}
+              </Text>
+            </Press>
+          )}
+          {idle && !typing && (
             <Text variant="small" tone="faint" style={{ fontSize: 11 }}>
-              Tap to change
+              {nativeDurationWheel ? 'Tap to change' : 'Tap to type'}
             </Text>
           )}
           {!idle && timer.label ? (
