@@ -12,7 +12,8 @@ export type Feature =
   | 'cloudSync'
   | 'themes'
   | 'advancedStats'
-  | 'customNudges';
+  | 'customNudges'
+  | 'premiumIcons';
 
 export interface Limits {
   habits: number;
@@ -26,7 +27,7 @@ const PLANS: Record<Plan, { features: Feature[]; limits: Limits }> = {
     limits: { habits: Infinity, countdowns: Infinity },
   },
   premium: {
-    features: ['unlimitedHabits', 'unlimitedCountdowns', 'cloudSync', 'themes', 'advancedStats', 'customNudges'],
+    features: ['unlimitedHabits', 'unlimitedCountdowns', 'cloudSync', 'themes', 'advancedStats', 'customNudges', 'premiumIcons'],
     limits: { habits: Infinity, countdowns: Infinity },
   },
 };

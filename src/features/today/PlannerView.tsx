@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Empty, Icon, IconButton, Press, Section, Text, showDialog, showToast } from '@/components/ui';
-import { CountdownCard } from '@/features/countdowns/CountdownCard';
+import { CountdownStack } from '@/features/countdowns/CountdownStack';
 import { FocusNowCard } from '@/features/focus/FocusNowCard';
 import { GoalCard } from '@/features/goals/GoalCard';
 import { HabitRing, tickHabit } from '@/features/habits/HabitCard';
@@ -70,7 +70,7 @@ export function PlannerView() {
   const items = occurrencesOn(tasks, day);
   const done = items.filter((o) => o.done).length;
 
-  const next = countdowns.filter((x) => x.date >= n.today).sort((a, b) => (a.date < b.date ? -1 : 1))[0];
+  const upcoming = countdowns.filter((x) => x.date >= n.today).sort((a, b) => (a.date < b.date ? -1 : 1));
   const focusToday = sessions.filter((x) => x.mode === 'focus' && x.day === n.today && !x.deletedAt).reduce((m, x) => m + x.minutes, 0);
   const overdueIds = new Set(n.overdue.map((o) => o.task.id));
   const reminders = n.dueReminders.filter((o) => !overdueIds.has(o.task.id) && !dismissed.has(`${o.task.id}:${n.today}`));
@@ -323,7 +323,7 @@ export function PlannerView() {
         </Press>
       )}
 
-      {next && <CountdownCard item={next} hero />}
+      <CountdownStack items={upcoming} />
     </>
   );
 }
