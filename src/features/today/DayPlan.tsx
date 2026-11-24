@@ -40,9 +40,12 @@ export function DayPlan({ day, items, compact }: { day: DayKey; items: Occurrenc
         <Icon name="calendar-clear-outline" size={22} color={c.textFaint} />
         <Text style={{ fontWeight: '500', marginTop: 4 }}>{day === today ? 'Nothing planned yet' : 'A free day'}</Text>
         <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
-          Tap below to plan it, or type “Gym at 7am”.
+          {day === today ? 'Add the first thing below. Try “Gym at 7am”.' : 'Tap below to plan it, or type “Gym at 7am”.'}
         </Text>
-        <Button small label="Plan this day" icon="add" onPress={() => router.push({ pathname: '/task', params: { date: day } })} style={{ marginTop: space.sm }} />
+        {/* Today already has the add field right underneath; other days get a clear button. */}
+        {day !== today && (
+          <Button small label="Plan this day" icon="add" onPress={() => router.push({ pathname: '/task', params: { date: day } })} style={{ marginTop: space.sm }} />
+        )}
       </Card>
     );
   }
