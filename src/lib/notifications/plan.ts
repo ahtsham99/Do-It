@@ -35,7 +35,7 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
         date: morning,
         title: count ? `Plan your day · ${count} task${count === 1 ? '' : 's'} waiting` : 'Plan your day',
         body: pick('planPrompt', settings.tone, day),
-        url: '/plan',
+        url: '/',
       });
     }
 

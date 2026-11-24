@@ -1,7 +1,9 @@
 import { todayKey, type DayKey } from '@/lib/dates';
 import { uid } from '@/lib/id';
 
-import { markActive } from './stats';
+import { addDays } from '@/lib/dates';
+
+import { markActive, markPlanned } from './stats';
 import { setState } from '../store';
 import type { Task } from '../types';
 
@@ -18,6 +20,9 @@ export function addTask(input: TaskInput): Task {
     ...input,
   };
   setState((s) => ({ tasks: [...s.tasks, task] }));
+  // Planning today or tomorrow counts as showing up.
+  const t = todayKey();
+  if (task.date === t || task.date === addDays(t, 1)) markPlanned(t);
   return task;
 }
 

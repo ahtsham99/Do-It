@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Empty, Icon, IconButton, Press, Section, Text } from '@/components/ui';
+import { Empty, Icon, IconButton, Press, Section, Text, showDialog } from '@/components/ui';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { FocusNowCard } from '@/features/focus/FocusNowCard';
 import { GoalCard } from '@/features/goals/GoalCard';
@@ -17,6 +17,7 @@ import { MonthGrid } from '@/features/tasks/MonthGrid';
 import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { DayPlan } from '@/features/today/DayPlan';
+import { FromEarlier } from '@/features/today/FromEarlier';
 import { NudgeStrip, type Nudge } from '@/features/today/NudgeStrip';
 import { StatCard } from '@/features/today/StatCard';
 import { addDays, addMonths, diffDays, formatDay, fromKey, monthName, range, startOfWeek, type DayKey } from '@/lib/dates';
@@ -72,7 +73,6 @@ export function PlannerView() {
   const overdueIds = new Set(n.overdue.map((o) => o.task.id));
   const reminders = n.dueReminders.filter((o) => !overdueIds.has(o.task.id) && !dismissed.has(`${o.task.id}:${n.today}`));
 
-  const plural = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
   // Most important first; only the first shows, as one slim line, and only on today.
   const nudges: Nudge[] = [];
   const tomorrow = addDays(n.today, 1);
@@ -89,8 +89,6 @@ export function PlannerView() {
     nudges.push({ key: `r:${o.task.id}`, kind: 'warning', icon: 'alarm-outline', title: `Reminder: ${o.task.title}`, onPress: () => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } }) });
   }
   if (planTomorrow) nudges.push(planTomorrow);
-  if (n.overdue.length > 0) nudges.push({ key: 'overdue', kind: 'danger', icon: 'time-outline', title: `${plural(n.overdue.length, 'thing')} from earlier still waiting`, onPress: () => router.push('/plan') });
-  if (!n.planned && !planTomorrow) nudges.push({ key: 'plan', kind: 'accent', icon: 'sunny-outline', title: 'Plan your day', onPress: () => router.push('/plan') });
   if (n.streakAtRisk) nudges.push({ key: 'streak', kind: 'warning', icon: 'flame-outline', title: `Keep your ${n.streak}-day streak going`, onPress: () => router.push('/streaks') });
 
   const pick = (d: DayKey) => {
@@ -159,7 +157,7 @@ export function PlannerView() {
         <WeekStrip selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
       )}
 
-      {isToday && (!timerIdle ? <FocusNowCard compact /> : nudges[0] ? <NudgeStrip nudge={nudges[0]} more={nudges.length - 1} onMore={() => router.push('/plan')} /> : null)}
+      {isToday && (!timerIdle ? <FocusNowCard compact /> : nudges[0] ? <NudgeStrip nudge={nudges[0]} more={nudges.length - 1} onMore={() => showDialog({ title: 'Also waiting', actions: nudges.slice(1).map((x) => ({ label: x.title, onPress: () => x.onPress?.() })) })} /> : null)}
 
       {span === 'week' && !monthOpen ? (
         <>
@@ -183,6 +181,8 @@ export function PlannerView() {
           <QuickAdd date={day < weekStart || day > addDays(weekStart, 6) ? weekStart : day} placeholder="Add to this week… e.g. Gym friday 7am" />
         </>
       ) : (
+        <>
+        {isToday && <FromEarlier items={n.overdue.filter((o) => o.day < n.today)} />}
         <Section
           title={isToday ? 'Your day' : `Plan for ${formatDay(day)}`}
           right={
@@ -202,6 +202,7 @@ export function PlannerView() {
             </Press>
           )}
         </Section>
+        </>
       )}
 
       {/* Everything else */}

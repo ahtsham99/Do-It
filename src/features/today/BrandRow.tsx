@@ -7,16 +7,14 @@ import { useNudges } from '@/features/nudges/useNudges';
 import { useSettings } from '@/store/hooks';
 import { LOGO, radius, space, useTheme } from '@/theme';
 
-export type MainMode = 'plan' | 'home' | 'stats' | 'settings';
+export type MainMode = 'plan' | 'stats';
 
-const META: Record<MainMode, { label: string; icon: 'calendar-outline' | 'home-outline' | 'stats-chart-outline' | 'settings-outline' }> = {
+const META: Record<MainMode, { label: string; icon: 'calendar-outline' | 'stats-chart-outline' }> = {
   plan: { label: 'Plan', icon: 'calendar-outline' },
-  home: { label: 'Home', icon: 'home-outline' },
   stats: { label: 'Stats', icon: 'stats-chart-outline' },
-  settings: { label: 'Settings', icon: 'settings-outline' },
 };
 
-/** Logo, Plan | Home switch, streak and your initials — shared by both views. */
+/** Logo, Plan | Stats switch, streak and your initials — shared by both views. */
 export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: MainMode) => void; modes: MainMode[] }) {
   const { c } = useTheme();
   const n = useNudges();
