@@ -59,6 +59,13 @@ export function parseQuickAdd(input: string, today: DayKey = todayKey()): Parsed
     if (m[3].toLowerCase() === 'pm') h += 12;
     time = `${pad(h)}:${pad(Number(m[2] ?? 0))}`;
   });
+  // "610am", "1130pm"
+  if (!time)
+    take(/\s(?:at\s+)?(\d{1,2})([0-5]\d)\s*(am|pm)\b/i, (m) => {
+      let h = Number(m[1]) % 12;
+      if (m[3].toLowerCase() === 'pm') h += 12;
+      time = `${pad(h)}:${m[2]}`;
+    });
   if (!time) take(/\s(?:at\s+)?([01]?\d|2[0-3])[:.]([0-5]\d)\b/, (m) => (time = `${pad(Number(m[1]))}:${m[2]}`));
   if (!time)
     take(/\sat\s+(\d{1,2})\b/i, (m) => {

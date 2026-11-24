@@ -1,9 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Button, Card, Chip, Field, Glyph, IconButton, Label, Press, Screen, Section, Text, showDialog } from '@/components/ui';
 import { SOUNDS, playSound, soundsSupported, stopSound, type SoundId } from '@/features/focus/sounds';
+import { parseLength } from '@/features/focus/parseLength';
 import { TimerRing } from '@/features/focus/TimerRing';
 import { formatClock, useTick } from '@/features/focus/useTick';
 import { isDueToday } from '@/features/habits/logic';
@@ -17,10 +18,12 @@ import { SERIF, radius, space, useTheme } from '@/theme';
 
 const PRESETS = [5, 15, 25, 45];
 
+
+
 type Target = { kind: 'task' | 'habit' | 'none'; id: string | null; label: string; icon?: string };
 
 export default function FocusScreen() {
-  const { c } = useTheme();
+  const { c, fonts } = useTheme();
   const timer = useStore((s) => s.timer);
   const sessions = useStore((s) => s.sessions);
   const settings = useSettings();
@@ -32,6 +35,13 @@ export default function FocusScreen() {
   const [minutes, setMinutes] = useState(settings.focusMinutes);
   const [target, setTarget] = useState<Target>({ kind: 'none', id: null, label: '' });
   const [custom, setCustom] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [typed, setTyped] = useState('');
+  const applyTyped = () => {
+    const m = parseLength(typed);
+    if (m) setMinutes(m);
+    setEditing(false);
+  };
   const params = useLocalSearchParams<{ taskId?: string; habitId?: string }>();
 
   // Opened from a reminder or habit: preselect it (once per link).
@@ -118,9 +128,32 @@ export default function FocusScreen() {
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
             {status}
           </Text>
-          <Text accessibilityRole="timer" style={{ fontFamily: SERIF, fontSize: 58, lineHeight: 64, fontVariant: ['tabular-nums'] }}>
-            {formatClock(left)}
-          </Text>
+          {editing ? (
+            <TextInput
+              autoFocus
+              value={typed}
+              onChangeText={setTyped}
+              onSubmitEditing={applyTyped}
+              onBlur={applyTyped}
+              placeholder="e.g. 90 or 1:30"
+              placeholderTextColor={c.textFaint}
+              keyboardType="numbers-and-punctuation"
+              returnKeyType="done"
+              accessibilityLabel="Type a length"
+              style={{ fontFamily: fonts.display, fontSize: 34, textAlign: 'center', color: c.text, width: 170, paddingVertical: 6, borderBottomWidth: 2, borderBottomColor: c.accent, outlineStyle: 'none' } as object}
+            />
+          ) : (
+            <Press haptic={false} disabled={!idle} onPress={() => (setTyped(''), setEditing(true))} accessibilityRole="button" accessibilityLabel="Tap to type a length">
+              <Text accessibilityRole="timer" style={{ fontFamily: SERIF, fontSize: left >= 3600 ? 46 : 58, lineHeight: 64, fontVariant: ['tabular-nums'] }}>
+                {formatClock(left)}
+              </Text>
+            </Press>
+          )}
+          {idle && !editing && (
+            <Text variant="small" tone="faint" style={{ fontSize: 11 }}>
+              Tap to type
+            </Text>
+          )}
           {!idle && timer.label ? (
             <Text variant="small" tone="muted" numberOfLines={1} style={{ maxWidth: 190 }}>
               {timer.label}

@@ -115,6 +115,7 @@ export function PlannerView() {
     setSpan('day');
   };
   const step = (dir: 1 | -1) => setDay(monthOpen ? addMonths(day, dir) : addDays(day, 7 * dir));
+  const [titleW, setTitleW] = useState(220);
   const weekStart = startOfWeek(day, weekStartsOn);
   const weekDays = range(weekStart, 7);
   const weekLabel = (() => {
@@ -123,14 +124,18 @@ export function PlannerView() {
     return d === 0 ? 'This week' : d === 7 ? 'Next week' : d === -7 ? 'Last week' : `Week of ${formatDay(weekStart, { relative: false })}`;
   })();
 
+  // Shrink the big title so long words (Tomorrow, November, Wednesday) always fit.
+  const titleText = monthOpen ? monthName(day) : span === 'week' ? weekLabel : dayTitle(day, n.today);
+  const titleSize = Math.round(Math.max(24, Math.min(46, (titleW - 30) / (titleText.length * 0.62))));
+
   return (
     <>
       {/* Day title + calendar controls */}
       <View style={{ gap: 2 }}>
         <View style={styles.titleRow}>
-          <Press haptic={false} onPress={() => setMonthOpen(!monthOpen)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : 'Show month'} style={styles.titleBtn}>
-            <Text style={{ fontFamily: SERIF, fontSize: 46, lineHeight: 50, letterSpacing: -0.8, flexShrink: 1 }} numberOfLines={1}>
-              {monthOpen ? monthName(day) : span === 'week' ? weekLabel : dayTitle(day, n.today)}
+          <Press haptic={false} onPress={() => setMonthOpen(!monthOpen)} onLayout={(e) => setTitleW(e.nativeEvent.layout.width)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : 'Show month'} style={styles.titleBtn}>
+            <Text style={{ fontFamily: SERIF, fontSize: titleSize, lineHeight: titleSize + 4, letterSpacing: -0.8, flexShrink: 1 }} numberOfLines={1}>
+              {titleText}
             </Text>
             <Icon name={monthOpen ? 'chevron-up' : 'chevron-down'} size={20} color={c.textMuted} />
           </Press>
