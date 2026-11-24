@@ -153,6 +153,8 @@ export interface Settings {
   displayFont: string;
   textFont: string;
   logoFont: string;
+  /** Focus sound id (src/features/focus/sounds). */
+  focusSound: string;
   /** Night-mode glow colour (src/theme/colors.ts NIGHT_COLORS). */
   nightColor: 'forest' | 'ember' | 'electric' | 'violet' | 'mono';
 }
@@ -197,6 +199,7 @@ export const DEFAULT_SETTINGS: Settings = {
   textFont: 'system',
   logoFont: 'newsreader',
   nightColor: 'forest',
+  focusSound: 'off',
 };
 
 export const DEFAULT_TIMER: TimerState = {

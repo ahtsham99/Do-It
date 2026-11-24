@@ -8,6 +8,7 @@ import { completeTimer, startTimer } from '@/store/actions/timer';
 import { getState, useStore } from '@/store/store';
 
 import { chime } from './chime';
+import { playSound, stopSound, type SoundId } from './sounds';
 
 /**
  * Finishes the timer when its end time passes, including when the app was in
@@ -22,13 +23,14 @@ export function TimerWatcher() {
       if (t.status !== 'running' || !t.endsAt || Date.now() < t.endsAt) return;
       const done = completeTimer();
       if (!done) return;
+      stopSound();
       chime();
       const { settings, tasks } = getState();
       if (done.mode === 'break') {
         showDialog({
           title: 'Break’s over',
           message: 'Ready for another round?',
-          actions: [{ label: `Focus ${settings.focusMinutes} min`, onPress: () => startTimer({ minutes: settings.focusMinutes, label: done.label, taskId: done.taskId, habitId: done.habitId }) }],
+          actions: [{ label: `Focus ${settings.focusMinutes} min`, onPress: () => (playSound(settings.focusSound as SoundId), startTimer({ minutes: settings.focusMinutes, label: done.label, taskId: done.taskId, habitId: done.habitId })) }],
         });
         return;
       }
@@ -42,7 +44,7 @@ export function TimerWatcher() {
             ? [{ label: 'Mark task as done', onPress: () => completeTask(task, task.repeat === 'none' ? task.date : todayKey()) }]
             : []),
           { label: `Take a ${settings.breakMinutes}-minute break`, onPress: () => startTimer({ minutes: settings.breakMinutes, mode: 'break', label: done.label, taskId: done.taskId, habitId: done.habitId }) },
-          { label: 'Keep going', onPress: () => startTimer({ minutes, label: done.label, taskId: done.taskId, habitId: done.habitId }) },
+          { label: 'Keep going', onPress: () => (playSound(settings.focusSound as SoundId), startTimer({ minutes, label: done.label, taskId: done.taskId, habitId: done.habitId })) },
         ],
       });
     };

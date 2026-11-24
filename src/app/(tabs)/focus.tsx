@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Button, Card, Chip, Field, Glyph, IconButton, Label, Press, Screen, Section, Text, showDialog } from '@/components/ui';
+import { SOUNDS, playSound, soundsSupported, stopSound, type SoundId } from '@/features/focus/sounds';
 import { TimerRing } from '@/features/focus/TimerRing';
 import { formatClock, useTick } from '@/features/focus/useTick';
 import { isDueToday } from '@/features/habits/logic';
@@ -11,7 +12,7 @@ import { addDays, formatDay, todayKey } from '@/lib/dates';
 import { updateSettings } from '@/store/actions/settings';
 import { addMinutes, pauseTimer, remainingSec, resumeTimer, startTimer, stopTimer } from '@/store/actions/timer';
 import { useHabits, useSettings, useTasks } from '@/store/hooks';
-import { useStore } from '@/store/store';
+import { getState, useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
 const PRESETS = [5, 15, 25, 45];
@@ -79,7 +80,19 @@ export default function FocusScreen() {
     };
   }, [sessions, today]);
 
+  const sound = settings.focusSound as SoundId;
+  const chooseSound = (id: SoundId) => {
+    updateSettings({ focusSound: id });
+    // Preview right away (and keep playing if a session is running).
+    if (timer.status === 'running' || id === 'off') playSound(id);
+    else {
+      playSound(id);
+      setTimeout(() => getState().timer.status !== 'running' && stopSound(), 2500);
+    }
+  };
+
   const start = () => {
+    playSound(sound);
     const label = target.kind === 'none' ? custom.trim() : target.label;
     startTimer({
       minutes,
@@ -93,7 +106,7 @@ export default function FocusScreen() {
     showDialog({
       title: 'End this session?',
       message: 'The minutes you’ve already done still count.',
-      actions: [{ label: 'End session', destructive: true, onPress: stopTimer }],
+      actions: [{ label: 'End session', destructive: true, onPress: () => (stopSound(), stopTimer()) }],
     });
 
   const status = idle ? 'Ready' : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
@@ -134,12 +147,37 @@ export default function FocusScreen() {
         ) : (
           <View style={styles.row}>
             {timer.status === 'running' ? (
-              <Button label="Pause" icon="pause" onPress={pauseTimer} style={{ minWidth: 140 }} />
+              <Button label="Pause" icon="pause" onPress={() => (stopSound(), pauseTimer())} style={{ minWidth: 140 }} />
             ) : (
-              <Button label="Resume" icon="play" onPress={resumeTimer} style={{ minWidth: 140 }} />
+              <Button label="Resume" icon="play" onPress={() => (playSound(sound), resumeTimer())} style={{ minWidth: 140 }} />
             )}
             <Button kind="secondary" label="+5 min" onPress={() => addMinutes(5)} />
             <Button kind="ghost" label="End" onPress={stop} />
+          </View>
+        )}
+        {soundsSupported && (
+          <View style={{ alignSelf: 'stretch', gap: space.sm }}>
+            <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', textAlign: 'center', fontSize: 11 }}>
+              Focus sound
+            </Text>
+            <View style={styles.sounds}>
+              {SOUNDS.map((x) => {
+                const on = sound === x.id;
+                return (
+                  <Press
+                    key={x.id}
+                    onPress={() => chooseSound(x.id)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: on }}
+                    style={[styles.sound, { backgroundColor: on ? c.accentSoft : c.surfaceAlt, borderColor: on ? c.accent : 'transparent' }]}>
+                    <Text style={{ fontSize: 16 }}>{x.icon}</Text>
+                    <Text variant="small" color={on ? c.accent : c.textMuted} style={{ fontSize: 11, fontWeight: '600' }}>
+                      {x.label}
+                    </Text>
+                  </Press>
+                );
+              })}
+            </View>
           </View>
         )}
       </Card>
@@ -237,5 +275,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
+  sounds: { flexDirection: 'row', justifyContent: 'space-between', gap: 6 },
+  sound: { flex: 1, alignItems: 'center', gap: 2, paddingVertical: 8, borderRadius: radius.md, borderWidth: 1.5 },
   session: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 62 },
 });
