@@ -201,11 +201,18 @@ export function PlannerView() {
         <Section
           title={isToday ? 'Your day' : `Plan for ${formatDay(day)}`}
           right={
-            items.length ? (
-              <Text variant="small" tone="muted">
-                {done} of {items.length} done
-              </Text>
-            ) : undefined
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
+              {items.length ? (
+                <Text variant="small" tone="muted">
+                  {done} of {items.length} done
+                </Text>
+              ) : null}
+              <Press onPress={() => router.push({ pathname: '/task', params: { date: day } })} hitSlop={10} accessibilityLabel="Add a plan">
+                <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
+                  + Add
+                </Text>
+              </Press>
+            </View>
           }>
           <DayPlan day={day} items={items} />
           {carryOver.length > 0 && (

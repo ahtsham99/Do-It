@@ -18,16 +18,16 @@ const REPEATS = Object.keys(REPEAT_LABELS) as Repeat[];
 export default function TaskEditor() {
   const { c } = useTheme();
   const sheetTop = useSheetTopInset();
-  const params = useLocalSearchParams<{ id?: string; date?: string; day?: string; title?: string }>();
+  const params = useLocalSearchParams<{ id?: string; date?: string; day?: string; title?: string; time?: string; duration?: string }>();
   const existing = useStore((s) => s.tasks.find((t) => t.id === params.id));
   const { use24h, notificationsEnabled } = useSettings();
 
   const [title, setTitle] = useState(existing?.title ?? params.title ?? '');
   const [notes, setNotes] = useState(existing?.notes ?? '');
   const [date, setDate] = useState<DayKey>(existing?.date ?? params.date ?? todayKey());
-  const [time, setTime] = useState<string | null>(existing?.time ?? null);
-  const [duration, setDuration] = useState<number | null>(existing?.duration ?? null);
-  const [reminder, setReminder] = useState<number | null>(existing?.reminder ?? null);
+  const [time, setTime] = useState<string | null>(existing?.time ?? params.time ?? null);
+  const [duration, setDuration] = useState<number | null>(existing?.duration ?? (params.duration ? Number(params.duration) : null));
+  const [reminder, setReminder] = useState<number | null>(existing?.reminder ?? (params.time ? 0 : null));
   const [repeat, setRepeat] = useState<Repeat>(existing?.repeat ?? 'none');
 
   const canSave = title.trim().length > 0;

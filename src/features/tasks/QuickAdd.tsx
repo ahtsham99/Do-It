@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
@@ -31,7 +32,18 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
   return (
     <View style={{ gap: 6 }}>
       <View style={[styles.wrap, { backgroundColor: c.surface, borderColor: c.border }]}>
-        <Icon name="add" size={22} color={c.textFaint} />
+        {/* + opens the full plan form for this day (whatever you've typed comes along). */}
+        <Press
+          onPress={() => {
+            router.push({ pathname: '/task', params: { date: day, ...(parsed.title && text.trim() ? { title: parsed.title } : {}), ...(parsed.time ? { time: parsed.time } : {}), ...(parsed.duration ? { duration: String(parsed.duration) } : {}) } });
+            setText('');
+          }}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Add with details"
+          style={[styles.plus, { backgroundColor: c.accentSoft }]}>
+          <Icon name="add" size={20} color={c.accent} />
+        </Press>
         <TextInput
           value={text}
           onChangeText={setText}
@@ -88,6 +100,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
   },
   input: { flex: 1, height: '100%', fontSize: 16, outlineStyle: 'none' } as object,
+  plus: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', marginLeft: -4 },
   go: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
   preview: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 4 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, height: 26, borderRadius: radius.pill },

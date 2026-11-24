@@ -14,7 +14,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 /**
  * Understands the little bits people type naturally:
- * "Gym tomorrow at 7am", "Call mum 18:30", "Dentist friday 3pm",
+ * "Gym tomorrow at 7am", "Wake up at 5.20am", "Call mum 18:30", "Dentist friday 3pm",
  * "Read tonight", "Pay rent next week". Anything not understood stays in the title.
  */
 export function parseQuickAdd(input: string, today: DayKey = todayKey()): ParsedQuickAdd {
@@ -32,7 +32,7 @@ export function parseQuickAdd(input: string, today: DayKey = todayKey()): Parsed
   };
 
   // Ranges: "7-8am", "7am-8:30am", "9:00-10:30", "from 2 to 4pm"
-  take(/\s(?:from\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:-|–|to)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i, (m) => {
+  take(/\s(?:from\s+)?(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\s*(?:-|–|to)\s*(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\b/i, (m) => {
     const endMer = m[6]?.toLowerCase();
     const startMer = m[3]?.toLowerCase() ?? endMer;
     const to24 = (h: number, mer?: string) => (mer ? (h % 12) + (mer === 'pm' ? 12 : 0) : h);
@@ -54,12 +54,12 @@ export function parseQuickAdd(input: string, today: DayKey = todayKey()): Parsed
   });
 
   // Times: "at 3pm", "3:30 pm", "15:00", "at 9", "noon", "midnight"
-  if (!time) take(/\s(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i, (m) => {
+  if (!time) take(/\s(?:at\s+)?(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)\b/i, (m) => {
     let h = Number(m[1]) % 12;
     if (m[3].toLowerCase() === 'pm') h += 12;
     time = `${pad(h)}:${pad(Number(m[2] ?? 0))}`;
   });
-  if (!time) take(/\s(?:at\s+)?([01]?\d|2[0-3]):([0-5]\d)\b/, (m) => (time = `${pad(Number(m[1]))}:${m[2]}`));
+  if (!time) take(/\s(?:at\s+)?([01]?\d|2[0-3])[:.]([0-5]\d)\b/, (m) => (time = `${pad(Number(m[1]))}:${m[2]}`));
   if (!time)
     take(/\sat\s+(\d{1,2})\b/i, (m) => {
       const h = Number(m[1]);
