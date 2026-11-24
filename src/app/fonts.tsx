@@ -7,7 +7,7 @@ import { Card, Icon, Press, Section, SheetHeader, Text } from '@/components/ui';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { LOGO, radius, space, useTheme } from '@/theme';
-import { DISPLAY_FONTS, TEXT_FONTS, faceForWeight, previewFaces } from '@/theme/fonts';
+import { DISPLAY_FONTS, FONT_STYLES, TEXT_FONTS, displayFont, faceForWeight, previewFaces, styleFor, textFont } from '@/theme/fonts';
 
 /** Pick the logo, heading and text fonts, with a live preview. */
 export default function FontsScreen() {
@@ -15,6 +15,7 @@ export default function FontsScreen() {
   const sheetTop = useSheetTopInset();
   const s = useSettings();
   const [previewsReady, setPreviewsReady] = useState(false);
+  const [custom, setCustom] = useState(false);
 
   // Load one face of every option so each card can show itself.
   useEffect(() => {
@@ -49,6 +50,33 @@ export default function FontsScreen() {
           <Text variant="bodyStrong">Read 20 pages · 4 day streak</Text>
         </Card>
 
+        <Section title="Style">
+          <View style={styles.grid}>
+            {FONT_STYLES.map((st) => {
+              const d = displayFont(st.choice.display).face?.family;
+              const t = faceForWeight(textFont(st.choice.text), 400)?.family;
+              const on = styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont })?.id === st.id;
+              return (
+                <Option key={st.id} selected={on} onPress={() => updateSettings({ logoFont: st.choice.logo, displayFont: st.choice.display, textFont: st.choice.text })}>
+                  <Text style={[{ fontSize: 26, lineHeight: 32 }, own(d), !d && { fontWeight: '600' }]}>{st.label}</Text>
+                  <Text variant="small" tone="muted" style={own(t)}>
+                    {st.blurb}
+                  </Text>
+                </Option>
+              );
+            })}
+          </View>
+        </Section>
+
+        <Press onPress={() => setCustom(!custom)} style={styles.customRow} accessibilityRole="button">
+          <Text variant="small" tone="muted" style={{ fontWeight: '600' }}>
+            Customise each font
+          </Text>
+          <Icon name={custom ? 'chevron-up' : 'chevron-down'} size={16} color={c.textMuted} />
+        </Press>
+
+        {custom && (
+        <>
         <Section title="Logo">
           <View style={styles.grid}>
             {DISPLAY_FONTS.map((f) => (
@@ -99,6 +127,9 @@ export default function FontsScreen() {
           </Card>
         </Section>
 
+        </>
+        )}
+
         <Press
           onPress={() => updateSettings({ logoFont: 'newsreader', displayFont: 'instrument', textFont: 'system' })}
           style={{ alignSelf: 'center', padding: space.sm }}>
@@ -142,6 +173,7 @@ const styles = StyleSheet.create({
     gap: 4,
     justifyContent: 'center',
   },
+  customRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: space.sm },
   tick: { position: 'absolute', top: 10, right: 10 },
   textRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 66 },
 });

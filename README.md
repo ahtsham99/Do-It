@@ -74,11 +74,11 @@ rewrites and the caching headers. You don't need to configure anything by hand.
 | **Due reminders** | Card on Today with **Done**, **Later** (15 min / 1 hour / 3 hours / tomorrow) and **Focus** (start a 5-minute session on it). Native: notification, also for snoozes. Web: the card is the reminder |
 | **Focus timer** | Countdown timer with a ring: 5 ("just start") / 15 / 25 / 45 min or custom, pick what you're working on, pause, +5 min, end early. Keeps running when the app is closed. When it ends: chime/haptic, then break or keep going; a linked habit is ticked and the session counts toward your streak. Today / week stats and recent sessions |
 | **Goals** | Habits tab → Goals. A goal is a bigger outcome tracked by small steps (tick them, or send one to today's reminders) or by a number (e.g. 2 of 12 books). Optional why, target date with days left, emoji and colour, linked habits, quick-start ideas. Reaching 100% marks it achieved. Top goals show on Today; weekly check-in and day-before-target notifications on native |
-| **Countdowns** | Events grouped by category; "days left" / "days ago"; emoji icon + colour; Future / Past; search |
+| **Countdowns** | Under Habits → Goals (full list via 'All'). Events grouped by category; "days left" / "days ago"; emoji icon + colour; Future / Past; search |
 | **Nudges** | Daily "Plan your day" ritual, completion toasts, Gentle / Firm / Relentless strength in calm language. Native: morning prompt, evening check-in, reminders and timer end |
 | **Streak & Profile** | Streak count, best, six-week calendar and habit streaks; profile with name, who you are and totals |
 | **Onboarding** | Asks who you are (student / professional / athlete / other) **only** to suggest habits and reminders |
-| **Fonts** | Settings → Appearance → Fonts: choose the logo font, heading font and text font separately, with a live preview. Options include Classic (Newsreader, the logo default), Editorial (Instrument Serif), Book, Soft, Elegant, Bold, Modern and System for logo/headings; System, Inter, DM Sans, Rounded, Easy to read (Atkinson Hyperlegible) and Serif for text. Only the chosen fonts load at start-up |
+| **Fonts** | Settings → Appearance → Fonts: one-tap styles (Classic, Bookish, Soft, Modern, Bold, Easy to read), or 'Customise each font' for logo, heading and text separately, with a live preview. Options include Classic (Newsreader, the logo default), Editorial (Instrument Serif), Book, Soft, Elegant, Bold, Modern and System for logo/headings; System, Inter, DM Sans, Rounded, Easy to read (Atkinson Hyperlegible) and Serif for text. Only the chosen fonts load at start-up |
 | **Look** | Day mode: the original warm off-white with a faint green glow and light dots. Night mode: true black, dark cards and a colour glow with a dotted texture; choose Forest, Ember, Electric, Violet or Mono |
 | **Settings** | Opened from your initials on Today. Profile, appearance (light/dark/auto, night colour) and fonts, nudge strength, notification times, focus and break length, light/dark/auto, week start, 24h clock, erase data |
 
@@ -139,3 +139,10 @@ development build (they aren't all in Expo Go).
 - Habits: daily + 3×/week habit, tick, backfill a past day, open history.
 - Settings → theme Dark/Light; erase everything → onboarding again.
 - On iPhone: Add to Home Screen → opens full-screen, status bar blends, works offline.
+
+## Latest additions
+- Main page: **Plan | Stats**. Stats shows streak, plans done, focus, habit check-ins, reminders done, focus by day, a habit week grid and 6 months of history, and goals.
+- Plans with a length ("Gym 7-8am", "Study at 4pm for 2h") show as blocks with free time between; in the evening, move unfinished plans to tomorrow in one tap.
+- Habits can have a daily count ("Drink water 0/8").
+- Focus sounds (web): Rain, Ocean, Deep, White, Tick.
+- Four tabs: Today, Habits, Reminders, Focus.

@@ -13,7 +13,7 @@ import { useSettings } from '@/store/hooks';
 import { resetAll } from '@/store/store';
 import type { ThemePreference, Tone } from '@/store/types';
 import { NIGHT_COLORS, radius, space, useTheme, type NightColor } from '@/theme';
-import { displayFont, textFont } from '@/theme/fonts';
+import { styleFor } from '@/theme/fonts';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
   { value: 'gentle', label: 'Gentle', blurb: 'Soft reminders, no pressure.' },
@@ -92,7 +92,7 @@ export function SettingsBody() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.label}>Fonts</Text>
             <Text variant="small" tone="muted">
-              {displayFont(s.logoFont).label} logo · {displayFont(s.displayFont).label} headings · {textFont(s.textFont).label} text
+              {styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont })?.label ?? 'Custom'} style
             </Text>
           </View>
           <Icon name="chevron-forward" size={18} color={c.textFaint} />

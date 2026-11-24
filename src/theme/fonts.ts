@@ -134,3 +134,17 @@ export function previewFaces(): Record<string, Source> {
   }
   return map;
 }
+
+/** Ready-made font combinations: one tap instead of three choices. */
+export const FONT_STYLES: { id: string; label: string; blurb: string; choice: FontChoice }[] = [
+  { id: 'classic', label: 'Classic', blurb: 'Elegant serif headings', choice: { logo: 'newsreader', display: 'instrument', text: 'system' } },
+  { id: 'book', label: 'Bookish', blurb: 'Warm and readable', choice: { logo: 'newsreader', display: 'source-serif', text: 'serif' } },
+  { id: 'soft', label: 'Soft', blurb: 'Round and friendly', choice: { logo: 'fraunces', display: 'fraunces', text: 'nunito' } },
+  { id: 'modern', label: 'Modern', blurb: 'Clean and simple', choice: { logo: 'inter', display: 'inter', text: 'inter' } },
+  { id: 'bold', label: 'Bold', blurb: 'Big and confident', choice: { logo: 'dm-serif', display: 'dm-serif', text: 'dm-sans' } },
+  { id: 'easy', label: 'Easy to read', blurb: 'For low vision and dyslexia', choice: { logo: 'newsreader', display: 'source-serif', text: 'atkinson' } },
+];
+
+export function styleFor(c: FontChoice) {
+  return FONT_STYLES.find((x) => x.choice.logo === c.logo && x.choice.display === c.display && x.choice.text === c.text);
+}
