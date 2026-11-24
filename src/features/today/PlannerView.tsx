@@ -8,6 +8,7 @@ import { FocusNowCard } from '@/features/focus/FocusNowCard';
 import { GoalCard } from '@/features/goals/GoalCard';
 import { HabitRing, tickHabit } from '@/features/habits/HabitCard';
 import { habitStreak } from '@/features/habits/logic';
+import { countFor } from '@/store/actions/habits';
 import { greeting } from '@/features/nudges/messages';
 import { ReminderCard } from '@/features/nudges/ReminderCard';
 import { DueReminderCard, useDueReminders } from '@/features/reminders/DueReminders';
@@ -247,9 +248,15 @@ export function PlannerView() {
                   <Text variant="small" tone="muted" numberOfLines={1} style={{ marginTop: 2, fontSize: 12 }}>
                     {h.name}
                   </Text>
-                  <Text variant="small" color={streak > 0 ? c.flame : c.textFaint} style={{ fontSize: 12 }}>
-                    {streak > 0 ? `🔥 ${streak}` : '—'}
-                  </Text>
+                  {(h.perDay ?? 1) > 1 ? (
+                    <Text variant="small" tone="muted" style={{ fontSize: 12, fontWeight: '600' }}>
+                      {countFor(h, n.today)}/{h.perDay}
+                    </Text>
+                  ) : (
+                    <Text variant="small" color={streak > 0 ? c.flame : c.textFaint} style={{ fontSize: 12 }}>
+                      {streak > 0 ? `🔥 ${streak}` : '—'}
+                    </Text>
+                  )}
                 </View>
               );
             })}

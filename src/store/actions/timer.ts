@@ -1,7 +1,7 @@
 import { todayKey } from '@/lib/dates';
 import { uid } from '@/lib/id';
 
-import { toggleHabit } from './habits';
+import { stepHabit } from './habits';
 import { markActive } from './stats';
 import { getState, setState } from '../store';
 import { DEFAULT_TIMER, type TimerMode, type TimerState } from '../types';
@@ -106,7 +106,7 @@ export function completeTimer(): TimerState | null {
     record(t, true);
     markActive(todayKey());
     const habit = t.habitId ? getState().habits.find((h) => h.id === t.habitId && !h.deletedAt) : null;
-    if (habit && !habit.history.includes(todayKey())) toggleHabit(habit, todayKey());
+    if (habit && !habit.history.includes(todayKey())) stepHabit(habit, todayKey());
   }
   setState(() => ({ timer: { ...t, status: 'idle', endsAt: null, remainingSec: 0 } }));
   return t;

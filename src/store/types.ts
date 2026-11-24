@@ -57,6 +57,10 @@ export interface Habit extends SyncMeta {
   archived?: boolean;
   /** Optional goal this habit helps with. */
   goalId?: string | null;
+  /** How many times a day counts as done (e.g. 8 glasses of water). Default 1. */
+  perDay?: number;
+  /** Partial progress per day, for habits with perDay > 1. */
+  counts?: Record<DayKey, number>;
 }
 
 export type GoalKind = 'steps' | 'number';

@@ -25,6 +25,7 @@ export default function HabitEditor() {
   const [color, setColor] = useState(existing?.color ?? SWATCHES[0]);
   const [frequency, setFrequency] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [timesPerWeek, setTimes] = useState(existing?.timesPerWeek ?? 3);
+  const [perDay, setPerDay] = useState(existing?.perDay ?? 1);
   const goals = useGoals().filter((g) => !g.completedAt);
   const [goalId, setGoalId] = useState<string | null>(existing?.goalId ?? null);
 
@@ -32,7 +33,7 @@ export default function HabitEditor() {
   const close = () => (router.canGoBack() ? router.back() : router.replace('/habits'));
   const save = () => {
     if (!canSave) return;
-    const data = { name: name.trim(), icon, color, frequency, timesPerWeek: frequency === 'weekly' ? timesPerWeek : 1, goalId };
+    const data = { name: name.trim(), icon, color, frequency, timesPerWeek: frequency === 'weekly' ? timesPerWeek : 1, perDay: frequency === 'daily' ? perDay : 1, goalId };
     if (existing) updateHabit(existing.id, data);
     else addHabit(data);
     close();
@@ -77,6 +78,23 @@ export default function HabitEditor() {
             value={frequency}
             onChange={setFrequency}
           />
+          {frequency === 'daily' && (
+            <Card style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flex: 1 }}>
+                <Text>Times a day</Text>
+                <Text variant="small" tone="muted">
+                  {perDay === 1 ? 'Once is enough' : `Tap the ring ${perDay} times, e.g. glasses of water`}
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                <IconButton icon="remove" label="Fewer" size={18} onPress={() => setPerDay(Math.max(1, perDay - 1))} />
+                <Text variant="heading" style={{ minWidth: 22, textAlign: 'center' }}>
+                  {perDay}
+                </Text>
+                <IconButton icon="add" label="More" size={18} onPress={() => setPerDay(Math.min(30, perDay + 1))} />
+              </View>
+            </Card>
+          )}
           {frequency === 'weekly' && (
             <Card style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <Text>Target per week</Text>

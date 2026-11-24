@@ -3,9 +3,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { Card, Glyph, Icon, Press, SwipeToDelete, Text, showToast, tap } from '@/components/ui';
 import { deleteHabitWithUndo } from '@/features/delete/deleteWithUndo';
+import { TimerRing } from '@/features/focus/TimerRing';
 import { randomLine } from '@/features/nudges/messages';
 import { range, startOfWeek, todayKey, weekdayShort } from '@/lib/dates';
-import { toggleHabit } from '@/store/actions/habits';
+import { countFor, setHabitDay, stepHabit } from '@/store/actions/habits';
 import { useSettings } from '@/store/hooks';
 import type { Habit } from '@/store/types';
 import { space, useTheme } from '@/theme';
@@ -16,36 +17,34 @@ import { bestHabitStreak, habitStreak, streakLabel, weekCount } from './logic';
 export function tickHabit(habit: Habit, day: string, tone: Parameters<typeof randomLine>[1], weekStartsOn: 0 | 1) {
   const wasDone = habit.history.includes(day);
   tap(wasDone ? 'light' : 'success');
-  if (toggleHabit(habit, day) && day === todayKey()) {
+  if (stepHabit(habit, day) && day === todayKey()) {
     const s = habitStreak({ ...habit, history: [...habit.history, day] }, day, weekStartsOn);
     showToast(s > 1 ? `${streakLabel(habit, s)} in a row. ${randomLine('done', tone)}` : randomLine('done', tone), 'flame');
   }
 }
 
-/** Ring with the habit's emoji; filled in the habit colour once ticked today. */
+/** Ring with the habit's emoji; fills as you go (counted habits) and when done today. */
 export function HabitRing({ habit, size = 64, onPress }: { habit: Habit; size?: number; onPress?: () => void }) {
   const { c, paint } = useTheme();
   const color = paint(habit.color);
-  const done = habit.history.includes(todayKey());
+  const today = todayKey();
+  const done = habit.history.includes(today);
+  const target = Math.max(1, habit.perDay ?? 1);
+  const count = countFor(habit, today);
   return (
     <Press
       haptic={false}
       onPress={onPress}
       disabled={!onPress}
-      accessibilityRole="checkbox"
+      accessibilityRole="button"
       accessibilityState={{ checked: done }}
-      accessibilityLabel={`Tick ${habit.name}`}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        borderWidth: 3,
-        borderColor: done ? color : c.border,
-        backgroundColor: done ? c.accentSoft : c.surface,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <Glyph value={habit.icon} size={size * 0.42} color={color} />
+      accessibilityLabel={target > 1 ? `${habit.name}: ${count} of ${target}. Tap to add one` : `Tick ${habit.name}`}
+      style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <TimerRing size={size} stroke={3} progress={target > 1 ? count / target : done ? 1 : 0} color={color}>
+        <View style={{ width: size - 6, height: size - 6, borderRadius: size, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.accentSoft : c.surface }}>
+          <Glyph value={habit.icon} size={size * 0.42} color={color} />
+        </View>
+      </TimerRing>
       {done && (
         <View style={[styles.badge, { backgroundColor: color, borderColor: c.surface }]}>
           <Icon name="checkmark" size={11} color="#fff" />
@@ -75,6 +74,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
             {habit.name}
           </Text>
           <Text variant="small" tone="muted">
+            {(habit.perDay ?? 1) > 1 ? `${countFor(habit, today)}/${habit.perDay} today · ` : ''}
             {streak > 0 ? `${streakLabel(habit, streak)} streak` : 'No streak yet'} · best {best}
             {habit.frequency === 'weekly' ? ` · ${weekCount(habit, today, weekStartsOn)}/${habit.timesPerWeek} this week` : ''}
           </Text>
@@ -92,7 +92,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
               key={d}
               haptic={false}
               disabled={future}
-              onPress={() => tickHabit(habit, d, tone, weekStartsOn)}
+              onPress={() => (d === today ? tickHabit(habit, d, tone, weekStartsOn) : setHabitDay(habit, d, !hit))}
               accessibilityLabel={`${weekdayShort(d)} ${hit ? 'done' : 'not done'}`}
               style={[
                 styles.day,
