@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 
 import { storage } from '@/lib/storage';
 
-import { DEFAULT_SETTINGS, DEFAULT_STATS, DEFAULT_TIMER, type AppState } from './types';
+import { DEFAULT_LISTS, DEFAULT_SETTINGS, DEFAULT_STATS, DEFAULT_TIMER, type AppState } from './types';
 
 /**
  * Tiny local-first store. State lives in memory, every slice is persisted to
@@ -10,9 +10,9 @@ import { DEFAULT_SETTINGS, DEFAULT_STATS, DEFAULT_TIMER, type AppState } from '.
  * write through the action modules in `src/store/actions/*`.
  */
 
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 type Slice = Exclude<keyof AppState, 'hydrated'>;
-const SLICES: Slice[] = ['tasks', 'habits', 'countdowns', 'settings', 'stats', 'timer', 'sessions', 'goals'];
+const SLICES: Slice[] = ['tasks', 'habits', 'countdowns', 'settings', 'stats', 'timer', 'sessions', 'goals', 'lists', 'reminders'];
 
 function initialState(hydrated: boolean): AppState {
   return {
@@ -25,6 +25,8 @@ function initialState(hydrated: boolean): AppState {
     timer: DEFAULT_TIMER,
     sessions: [],
     goals: [],
+    lists: DEFAULT_LISTS,
+    reminders: [],
   };
 }
 
@@ -70,7 +72,7 @@ export async function hydrate() {
   if (state.hydrated) return;
   const version = await storage.read<number>('schemaVersion', SCHEMA_VERSION);
   const base = initialState(true);
-  const [tasks, habits, countdowns, settings, stats, timer, sessions, goals] = await Promise.all([
+  const [tasks, habits, countdowns, settings, stats, timer, sessions, goals, lists, reminders] = await Promise.all([
     storage.read('tasks', base.tasks),
     storage.read('habits', base.habits),
     storage.read('countdowns', base.countdowns),
@@ -79,6 +81,8 @@ export async function hydrate() {
     storage.read('timer', base.timer),
     storage.read('sessions', base.sessions),
     storage.read('goals', base.goals),
+    storage.read('lists', base.lists),
+    storage.read('reminders', base.reminders),
   ]);
   state = migrate(version, {
     hydrated: true,
@@ -91,12 +95,14 @@ export async function hydrate() {
     timer: { ...DEFAULT_TIMER, ...timer },
     sessions,
     goals,
+    lists: lists.length ? lists : DEFAULT_LISTS,
+    reminders,
   });
   await storage.write('schemaVersion', SCHEMA_VERSION);
   listeners.forEach((l) => l());
 }
 
-/** Hook for future data shape changes. v2 and v3 only added slices with defaults. */
+/** Hook for future data shape changes. v2–v4 only added slices with defaults. */
 function migrate(_from: number, s: AppState): AppState {
   return s;
 }

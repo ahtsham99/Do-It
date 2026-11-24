@@ -17,7 +17,7 @@ const TIME_W = 54;
  * in order, with a "Now" line on today. Tap the circle to tick, tap the row to
  * edit, swipe left to delete.
  */
-export function DayPlan({ day, items }: { day: DayKey; items: Occurrence[] }) {
+export function DayPlan({ day, items, compact }: { day: DayKey; items: Occurrence[]; compact?: boolean }) {
   const { c } = useTheme();
   const { use24h } = useSettings();
   const today = todayKey();
@@ -27,6 +27,13 @@ export function DayPlan({ day, items }: { day: DayKey; items: Occurrence[] }) {
   const nowIndex = day === today ? timed.findIndex((o) => o.task.time! > now) : -1;
   const showNowAtEnd = day === today && timed.length > 0 && nowIndex === -1;
 
+  if (items.length === 0 && compact) {
+    return (
+      <Text variant="small" tone="faint" style={{ paddingHorizontal: 4 }}>
+        Nothing planned
+      </Text>
+    );
+  }
   if (items.length === 0) {
     return (
       <Card style={{ alignItems: 'center', paddingVertical: space.xl, gap: 4 }}>

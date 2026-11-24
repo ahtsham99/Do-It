@@ -11,6 +11,7 @@ import { habitStreak, isDueToday } from '@/features/habits/logic';
 import { greeting, pick } from '@/features/nudges/messages';
 import { ProgressCard } from '@/features/nudges/ProgressCard';
 import { ReminderCard } from '@/features/nudges/ReminderCard';
+import { DueReminderCard, useDueReminders } from '@/features/reminders/DueReminders';
 import { useNudges } from '@/features/nudges/useNudges';
 import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { TaskList } from '@/features/tasks/TaskList';
@@ -34,6 +35,7 @@ export function HomeView() {
   const habits = useHabits();
   const countdowns = useCountdowns();
   const [, force] = useState(0);
+  const dueItems = useDueReminders();
 
   const habitsLeft = habits.filter((h) => h.frequency === 'daily' && isDueToday(h, n.today, weekStartsOn));
   const next = countdowns.filter((x) => x.date >= n.today).sort((a, b) => (a.date < b.date ? -1 : 1))[0];
@@ -60,12 +62,15 @@ export function HomeView() {
   const plural = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
   // Most important first. Only the first shows at the top, as one slim line.
   const nudges: Nudge[] = [];
+  for (const r of dueItems) {
+    nudges.push({ key: `ri:${r.id}`, kind: 'warning', icon: 'notifications-outline', title: `Remember: ${r.title}`, onPress: () => router.push({ pathname: '/reminder', params: { id: r.id } }) });
+  }
   for (const o of reminders) {
     nudges.push({ key: `r:${o.task.id}`, kind: 'warning', icon: 'alarm-outline', title: `Reminder: ${o.task.title}`, onPress: () => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } }) });
   }
   if (!n.planned) nudges.push({ key: 'plan', kind: 'accent', icon: 'sunny-outline', title: 'Plan your day', onPress: () => router.push('/plan') });
   if (n.overdue.length > 0) nudges.push({ key: 'overdue', kind: 'danger', icon: 'time-outline', title: `${plural(n.overdue.length, 'task')} still waiting`, onPress: () => router.push('/plan') });
-  if (n.evening && n.open.length > 0 && n.planned) nudges.push({ key: 'open', kind: 'warning', icon: 'moon-outline', title: `${n.open.length} left for today`, onPress: () => router.push('/planner') });
+  if (n.evening && n.open.length > 0 && n.planned) nudges.push({ key: 'open', kind: 'warning', icon: 'moon-outline', title: `${n.open.length} left for today`, onPress: () => router.push('/') });
   if (n.streakAtRisk) nudges.push({ key: 'streak', kind: 'warning', icon: 'flame-outline', title: `Keep your ${n.streak}-day streak going`, onPress: () => router.push('/streaks') });
   const timerRunning = !timerIdle;
 
@@ -99,7 +104,7 @@ export function HomeView() {
         <Section
           title="Up next"
           right={
-            <Press onPress={addTask} hitSlop={10} accessibilityLabel="Add reminder" style={styles.add}>
+            <Press onPress={addTask} hitSlop={10} accessibilityLabel="Add to plan" style={styles.add}>
               <Icon name="add" size={16} color={c.accent} />
               <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
                 Add
@@ -110,7 +115,7 @@ export function HomeView() {
             <UpNext items={upNext} />
           ) : (
             <Text variant="small" tone="muted">
-              Nothing coming up. Tap Add for anything you might forget.
+              Nothing coming up. Tap Add to plan something.
             </Text>
           )}
         </Section>
@@ -159,9 +164,12 @@ export function HomeView() {
           </Section>
         )}
 
-        {reminders.length > 0 && (
+        {(reminders.length > 0 || dueItems.length > 0) && (
           <Section title="Due now">
             <View style={{ gap: space.sm }}>
+              {dueItems.map((r) => (
+                <DueReminderCard key={r.id} item={r} />
+              ))}
               {reminders.map((o) => (
                 <ReminderCard
                   key={o.task.id}
@@ -180,9 +188,9 @@ export function HomeView() {
           {n.todays.length === 0 ? (
             <Empty
               icon="alarm-outline"
-              title="Nothing to remember today"
-              body="Add anything you might forget. We’ll remind you at the right moment."
-              action="Add a reminder"
+              title="Nothing planned today"
+              body="Plan your day in a line or two. Add a time and we’ll remind you."
+              action="Add to today"
               onAction={addTask}
             />
           ) : (

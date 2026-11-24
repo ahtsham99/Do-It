@@ -98,7 +98,15 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
     }
   }
 
-  // Snoozed reminders.
+  // Things to remember (Reminders tab) with an alert time.
+  for (const r of state.reminders) {
+    if (r.deletedAt || r.done) continue;
+    const at = r.snoozedUntil && r.snoozedUntil > now.getTime() ? r.snoozedUntil : r.remindAt;
+    if (!at || at <= now.getTime()) continue;
+    out.push({ id: `rem-${r.id}`, date: new Date(at), title: r.title, body: `${pick('reminder', settings.tone, r.id)} you asked to remember this.`, url: `/reminder?id=${r.id}` });
+  }
+
+  // Snoozed plan items.
   for (const task of tasks) {
     if (task.snoozedUntil && task.snoozedUntil > now.getTime()) {
       out.push({

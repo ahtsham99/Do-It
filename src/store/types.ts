@@ -23,6 +23,27 @@ export interface Task extends SyncMeta {
   snoozedUntil?: number | null;
 }
 
+/** A list of things to remember (e.g. "Reminders", "Groceries"). */
+export interface ReminderList extends SyncMeta {
+  name: string;
+  icon: string;
+}
+
+/**
+ * Something to remember — not a scheduled plan. Optionally alerts at a time.
+ * e.g. "Call dentist for mum", "Milk".
+ */
+export interface ReminderItem extends SyncMeta {
+  listId: string;
+  title: string;
+  notes?: string;
+  done: boolean;
+  doneAt?: number | null;
+  /** Epoch ms to alert at, or null for no alert. */
+  remindAt?: number | null;
+  snoozedUntil?: number | null;
+}
+
 export type HabitFrequency = 'daily' | 'weekly';
 
 export interface Habit extends SyncMeta {
@@ -148,6 +169,8 @@ export interface AppState {
   timer: TimerState;
   sessions: FocusSession[];
   goals: Goal[];
+  lists: ReminderList[];
+  reminders: ReminderItem[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -183,3 +206,10 @@ export const DEFAULT_TIMER: TimerState = {
 };
 
 export const DEFAULT_STATS: Stats = { activeDays: [], plannedDays: [], bestStreak: 0 };
+
+/** Starter lists. Fixed ids so they're the same on every device. */
+export const INBOX_LIST = 'list_inbox';
+export const DEFAULT_LISTS: ReminderList[] = [
+  { id: INBOX_LIST, name: 'Reminders', icon: '🔔', createdAt: 0, updatedAt: 0 },
+  { id: 'list_groceries', name: 'Groceries', icon: '🛒', createdAt: 0, updatedAt: 0 },
+];

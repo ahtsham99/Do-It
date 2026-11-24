@@ -27,7 +27,7 @@ export function SuggestionPicker({
           ))}
         </Card>
       </Section>
-      <Section title="Repeating reminders">
+      <Section title="Repeating plans">
         <Card padded={false} style={{ paddingHorizontal: space.lg }}>
           {tasks.map((s, i) => (
             <Row key={suggestionKey(s)} s={s} on={selected.has(suggestionKey(s))} onToggle={onToggle} last={i === tasks.length - 1} />

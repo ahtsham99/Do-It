@@ -10,6 +10,7 @@ import { HabitRing, tickHabit } from '@/features/habits/HabitCard';
 import { habitStreak } from '@/features/habits/logic';
 import { greeting } from '@/features/nudges/messages';
 import { ReminderCard } from '@/features/nudges/ReminderCard';
+import { DueReminderCard, useDueReminders } from '@/features/reminders/DueReminders';
 import { useNudges } from '@/features/nudges/useNudges';
 import { occurrencesOn } from '@/features/tasks/logic';
 import { MonthGrid } from '@/features/tasks/MonthGrid';
@@ -18,8 +19,9 @@ import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { DayPlan } from '@/features/today/DayPlan';
 import { NudgeStrip, type Nudge } from '@/features/today/NudgeStrip';
 import { StatCard } from '@/features/today/StatCard';
-import { addDays, addMonths, diffDays, formatDay, fromKey, monthName, type DayKey } from '@/lib/dates';
+import { addDays, addMonths, diffDays, formatDay, fromKey, monthName, range, startOfWeek, type DayKey } from '@/lib/dates';
 import { useCountdowns, useGoals, useHabits, useSettings, useTasks } from '@/store/hooks';
+import { recall, remember } from '@/lib/uiMemory';
 import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
 
@@ -52,9 +54,15 @@ export function PlannerView() {
   const sessions = useStore((s) => s.sessions);
   const timerIdle = useStore((s) => s.timer.status === 'idle');
   const [, force] = useState(0);
+  const dueItems = useDueReminders();
 
   const [day, setDay] = useState<DayKey>(n.today);
   const [monthOpen, setMonthOpen] = useState(false);
+  const [span, setSpanState] = useState<'day' | 'week'>(() => recall('plan.span', 'day'));
+  const setSpan = (v: 'day' | 'week') => {
+    remember('plan.span', v);
+    setSpanState(v);
+  };
   const isToday = day === n.today;
   const items = occurrencesOn(tasks, day);
   const done = items.filter((o) => o.done).length;
@@ -67,18 +75,40 @@ export function PlannerView() {
   const plural = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
   // Most important first; only the first shows, as one slim line, and only on today.
   const nudges: Nudge[] = [];
+  const tomorrow = addDays(n.today, 1);
+  const tomorrowCount = occurrencesOn(tasks, tomorrow).length;
+  // In the evening, the most useful thing is to set up tomorrow.
+  const planTomorrow: Nudge | null =
+    n.now.getHours() >= 17
+      ? { key: 'tomorrow', kind: 'accent', icon: 'moon-outline', title: tomorrowCount ? `Plan tomorrow · ${tomorrowCount} planned so far` : 'Plan tomorrow while it’s fresh', onPress: () => (setSpan('day'), pick(tomorrow)) }
+      : null;
+  for (const r of dueItems) {
+    nudges.push({ key: `ri:${r.id}`, kind: 'warning', icon: 'notifications-outline', title: `Remember: ${r.title}`, onPress: () => router.push({ pathname: '/reminder', params: { id: r.id } }) });
+  }
   for (const o of reminders) {
     nudges.push({ key: `r:${o.task.id}`, kind: 'warning', icon: 'alarm-outline', title: `Reminder: ${o.task.title}`, onPress: () => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } }) });
   }
+  if (planTomorrow) nudges.push(planTomorrow);
   if (n.overdue.length > 0) nudges.push({ key: 'overdue', kind: 'danger', icon: 'time-outline', title: `${plural(n.overdue.length, 'thing')} from earlier still waiting`, onPress: () => router.push('/plan') });
-  if (!n.planned) nudges.push({ key: 'plan', kind: 'accent', icon: 'sunny-outline', title: 'Plan your day', onPress: () => router.push('/plan') });
+  if (!n.planned && !planTomorrow) nudges.push({ key: 'plan', kind: 'accent', icon: 'sunny-outline', title: 'Plan your day', onPress: () => router.push('/plan') });
   if (n.streakAtRisk) nudges.push({ key: 'streak', kind: 'warning', icon: 'flame-outline', title: `Keep your ${n.streak}-day streak going`, onPress: () => router.push('/streaks') });
 
   const pick = (d: DayKey) => {
     setDay(d);
     setMonthOpen(false);
   };
+  const pickFromStrip = (d: DayKey) => {
+    pick(d);
+    setSpan('day');
+  };
   const step = (dir: 1 | -1) => setDay(monthOpen ? addMonths(day, dir) : addDays(day, 7 * dir));
+  const weekStart = startOfWeek(day, weekStartsOn);
+  const weekDays = range(weekStart, 7);
+  const weekLabel = (() => {
+    const thisWeek = startOfWeek(n.today, weekStartsOn);
+    const d = diffDays(thisWeek, weekStart);
+    return d === 0 ? 'This week' : d === 7 ? 'Next week' : d === -7 ? 'Last week' : `Week of ${formatDay(weekStart, { relative: false })}`;
+  })();
 
   return (
     <>
@@ -87,7 +117,7 @@ export function PlannerView() {
         <View style={styles.titleRow}>
           <Press haptic={false} onPress={() => setMonthOpen(!monthOpen)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : 'Show month'} style={styles.titleBtn}>
             <Text style={{ fontFamily: SERIF, fontSize: 46, lineHeight: 50, letterSpacing: -0.8, flexShrink: 1 }} numberOfLines={1}>
-              {monthOpen ? monthName(day) : dayTitle(day, n.today)}
+              {monthOpen ? monthName(day) : span === 'week' ? weekLabel : dayTitle(day, n.today)}
             </Text>
             <Icon name={monthOpen ? 'chevron-up' : 'chevron-down'} size={20} color={c.textMuted} />
           </Press>
@@ -101,46 +131,86 @@ export function PlannerView() {
           <IconButton icon="chevron-back" label={monthOpen ? 'Previous month' : 'Previous week'} size={16} diameter={34} onPress={() => step(-1)} />
           <IconButton icon="chevron-forward" label={monthOpen ? 'Next month' : 'Next week'} size={16} diameter={34} onPress={() => step(1)} />
         </View>
-        <Text variant="small" tone="muted" numberOfLines={1}>
-          {monthOpen
-            ? `${fromKey(day).getFullYear()} · tap a day`
-            : `${formatDay(day, { relative: false, long: true })}${isToday ? ` · ${greeting(n.now.getHours())}${name.trim() ? `, ${name.trim()}` : ''}` : ''}`}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+          <Text variant="small" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
+            {monthOpen
+              ? `${fromKey(day).getFullYear()} · tap a day`
+              : span === 'week'
+                ? `${formatDay(weekStart, { relative: false })} – ${formatDay(addDays(weekStart, 6), { relative: false })}`
+                : `${formatDay(day, { relative: false, long: true })}${isToday ? ` · ${greeting(n.now.getHours())}${name.trim() ? `, ${name.trim()}` : ''}` : ''}`}
+          </Text>
+          {!monthOpen && (
+            <View style={[styles.span, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
+              {(['day', 'week'] as const).map((v) => (
+                <Press key={v} onPress={() => setSpan(v)} accessibilityRole="tab" accessibilityState={{ selected: span === v }} style={[styles.spanOpt, span === v && { backgroundColor: c.surface }]}>
+                  <Text variant="small" color={span === v ? c.text : c.textMuted} style={{ fontWeight: '600', fontSize: 12 }}>
+                    {v === 'day' ? 'Day' : 'Week'}
+                  </Text>
+                </Press>
+              ))}
+            </View>
+          )}
+        </View>
       </View>
 
       {monthOpen ? (
-        <MonthGrid month={day} selected={day} onSelect={pick} tasks={tasks} weekStartsOn={weekStartsOn} />
+        <MonthGrid month={day} selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
       ) : (
-        <WeekStrip selected={day} onSelect={pick} tasks={tasks} weekStartsOn={weekStartsOn} />
+        <WeekStrip selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
       )}
 
       {isToday && (!timerIdle ? <FocusNowCard compact /> : nudges[0] ? <NudgeStrip nudge={nudges[0]} more={nudges.length - 1} onMore={() => router.push('/plan')} /> : null)}
 
-      {/* The day's plan */}
-      <Section
-        title={isToday ? 'Your day' : `Plan for ${formatDay(day)}`}
-        right={
-          items.length ? (
-            <Text variant="small" tone="muted">
-              {done} of {items.length} done
-            </Text>
-          ) : undefined
-        }>
-        <DayPlan day={day} items={items} />
-        <QuickAdd date={day} placeholder={isToday ? 'Add to today… e.g. Gym at 7am' : `Add to ${formatDay(day)}… e.g. Call mum 6pm`} />
-        {isToday && n.open.length > 0 && timerIdle && (
-          <Press onPress={() => router.push('/focus')} style={{ alignSelf: 'center', padding: space.xs }}>
-            <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
-              Putting something off? Focus on it for 5 minutes
-            </Text>
-          </Press>
-        )}
-      </Section>
+      {span === 'week' && !monthOpen ? (
+        <>
+          {weekDays.map((d) => {
+            const its = occurrencesOn(tasks, d);
+            return (
+              <Section
+                key={d}
+                title={formatDay(d)}
+                right={
+                  <Press onPress={() => pickFromStrip(d)} hitSlop={8}>
+                    <Text variant="small" tone="muted">
+                      {its.length ? `${its.filter((o) => o.done).length}/${its.length}` : 'Open'} ›
+                    </Text>
+                  </Press>
+                }>
+                <DayPlan day={d} items={its} compact />
+              </Section>
+            );
+          })}
+          <QuickAdd date={day < weekStart || day > addDays(weekStart, 6) ? weekStart : day} placeholder="Add to this week… e.g. Gym friday 7am" />
+        </>
+      ) : (
+        <Section
+          title={isToday ? 'Your day' : `Plan for ${formatDay(day)}`}
+          right={
+            items.length ? (
+              <Text variant="small" tone="muted">
+                {done} of {items.length} done
+              </Text>
+            ) : undefined
+          }>
+          <DayPlan day={day} items={items} />
+          <QuickAdd date={day} placeholder={isToday ? 'Add to today… e.g. Gym at 7am' : `Add to ${formatDay(day)}… e.g. Call mum 6pm`} />
+          {isToday && n.open.length > 0 && timerIdle && (
+            <Press onPress={() => router.push('/focus')} style={{ alignSelf: 'center', padding: space.xs }}>
+              <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
+                Putting something off? Focus on it for 5 minutes
+              </Text>
+            </Press>
+          )}
+        </Section>
+      )}
 
       {/* Everything else */}
-      {reminders.length > 0 && (
+      {(reminders.length > 0 || dueItems.length > 0) && (
         <Section title="Due now">
           <View style={{ gap: space.sm }}>
+            {dueItems.map((r) => (
+              <DueReminderCard key={r.id} item={r} />
+            ))}
             {reminders.map((o) => (
               <ReminderCard
                 key={o.task.id}
@@ -224,4 +294,6 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   titleBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
   todayPill: { height: 34, paddingHorizontal: 12, borderRadius: 17, justifyContent: 'center' },
+  span: { flexDirection: 'row', borderRadius: 999, borderWidth: 1, padding: 2 },
+  spanOpt: { height: 26, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center' },
 });

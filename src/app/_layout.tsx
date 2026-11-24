@@ -57,6 +57,7 @@ function Navigator() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="task" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="reminder" options={{ presentation: 'modal' }} />
         <Stack.Screen name="plan" options={{ presentation: 'modal' }} />
         <Stack.Screen name="countdown" options={{ presentation: 'modal' }} />
         <Stack.Screen name="habit" options={{ presentation: 'modal' }} />

@@ -34,7 +34,7 @@ export function deleteTaskWithUndo(task: Task, day: DayKey) {
     return;
   }
   showDialog({
-    title: 'Delete repeating reminder',
+    title: 'Delete repeating plan',
     message: `“${task.title}”`,
     actions: [
       {

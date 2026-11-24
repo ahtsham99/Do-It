@@ -26,3 +26,13 @@ export function useGoals() {
   const goals = useStore((s) => s.goals);
   return useMemo(() => goals.filter((g) => !g.deletedAt), [goals]);
 }
+
+export function useLists() {
+  const lists = useStore((s) => s.lists);
+  return useMemo(() => lists.filter((l) => !l.deletedAt), [lists]);
+}
+
+export function useReminders() {
+  const items = useStore((s) => s.reminders);
+  return useMemo(() => items.filter((r) => !r.deletedAt), [items]);
+}

@@ -182,7 +182,7 @@ export default function GoalScreen() {
                     <Press
                       onPress={() => {
                         addTask({ title: s.title, date: todayKey(), repeat: 'none', reminder: null, time: null });
-                        showToast('Added to today’s reminders.', 'alarm-outline');
+                        showToast('Added to today’s plan.', 'calendar-outline');
                       }}
                       accessibilityLabel={`Add ${s.title} to today`}
                       style={[styles.mini, { backgroundColor: c.surfaceAlt }]}>

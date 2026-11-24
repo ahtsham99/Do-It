@@ -30,7 +30,7 @@ export default function TaskEditor() {
   const [repeat, setRepeat] = useState<Repeat>(existing?.repeat ?? 'none');
 
   const canSave = title.trim().length > 0;
-  const close = () => (router.canGoBack() ? router.back() : router.replace('/planner'));
+  const close = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
   const save = () => {
     if (!canSave) return;
@@ -67,13 +67,13 @@ export default function TaskEditor() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={{ paddingTop: sheetTop }}>
-        <SheetHeader title={existing ? 'Edit reminder' : 'New reminder'} onSave={save} canSave={canSave} />
+        <SheetHeader title={existing ? 'Edit plan' : 'Add to plan'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <Field
-          placeholder="What do you want to remember?"
+          placeholder="What’s the plan?"
           value={title}
           onChangeText={setTitle}
           autoFocus={!existing}
@@ -126,7 +126,7 @@ export default function TaskEditor() {
             <Text variant="small" tone="muted">
               {!time ? 'No time set — you’ll be reminded at 9am. ' : ''}
               {Platform.OS === 'web'
-                ? 'In the web app, reminders appear as banners on the Today screen.'
+                ? 'In the web app, this shows on your main page when it’s time.'
                 : !notificationsEnabled
                   ? 'Turn on notifications in Settings to get this reminder.'
                   : ''}
@@ -145,7 +145,7 @@ export default function TaskEditor() {
 
         <Field label="Notes" placeholder="Details, links, sub-steps…" value={notes} onChangeText={setNotes} multiline />
 
-        <Button label={existing ? 'Save changes' : 'Add reminder'} onPress={save} disabled={!canSave} />
+        <Button label={existing ? 'Save changes' : 'Add to plan'} onPress={save} disabled={!canSave} />
         {existing && (
           <Button
             kind="secondary"
