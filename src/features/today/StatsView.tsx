@@ -8,7 +8,7 @@ import { HistoryGrid } from '@/features/habits/HistoryGrid';
 import { WeekGrid } from '@/features/habits/WeekGrid';
 import { useNudges } from '@/features/nudges/useNudges';
 import { occurrencesInRange } from '@/features/tasks/logic';
-import { addDays, range, weekdayShort } from '@/lib/dates';
+import { addDays, diffDays, range, toKey, weekdayShort } from '@/lib/dates';
 import { useGoals, useHabits, useReminders, useSettings, useTasks } from '@/store/hooks';
 import type { Habit } from '@/store/types';
 import { useStore } from '@/store/store';
@@ -20,6 +20,7 @@ const HISTORY_RANGES = [
   { id: '3M', weeks: 13, title: 'Last 3 months' },
   { id: '6M', weeks: 26, title: 'Last 6 months' },
   { id: '1Y', weeks: 52, title: 'Last year' },
+  { id: 'Max', weeks: 0, title: 'Since you started' },
 ] as const;
 
 /** Your progress: streak, the last 7 days, habits, focus and goals. */
@@ -34,6 +35,12 @@ export function StatsView() {
   const activeDays = useStore((s) => s.stats.activeDays);
   const { weekStartsOn } = useSettings();
   const [yearHabit, setYearHabit] = useState<Habit | null>(null);
+  // Max: from the first habit check-in (or habit creation) until today.
+  const maxWeeks = useMemo(() => {
+    const firsts = habits.flatMap((h) => [h.history.length ? [...h.history].sort()[0] : n.today, toKey(new Date(h.createdAt))]);
+    const first = firsts.filter((d) => d > '2000').sort()[0] ?? n.today;
+    return Math.max(2, Math.ceil((diffDays(first, n.today) + 1) / 7) + 1);
+  }, [habits, n.today]);
   const [histRange, setHistRange] = useState<(typeof HISTORY_RANGES)[number]['id']>('6M');
 
   const week = useMemo(() => {
@@ -145,7 +152,7 @@ export function StatsView() {
                 );
               })}
             </ScrollView>
-            <HistoryGrid habit={habits.find((h) => h.id === (yearHabit ?? habits[0]).id) ?? habits[0]} weekStartsOn={weekStartsOn} weeks={HISTORY_RANGES.find((r) => r.id === histRange)!.weeks} />
+            <HistoryGrid habit={habits.find((h) => h.id === (yearHabit ?? habits[0]).id) ?? habits[0]} weekStartsOn={weekStartsOn} weeks={histRange === 'Max' ? maxWeeks : HISTORY_RANGES.find((r) => r.id === histRange)!.weeks} />
             <View style={[styles.ranges, { backgroundColor: c.surfaceAlt }]}>
               {HISTORY_RANGES.map((r) => {
                 const on = r.id === histRange;
@@ -205,7 +212,7 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
   chip: { height: 32, paddingHorizontal: 12, borderRadius: 16, justifyContent: 'center' },
   ranges: { flexDirection: 'row', borderRadius: radius.pill, padding: 3 },
-  range: { flex: 1, height: 34, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  range: { flex: 1, height: 34, minWidth: 0, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   bars: { height: 90, flexDirection: 'row', alignItems: 'flex-end' },
   barCol: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center' },
 });

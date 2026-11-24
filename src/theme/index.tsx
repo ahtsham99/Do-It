@@ -4,10 +4,11 @@ import { useColorScheme } from 'react-native';
 
 import { useStore } from '@/store/store';
 
-import { darkFor, itemColor, light, lightFor, type NightColor, type ThemeColors } from './colors';
+import { darkFor, itemColor, light, lightFor, type DayBackground, type NightBackground, type ThemeColors } from './colors';
 import { displayFont, faceForWeight, facesFor, textFont, type FontChoice } from './fonts';
 
-export { DEFAULT_ITEM_COLOR, NIGHT_COLORS, SWATCHES, hexAlpha } from './colors';
+export { DAY_BACKGROUNDS, DEFAULT_ITEM_COLOR, NIGHT_BACKGROUNDS, NIGHT_COLORS, SWATCHES, customColor, hexAlpha, hslToHex } from './colors';
+export type { DayBackground, NightBackground } from './colors';
 export type { NightColor, ThemeColors } from './colors';
 
 /**
@@ -74,6 +75,9 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
   const text = useStore((s) => s.settings.textFont);
   const logo = useStore((s) => s.settings.logoFont);
   const night = useStore((s) => s.settings.nightColor);
+  const custom = useStore((s) => s.settings.customColor);
+  const dayBg = useStore((s) => s.settings.dayBackground);
+  const nightBg = useStore((s) => s.settings.nightBackground);
   // Fonts switch only once the new files have loaded, so text never flashes.
   const [applied, setApplied] = useState<FontChoice | null>(null);
 
@@ -92,11 +96,11 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
   const isDark = pref === 'system' ? system === 'dark' : pref === 'dark';
   const value = useMemo(
     () => {
-      const c = isDark ? darkFor(night as NightColor) : lightFor(night as NightColor);
+      const c = isDark ? darkFor(night, custom, nightBg as NightBackground) : lightFor(night, custom, dayBg as DayBackground);
       const paint = (color: string) => itemColor(color, c.accent);
       return { dark: isDark, c, paint, fonts: applied ? resolve(applied) : SYSTEM, fontsReady: !!applied };
     },
-    [isDark, applied, night],
+    [isDark, applied, night, custom, dayBg, nightBg],
   );
   // Web: paint the page behind the app (e.g. under Safari's bars) the same colour,
   // so there's never a differently-coloured band at the top or bottom.

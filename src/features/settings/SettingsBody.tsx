@@ -12,7 +12,7 @@ import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { resetAll } from '@/store/store';
 import type { ThemePreference, Tone } from '@/store/types';
-import { NIGHT_COLORS, radius, space, useTheme, type NightColor } from '@/theme';
+import { DAY_BACKGROUNDS, NIGHT_BACKGROUNDS, NIGHT_COLORS, customColor, radius, space, useTheme, type DayBackground, type NightBackground, type NightColor } from '@/theme';
 import { styleFor } from '@/theme/fonts';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
@@ -86,6 +86,42 @@ export function SettingsBody() {
                 </Press>
               );
             })}
+            {/* Any colour you like */}
+            <Press
+              onPress={() => router.push('/color')}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: s.nightColor === 'custom' }}
+              accessibilityLabel="Custom app colour"
+              style={{ alignItems: 'center', gap: 6 }}>
+              <View style={[styles.swatch, { borderColor: s.nightColor === 'custom' ? c.text : 'transparent' }]}>
+                {s.nightColor === 'custom' ? (
+                  <GradientSwatch from={customColor(s.customColor).swatch[0]} to={customColor(s.customColor).swatch[1]} id="custom" />
+                ) : (
+                  <RainbowSwatch />
+                )}
+              </View>
+              <Text variant="small" tone={s.nightColor === 'custom' ? 'default' : 'muted'} style={{ fontSize: 12, fontWeight: s.nightColor === 'custom' ? '600' : '400' }}>
+                Custom
+              </Text>
+            </Press>
+          </View>
+        </View>
+        <View style={{ gap: space.sm }}>
+          <Text variant="small" tone="muted">
+            Day background
+          </Text>
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            {(Object.keys(DAY_BACKGROUNDS) as DayBackground[]).map((k) => (
+              <BgChoice key={k} label={DAY_BACKGROUNDS[k].label} color={DAY_BACKGROUNDS[k].bg} card={DAY_BACKGROUNDS[k].surface} on={s.dayBackground === k} onPress={() => updateSettings({ dayBackground: k })} />
+            ))}
+          </View>
+          <Text variant="small" tone="muted" style={{ marginTop: space.xs }}>
+            Night background
+          </Text>
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            {(Object.keys(NIGHT_BACKGROUNDS) as NightBackground[]).map((k) => (
+              <BgChoice key={k} label={NIGHT_BACKGROUNDS[k].label} color={NIGHT_BACKGROUNDS[k].bg} card={NIGHT_BACKGROUNDS[k].surface} on={s.nightBackground === k} onPress={() => updateSettings({ nightBackground: k })} />
+            ))}
           </View>
         </View>
         <Press onPress={() => router.push('/fonts')} accessibilityRole="button" style={[styles.fontsRow, { borderTopColor: c.border }]}>
@@ -224,6 +260,37 @@ export function SettingsBody() {
   );
 }
 
+function RainbowSwatch() {
+  const stops = ['#FF4D4D', '#FFB020', '#E8E84A', '#3CCB6E', '#3DA5FF', '#8A5CFF', '#FF4DB8'];
+  return (
+    <View style={styles.swatchInner}>
+      <Svg width="100%" height="100%">
+        <Defs>
+          <LinearGradient id="sw-rainbow" x1="0" y1="0" x2="1" y2="1">
+            {stops.map((col, i) => (
+              <Stop key={col} offset={i / (stops.length - 1)} stopColor={col} />
+            ))}
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height="100%" rx="12" fill="url(#sw-rainbow)" />
+      </Svg>
+    </View>
+  );
+}
+
+function BgChoice({ label, color, card, on, onPress }: { label: string; color: string; card: string; on: boolean; onPress: () => void }) {
+  const { c } = useTheme();
+  const darkBg = color.startsWith('#0') || color.startsWith('#1');
+  return (
+    <Press onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected: on }} style={[styles.bg, { backgroundColor: color, borderColor: on ? c.accent : c.border }]}>
+      <View style={{ width: '70%', height: 10, borderRadius: 5, backgroundColor: card }} />
+      <Text variant="small" color={darkBg ? '#F4F3EE' : '#1E1C19'} style={{ fontWeight: on ? '700' : '500', fontSize: 12 }}>
+        {label}
+      </Text>
+    </Press>
+  );
+}
+
 function GradientSwatch({ from, to, id }: { from: string; to: string; id: string }) {
   return (
     <View style={styles.swatchInner}>
@@ -263,7 +330,8 @@ const styles = StyleSheet.create({
   },
   radio: { width: 10, height: 10, borderRadius: 5 },
   swatches: { flexDirection: 'row', justifyContent: 'space-between' },
-  swatch: { width: 50, height: 50, borderRadius: 16, borderWidth: 2, padding: 3 },
+  swatch: { width: 44, height: 44, borderRadius: 14, borderWidth: 2, padding: 3 },
+  bg: { flex: 1, height: 64, borderRadius: radius.md, borderWidth: 2, alignItems: 'center', justifyContent: 'center', gap: 6 },
   swatchInner: { flex: 1, borderRadius: 12, overflow: 'hidden' },
   fontsRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderTopWidth: 1, paddingTop: space.lg, marginTop: space.xs, minHeight: 56 },
 });

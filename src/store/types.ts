@@ -156,7 +156,11 @@ export interface Settings {
   /** Focus sound id (src/features/focus/sounds). */
   focusSound: string;
   /** Night-mode glow colour (src/theme/colors.ts NIGHT_COLORS). */
-  nightColor: 'forest' | 'ember' | 'electric' | 'violet' | 'mono';
+  nightColor: 'forest' | 'ember' | 'electric' | 'violet' | 'mono' | 'custom';
+  /** Used when nightColor is 'custom'. */
+  customColor: string;
+  dayBackground: 'paper' | 'linen' | 'sand';
+  nightBackground: 'black' | 'matte';
 }
 
 export interface Stats {
@@ -199,6 +203,9 @@ export const DEFAULT_SETTINGS: Settings = {
   textFont: 'system',
   logoFont: 'newsreader',
   nightColor: 'forest',
+  customColor: '#2F8A5F',
+  dayBackground: 'paper',
+  nightBackground: 'black',
   focusSound: 'off',
 };
 
