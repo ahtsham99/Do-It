@@ -28,7 +28,7 @@ export default function StreaksScreen() {
   // Max = since your first active day.
   const weeks =
     r === 'Max'
-      ? Math.max(2, Math.ceil((diffDays([...stats.activeDays].sort()[0] ?? n.today, n.today) + 1) / 7) + 1)
+      ? Math.max(5, Math.ceil((diffDays([...stats.activeDays].sort()[0] ?? n.today, n.today) + 1) / 7) + 1)
       : HISTORY_RANGES.find((x) => x.id === r)!.weeks;
   const first = addDays(startOfWeek(n.today, weekStartsOn), -(weeks - 1) * 7);
   const inRange = useMemo(() => {

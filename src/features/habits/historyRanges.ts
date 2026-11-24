@@ -16,7 +16,8 @@ export type HistoryRange = (typeof HISTORY_RANGES)[number]['id'];
 export function maxWeeksFor(habits: Habit[], today: string) {
   const firsts = habits.flatMap((h) => [h.history.length ? [...h.history].sort()[0] : today, toKey(new Date(h.createdAt))]);
   const first = firsts.filter((d) => d > '2000').sort()[0] ?? today;
-  return Math.max(2, Math.ceil((diffDays(first, today) + 1) / 7) + 1);
+  // Under a month of history still uses the 1M layout, so it doesn't look cramped.
+  return Math.max(5, Math.ceil((diffDays(first, today) + 1) / 7) + 1);
 }
 
 export function weeksFor(r: HistoryRange, habits: Habit[], today: string) {
