@@ -55,7 +55,7 @@ export function CountdownStack({ items }: { items: Countdown[] }) {
             style={{ width: w }}>
             {items.map((x) => (
               <View key={x.id} style={{ width: w }}>
-                <CountdownCard item={x} hero />
+                <CountdownCard item={x} hero flat />
               </View>
             ))}
           </ScrollView>

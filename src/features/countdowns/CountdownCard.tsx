@@ -13,7 +13,7 @@ const WHITE = '#FFFFFF';
 const SOFT = 'rgba(255,255,255,0.72)';
 
 /** Coloured countdown card. `hero` is the large "Next up" version on Today. */
-export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean }) {
+export function CountdownCard({ item, hero, flat }: { item: Countdown; hero?: boolean; flat?: boolean }) {
   const { c, paint } = useTheme();
   const fill = paint(item.color, 'fill');
   const days = daysUntil(item);
@@ -24,20 +24,20 @@ export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean 
 
   if (hero) {
     return (
-      <Press onPress={open} style={[styles.hero, { backgroundColor: fill }, shadow]}>
+      <Press onPress={open} style={[styles.hero, { backgroundColor: fill }, !flat && shadow]}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Text variant="caption" color={SOFT} style={{ textTransform: 'uppercase' }}>
             Next up
           </Text>
           <View style={styles.heroIcon}>
-            <Glyph value={item.icon} size={22} />
+            <Glyph value={item.icon} size={18} />
           </View>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: space.sm, flexWrap: 'wrap', marginTop: -space.md }}>
-          <Text color={WHITE} style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 60 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: space.sm, flexWrap: 'wrap', marginTop: -space.sm }}>
+          <Text color={WHITE} style={{ fontFamily: SERIF, fontSize: 44, lineHeight: 48 }}>
             {big}
           </Text>
-          <Text color={WHITE} style={{ fontSize: 18, flexShrink: 1 }} numberOfLines={2}>
+          <Text color={WHITE} style={{ fontSize: 16, flexShrink: 1 }} numberOfLines={2}>
             {days === 0 ? `is ${item.title}` : `${days === 1 ? 'day' : 'days'} to ${item.title}`}
           </Text>
         </View>
@@ -78,11 +78,11 @@ export function CountdownCard({ item, hero }: { item: Countdown; hero?: boolean 
 }
 
 const styles = StyleSheet.create({
-  hero: { borderRadius: radius.xl, padding: space.xl, gap: space.md, minHeight: 168, justifyContent: 'space-between' },
+  hero: { borderRadius: radius.xl, paddingHorizontal: space.xl - 4, paddingVertical: space.lg, gap: space.sm, minHeight: 128, justifyContent: 'space-between' },
   heroIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: 'rgba(255,255,255,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
