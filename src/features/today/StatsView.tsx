@@ -1,17 +1,26 @@
 import { router } from 'expo-router';
-import { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Card, Icon, Press, Section, Text } from '@/components/ui';
 import { GoalCard } from '@/features/goals/GoalCard';
-import { HabitHistory } from '@/features/habits/HabitHistory';
+import { HistoryGrid } from '@/features/habits/HistoryGrid';
 import { WeekGrid } from '@/features/habits/WeekGrid';
 import { useNudges } from '@/features/nudges/useNudges';
 import { occurrencesInRange } from '@/features/tasks/logic';
 import { addDays, range, weekdayShort } from '@/lib/dates';
 import { useGoals, useHabits, useReminders, useSettings, useTasks } from '@/store/hooks';
+import type { Habit } from '@/store/types';
 import { useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
+
+const HISTORY_RANGES = [
+  { id: '1W', weeks: 1, title: 'This week' },
+  { id: '1M', weeks: 5, title: 'Last month' },
+  { id: '3M', weeks: 13, title: 'Last 3 months' },
+  { id: '6M', weeks: 26, title: 'Last 6 months' },
+  { id: '1Y', weeks: 52, title: 'Last year' },
+] as const;
 
 /** Your progress: streak, the last 7 days, habits, focus and goals. */
 export function StatsView() {
@@ -24,6 +33,8 @@ export function StatsView() {
   const sessions = useStore((s) => s.sessions);
   const activeDays = useStore((s) => s.stats.activeDays);
   const { weekStartsOn } = useSettings();
+  const [yearHabit, setYearHabit] = useState<Habit | null>(null);
+  const [histRange, setHistRange] = useState<(typeof HISTORY_RANGES)[number]['id']>('6M');
 
   const week = useMemo(() => {
     const start = addDays(n.today, -6);
@@ -120,8 +131,34 @@ export function StatsView() {
       )}
 
       {habits.length > 0 && (
-        <Section title="History">
-          <HabitHistory habits={habits} weekStartsOn={weekStartsOn} />
+        <Section title={HISTORY_RANGES.find((r) => r.id === histRange)!.title}>
+          <Card style={{ gap: space.md }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+              {habits.map((h) => {
+                const on = (yearHabit ?? habits[0]).id === h.id;
+                return (
+                  <Press key={h.id} onPress={() => setYearHabit(h)} style={[styles.chip, { backgroundColor: on ? c.accent : c.surfaceAlt }]}>
+                    <Text variant="small" color={on ? c.accentText : c.text} style={{ fontWeight: '600' }}>
+                      {h.icon} {h.name}
+                    </Text>
+                  </Press>
+                );
+              })}
+            </ScrollView>
+            <HistoryGrid habit={habits.find((h) => h.id === (yearHabit ?? habits[0]).id) ?? habits[0]} weekStartsOn={weekStartsOn} weeks={HISTORY_RANGES.find((r) => r.id === histRange)!.weeks} />
+            <View style={[styles.ranges, { backgroundColor: c.surfaceAlt }]}>
+              {HISTORY_RANGES.map((r) => {
+                const on = r.id === histRange;
+                return (
+                  <Press key={r.id} onPress={() => setHistRange(r.id)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={[styles.range, on && { backgroundColor: c.surface }]}>
+                    <Text variant="small" color={on ? c.text : c.textMuted} style={{ fontWeight: on ? '700' : '500' }}>
+                      {r.id}
+                    </Text>
+                  </Press>
+                );
+              })}
+            </View>
+          </Card>
         </Section>
       )}
 
@@ -166,6 +203,9 @@ const styles = StyleSheet.create({
   dots: { flexDirection: 'row', justifyContent: 'space-between' },
   day: { width: 18, height: 18, borderRadius: 9, borderWidth: 1.5 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
+  chip: { height: 32, paddingHorizontal: 12, borderRadius: 16, justifyContent: 'center' },
+  ranges: { flexDirection: 'row', borderRadius: radius.pill, padding: 3 },
+  range: { flex: 1, height: 34, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   bars: { height: 90, flexDirection: 'row', alignItems: 'flex-end' },
   barCol: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center' },
 });
