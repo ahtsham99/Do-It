@@ -100,25 +100,6 @@ export function StatsView() {
         <Stat value={String(week.remindersDone)} label="Reminders done" icon="alarm-outline" onPress={() => router.push('/reminders')} />
       </View>
 
-      {/* Focus by day */}
-      <Section title="Focus by day">
-        <Card style={{ gap: space.sm }}>
-          <View style={styles.bars}>
-            {week.perDay.map((m, i) => (
-              <View key={week.days[i]} style={styles.barCol}>
-                <View style={{ height: `${Math.max(4, (m / maxMin) * 100)}%`, width: '62%', borderRadius: 6, backgroundColor: m ? c.accent : c.surfaceAlt }} />
-              </View>
-            ))}
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            {week.days.map((d) => (
-              <Text key={d} variant="small" tone={d === n.today ? 'default' : 'muted'} style={{ flex: 1, textAlign: 'center', fontSize: 11, fontWeight: d === n.today ? '700' : '400' }}>
-                {weekdayShort(d).slice(0, 1)}
-              </Text>
-            ))}
-          </View>
-        </Card>
-      </Section>
 
       {habits.length > 0 && (
         <Section title="Habits">
@@ -156,6 +137,26 @@ export function StatsView() {
           </Card>
         </Section>
       )}
+
+      {/* Focus by day */}
+      <Section title="Focus by day">
+        <Card style={{ gap: space.sm }}>
+          <View style={styles.bars}>
+            {week.perDay.map((m, i) => (
+              <View key={week.days[i]} style={styles.barCol}>
+                <View style={{ height: `${Math.max(4, (m / maxMin) * 100)}%`, width: '62%', borderRadius: 6, backgroundColor: m ? c.accent : c.surfaceAlt }} />
+              </View>
+            ))}
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            {week.days.map((d) => (
+              <Text key={d} variant="small" tone={d === n.today ? 'default' : 'muted'} style={{ flex: 1, textAlign: 'center', fontSize: 11, fontWeight: d === n.today ? '700' : '400' }}>
+                {weekdayShort(d).slice(0, 1)}
+              </Text>
+            ))}
+          </View>
+        </Card>
+      </Section>
 
       {goals.length > 0 && (
         <Section title={`Goals · ${inProgress.length} in progress${achieved ? ` · ${achieved} achieved` : ''}`}>
