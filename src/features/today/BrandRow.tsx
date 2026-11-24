@@ -7,10 +7,17 @@ import { useNudges } from '@/features/nudges/useNudges';
 import { useSettings } from '@/store/hooks';
 import { LOGO, radius, space, useTheme } from '@/theme';
 
-export type MainMode = 'plan' | 'home';
+export type MainMode = 'plan' | 'home' | 'stats' | 'settings';
+
+const META: Record<MainMode, { label: string; icon: 'calendar-outline' | 'home-outline' | 'stats-chart-outline' | 'settings-outline' }> = {
+  plan: { label: 'Plan', icon: 'calendar-outline' },
+  home: { label: 'Home', icon: 'home-outline' },
+  stats: { label: 'Stats', icon: 'stats-chart-outline' },
+  settings: { label: 'Settings', icon: 'settings-outline' },
+};
 
 /** Logo, Plan | Home switch, streak and your initials — shared by both views. */
-export function BrandRow({ mode, onMode }: { mode: MainMode; onMode: (m: MainMode) => void }) {
+export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: MainMode) => void; modes: MainMode[] }) {
   const { c } = useTheme();
   const n = useNudges();
   const { name } = useSettings();
@@ -22,7 +29,7 @@ export function BrandRow({ mode, onMode }: { mode: MainMode; onMode: (m: MainMod
       </Text>
       <View style={{ flex: 1 }} />
       <View style={[styles.switch, { backgroundColor: c.surfaceAlt, borderColor: c.border }]} accessibilityRole="tablist">
-        {(['plan', 'home'] as const).map((m) => {
+        {modes.map((m) => {
           const on = m === mode;
           return (
             <Press
@@ -31,9 +38,9 @@ export function BrandRow({ mode, onMode }: { mode: MainMode; onMode: (m: MainMod
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
               style={[styles.option, on && { backgroundColor: c.accent }]}>
-              <Icon name={m === 'plan' ? 'calendar-outline' : 'home-outline'} size={14} color={on ? c.accentText : c.textMuted} />
+              <Icon name={META[m].icon} size={14} color={on ? c.accentText : c.textMuted} />
               <Text variant="small" color={on ? c.accentText : c.textMuted} style={{ fontWeight: '600', fontSize: 13 }}>
-                {m === 'plan' ? 'Plan' : 'Home'}
+                {META[m].label}
               </Text>
             </Press>
           );
