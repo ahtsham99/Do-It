@@ -1,5 +1,5 @@
-import { useRef, useState, type ComponentRef } from 'react';
-import { ScrollView, View } from 'react-native';
+import { useState } from 'react';
+import { View } from 'react-native';
 
 import { Text } from '@/components/ui';
 import { addDays, range, startOfWeek, todayKey, weekdayLetters, weekdayShort } from '@/lib/dates';
@@ -9,12 +9,12 @@ import { useTheme } from '@/theme';
 /**
  * Habit history, time running left → right. One week is a single row of
  * days; longer ranges are weeks side by side (each column one week).
- * Very long ranges (Max) scroll sideways and open at today.
+ * Every range fits the width — no scrolling.
  */
 export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit; weekStartsOn: 0 | 1; weeks?: number }) {
   const { c, paint } = useTheme();
-  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const [width, setWidth] = useState(300);
+  const [yearsWidth, setYearsWidth] = useState(260);
   const today = todayKey();
   const set = new Set(habit.history);
   const color = paint(habit.color);
@@ -40,14 +40,62 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
     );
   }
 
+  // More than a year (Max): one dot per week, one row per year, so it always fits.
+  if (weeks > 53) {
+    const thisWeek = startOfWeek(today, weekStartsOn);
+    const years = Math.ceil(weeks / 52);
+    const g = 1.5;
+    const sz = Math.max(2, (yearsWidth - g * 51) / 52);
+    return (
+      <View key="years" style={{ gap: 6 }} onLayout={(e) => setYearsWidth(Math.max(100, e.nativeEvent.layout.width - 40))}>
+        {Array.from({ length: years }, (_, yi) => {
+          // Rows end at this week: the last row is the latest year.
+          const rowStart = addDays(thisWeek, -((years - 1 - yi) * 52 + 51) * 7);
+          return (
+            <View key={yi} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text variant="caption" tone="faint" style={{ fontSize: 9, width: 34 }}>
+                {rowStart.slice(0, 4)}
+              </Text>
+              <View style={{ flexDirection: 'row', gap: g }}>
+                {Array.from({ length: 52 }, (_, wi) => {
+                  const ws = addDays(rowStart, wi * 7);
+                  const daysIn = range(ws, 7).filter((d) => d <= today);
+                  const done = daysIn.filter((d) => set.has(d)).length;
+                  const future = ws > today;
+                  return (
+                    <View
+                      key={ws}
+                      style={{
+                        width: sz,
+                        height: sz,
+                        borderRadius: sz / 2,
+                        backgroundColor: future ? 'transparent' : done ? color : c.surfaceAlt,
+                        opacity: future || !done ? 1 : 0.3 + 0.7 * (done / Math.max(1, daysIn.length)),
+                        borderWidth: future ? 1 : 0,
+                        borderColor: c.border,
+                      }}
+                    />
+                  );
+                })}
+              </View>
+            </View>
+          );
+        })}
+        <Text variant="small" tone="faint" style={{ fontSize: 11 }}>
+          Each dot is one week — darker means more days done.
+        </Text>
+      </View>
+    );
+  }
+
   const first = addDays(startOfWeek(today, weekStartsOn), -(weeks - 1) * 7);
   const cols = Array.from({ length: weeks }, (_, i) => addDays(first, i * 7));
-  // A year or more scrolls sideways (opening at today) so the dots can stay a readable size.
-  const long = weeks > 26;
-  const gap = long ? 3 : weeks > 13 ? 3 : 5;
+  // Everything fits the width (no scrolling). Long ranges use tight gaps so dots stay as big as possible.
+  const gap = weeks > 26 ? 1.5 : 3;
   // Round dots: the size comes from the available width so every dot is a true circle.
   const fit = (width - gap * (weeks - 1)) / weeks;
-  const size = long ? 9 : Math.max(4, Math.min(weeks <= 5 ? 20 : 30, fit));
+  // 1M and 3M share one size: the 3-month fit.
+  const size = weeks <= 13 ? Math.min(20, (width - gap * 12) / 13) : Math.max(3, fit);
 
   const grid = (
     <View style={{ flexDirection: 'row', gap }}>
@@ -72,15 +120,9 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
           </View>
         ))}
       </View>
-      {long ? (
-        <ScrollView ref={scroll} horizontal showsHorizontalScrollIndicator={false} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}>
-          {grid}
-        </ScrollView>
-      ) : (
-        <View style={{ flex: 1 }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-          {grid}
-        </View>
-      )}
+      <View style={{ flex: 1 }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+        {grid}
+      </View>
     </View>
   );
 }
