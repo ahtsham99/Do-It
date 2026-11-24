@@ -11,7 +11,6 @@ export const TAB_META: Record<string, { title: string; icon: IconName }> = {
   habits: { title: 'Habits', icon: 'flame-outline' },
   reminders: { title: 'Reminders', icon: 'alarm-outline' },
   focus: { title: 'Focus', icon: 'timer-outline' },
-  countdowns: { title: 'Countdowns', icon: 'hourglass-outline' },
 };
 
 /** Floating, pill-shaped tab bar. */

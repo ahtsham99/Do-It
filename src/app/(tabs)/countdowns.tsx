@@ -64,6 +64,7 @@ export default function CountdownsScreen() {
               }}
             />
             <IconButton icon="add" label="Add countdown" onPress={add} />
+            <IconButton icon="close" label="Close" size={20} onPress={() => (router.canGoBack() ? router.back() : router.replace({ pathname: '/habits', params: { view: 'goals' } }))} />
           </>
         }>
         {searching && <Field placeholder="Search countdowns…" value={query} onChangeText={setQuery} autoFocus />}

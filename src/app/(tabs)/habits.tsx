@@ -2,14 +2,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { Chip, Empty, IconButton, Screen, Section, Segmented, Text } from '@/components/ui';
+import { Chip, Empty, IconButton, Press, Screen, Section, Segmented, Text } from '@/components/ui';
+import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { GoalCard } from '@/features/goals/GoalCard';
 import { GOAL_TEMPLATES } from '@/features/goals/logic';
 import { ConsistencyCard } from '@/features/habits/ConsistencyCard';
 import { HabitCard } from '@/features/habits/HabitCard';
 import { todayKey } from '@/lib/dates';
-import { useGoals, useHabits } from '@/store/hooks';
-import { space } from '@/theme';
+import { useCountdowns, useGoals, useHabits } from '@/store/hooks';
+import { space, useTheme } from '@/theme';
 
 type View_ = 'habits' | 'goals';
 // Remember the chosen view while the app is open.
@@ -28,8 +29,11 @@ export default function HabitsScreen() {
     setViewState(v);
   };
 
+  const { c } = useTheme();
   const habits = useHabits();
   const goals = useGoals();
+  const countdowns = useCountdowns();
+  const upcoming = countdowns.filter((x) => x.date >= todayKey()).sort((a, b) => (a.date < b.date ? -1 : 1));
   const today = todayKey();
   const daily = habits.filter((h) => h.frequency === 'daily');
   const weekly = habits.filter((h) => h.frequency === 'weekly');
@@ -44,7 +48,7 @@ export default function HabitsScreen() {
         : 'Small things, every day'
       : goals.length
         ? `${active.length} in progress${achieved.length ? ` · ${achieved.length} achieved` : ''}`
-        : 'Big things, one small step at a time';
+        : 'Goals and the days you’re counting down to';
 
   return (
     <Screen
@@ -122,6 +126,39 @@ export default function HabitsScreen() {
             </Section>
           )}
         </>
+      )}
+
+      {view === 'goals' && (
+        <Section
+          title="Countdowns"
+          right={
+            <View style={{ flexDirection: 'row', gap: space.lg }}>
+              <Press onPress={() => router.push('/countdown')} hitSlop={8}>
+                <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
+                  + Add
+                </Text>
+              </Press>
+              {countdowns.length > 0 && (
+                <Press onPress={() => router.push('/countdowns')} hitSlop={8}>
+                  <Text variant="small" tone="muted">
+                    All ›
+                  </Text>
+                </Press>
+              )}
+            </View>
+          }>
+          {upcoming.length ? (
+            <View style={{ gap: space.sm }}>
+              {upcoming.slice(0, 4).map((x) => (
+                <CountdownCard key={x.id} item={x} />
+              ))}
+            </View>
+          ) : (
+            <Text variant="small" tone="muted">
+              Exams, trips, birthdays — add the days you’re counting down to.
+            </Text>
+          )}
+        </Section>
       )}
     </Screen>
   );

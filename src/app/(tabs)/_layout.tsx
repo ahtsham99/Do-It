@@ -18,6 +18,8 @@ export default function TabLayout() {
       ))}
       {/* Not in the tab bar; opened from your avatar on Today. */}
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
+      {/* All countdowns; opened from Goals. */}
+      <Tabs.Screen name="countdowns" options={{ title: 'Countdowns' }} />
     </Tabs>
   );
 }
