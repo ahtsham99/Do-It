@@ -1,16 +1,15 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { Card, Icon, Press, Section, Text } from '@/components/ui';
 import { GoalCard } from '@/features/goals/GoalCard';
-import { HistoryGrid } from '@/features/habits/HistoryGrid';
+import { HabitHistory } from '@/features/habits/HabitHistory';
 import { WeekGrid } from '@/features/habits/WeekGrid';
 import { useNudges } from '@/features/nudges/useNudges';
 import { occurrencesInRange } from '@/features/tasks/logic';
 import { addDays, range, weekdayShort } from '@/lib/dates';
 import { useGoals, useHabits, useReminders, useSettings, useTasks } from '@/store/hooks';
-import type { Habit } from '@/store/types';
 import { useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
@@ -25,7 +24,6 @@ export function StatsView() {
   const sessions = useStore((s) => s.sessions);
   const activeDays = useStore((s) => s.stats.activeDays);
   const { weekStartsOn } = useSettings();
-  const [yearHabit, setYearHabit] = useState<Habit | null>(null);
 
   const week = useMemo(() => {
     const start = addDays(n.today, -6);
@@ -122,22 +120,8 @@ export function StatsView() {
       )}
 
       {habits.length > 0 && (
-        <Section title="Last 6 months">
-          <Card style={{ gap: space.md }}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
-              {habits.map((h) => {
-                const on = (yearHabit ?? habits[0]).id === h.id;
-                return (
-                  <Press key={h.id} onPress={() => setYearHabit(h)} style={[styles.chip, { backgroundColor: on ? c.accent : c.surfaceAlt }]}>
-                    <Text variant="small" color={on ? c.accentText : c.text} style={{ fontWeight: '600' }}>
-                      {h.icon} {h.name}
-                    </Text>
-                  </Press>
-                );
-              })}
-            </ScrollView>
-            <HistoryGrid habit={habits.find((h) => h.id === (yearHabit ?? habits[0]).id) ?? habits[0]} weekStartsOn={weekStartsOn} weeks={26} />
-          </Card>
+        <Section title="History">
+          <HabitHistory habits={habits} weekStartsOn={weekStartsOn} />
         </Section>
       )}
 
@@ -182,7 +166,6 @@ const styles = StyleSheet.create({
   dots: { flexDirection: 'row', justifyContent: 'space-between' },
   day: { width: 18, height: 18, borderRadius: 9, borderWidth: 1.5 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
-  chip: { height: 32, paddingHorizontal: 12, borderRadius: 16, justifyContent: 'center' },
   bars: { height: 90, flexDirection: 'row', alignItems: 'flex-end' },
   barCol: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center' },
 });
