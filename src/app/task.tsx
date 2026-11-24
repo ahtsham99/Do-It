@@ -6,7 +6,7 @@ import { useSheetTopInset } from '@/hooks/useTopInset';
 import { DateTimeField } from '@/components/pickers';
 import { Button, Card, Chip, Field, Label, SheetHeader, Text, Toggle, showDialog } from '@/components/ui';
 import { REMINDER_OPTIONS, REPEAT_LABELS } from '@/features/tasks/logic';
-import { addDays, formatDay, todayKey, type DayKey } from '@/lib/dates';
+import { addDays, addMinutesToTime, formatDay, formatDuration, formatTime, todayKey, type DayKey } from '@/lib/dates';
 import { addTask, deleteTask, skipOccurrence, updateTask } from '@/store/actions/tasks';
 import { useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
@@ -26,6 +26,7 @@ export default function TaskEditor() {
   const [notes, setNotes] = useState(existing?.notes ?? '');
   const [date, setDate] = useState<DayKey>(existing?.date ?? params.date ?? todayKey());
   const [time, setTime] = useState<string | null>(existing?.time ?? null);
+  const [duration, setDuration] = useState<number | null>(existing?.duration ?? null);
   const [reminder, setReminder] = useState<number | null>(existing?.reminder ?? null);
   const [repeat, setRepeat] = useState<Repeat>(existing?.repeat ?? 'none');
 
@@ -34,7 +35,7 @@ export default function TaskEditor() {
 
   const save = () => {
     if (!canSave) return;
-    const data = { title: title.trim(), notes: notes.trim() || undefined, date, time, reminder, repeat };
+    const data = { title: title.trim(), notes: notes.trim() || undefined, date, time, duration: time ? duration : null, reminder, repeat };
     if (existing) updateTask(existing.id, data);
     else addTask(data);
     close();
@@ -106,6 +107,18 @@ export default function TaskEditor() {
                 />
               </View>
             </Row>
+            {time && (
+              <View style={{ gap: space.sm }}>
+                <Text variant="small" tone="muted">
+                  How long?{duration ? ` · until ${formatTime(addMinutesToTime(time, duration), use24h)}` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+                  {[null, 15, 30, 45, 60, 90, 120, 180].map((m) => (
+                    <Chip key={String(m)} label={m ? formatDuration(m) : 'No end'} selected={duration === m} onPress={() => setDuration(m)} />
+                  ))}
+                </View>
+              </View>
+            )}
           </Card>
         </View>
 

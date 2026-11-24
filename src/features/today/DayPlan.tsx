@@ -6,7 +6,7 @@ import { Card, Icon, Press, SwipeToDelete, Text } from '@/components/ui';
 import { deleteTaskWithUndo } from '@/features/delete/deleteWithUndo';
 import { completeTask } from '@/features/nudges/celebrate';
 import type { Occurrence } from '@/features/tasks/logic';
-import { formatTime, nowTime, todayKey, type DayKey } from '@/lib/dates';
+import { addMinutesToTime, formatDuration, formatTime, minutesBetween, nowTime, todayKey, type DayKey } from '@/lib/dates';
 import { useSettings } from '@/store/hooks';
 import { radius, space, useTheme } from '@/theme';
 
@@ -51,14 +51,36 @@ export function DayPlan({ day, items, compact }: { day: DayKey; items: Occurrenc
       {anytime.map((o, i) => (
         <Row key={`${o.task.id}:${o.day}`} occ={o} label={i === 0 ? 'Anytime' : ''} last={i === anytime.length - 1 && timed.length === 0} />
       ))}
-      {timed.map((o, i) => (
-        <Fragment key={`${o.task.id}:${o.day}`}>
-          {i === nowIndex && <NowLine now={now} use24h={use24h} />}
-          <Row occ={o} label={formatTime(o.task.time!, use24h)} last={i === timed.length - 1 && !showNowAtEnd} />
-        </Fragment>
-      ))}
+      {timed.map((o, i) => {
+        // Free time between the end of the previous plan and this one.
+        const prev = timed[i - 1];
+        const prevEnd = prev ? addMinutesToTime(prev.task.time!, prev.task.duration ?? 0) : null;
+        const free = prevEnd ? minutesBetween(prevEnd, o.task.time!) : 0;
+        return (
+          <Fragment key={`${o.task.id}:${o.day}`}>
+            {free >= 30 && !compact && <FreeGap minutes={free} />}
+            {i === nowIndex && <NowLine now={now} use24h={use24h} />}
+            <Row occ={o} label={formatTime(o.task.time!, use24h)} last={i === timed.length - 1 && !showNowAtEnd} />
+          </Fragment>
+        );
+      })}
       {showNowAtEnd && <NowLine now={now} use24h={use24h} />}
     </Card>
+  );
+}
+
+function FreeGap({ minutes }: { minutes: number }) {
+  const { c } = useTheme();
+  return (
+    <View style={styles.freeRow}>
+      <View style={{ width: TIME_W }} />
+      <View style={styles.rail}>
+        <View style={[styles.freeLine, { borderColor: c.border }]} />
+      </View>
+      <Text variant="small" tone="faint" style={{ paddingLeft: 6, fontSize: 12 }}>
+        Free · {formatDuration(minutes)}
+      </Text>
+    </View>
   );
 }
 
@@ -79,12 +101,23 @@ function Row({ occ, label, last }: { occ: Occurrence; label: string; last: boole
   const { c } = useTheme();
   const { task, day, done } = occ;
   const late = !done && (day < todayKey() || (day === todayKey() && !!task.time && task.time < nowTime()));
+  const { use24h } = useSettings();
+  const end = task.time && task.duration ? addMinutesToTime(task.time, task.duration) : null;
+  // Longer plans get taller blocks, so the day's shape is visible at a glance.
+  const blockH = task.duration ? Math.min(140, Math.max(50, task.duration * 0.8)) : 50;
   return (
     <SwipeToDelete onDelete={() => deleteTaskWithUndo(task, day)} borderRadius={radius.md}>
-      <View style={[styles.row, { backgroundColor: c.surface }]}>
-        <Text variant="small" tone={late ? 'danger' : 'muted'} style={{ width: TIME_W, fontSize: 13, fontWeight: '500' }} numberOfLines={1}>
-          {label}
-        </Text>
+      <View style={[styles.row, { backgroundColor: c.surface, minHeight: blockH }]}>
+        <View style={{ width: TIME_W }}>
+          <Text variant="small" tone={late ? 'danger' : 'muted'} style={{ fontSize: 13, fontWeight: '500' }} numberOfLines={1}>
+            {label}
+          </Text>
+          {end && (
+            <Text variant="small" tone="faint" style={{ fontSize: 11 }} numberOfLines={1}>
+              –{formatTime(end, use24h)}
+            </Text>
+          )}
+        </View>
         <View style={styles.rail}>
           {!last && <View style={[styles.line, { backgroundColor: c.border }]} />}
           <Press
@@ -98,12 +131,20 @@ function Row({ occ, label, last }: { occ: Occurrence; label: string; last: boole
             {done && <Icon name="checkmark" size={14} color={c.accentText} />}
           </Press>
         </View>
-        <Press haptic={false} style={styles.body} onPress={() => router.push({ pathname: '/task', params: { id: task.id, day } })}>
+        <Press
+          haptic={false}
+          style={[styles.body, task.duration ? [styles.block, { backgroundColor: done ? c.surfaceAlt : c.accentSoft, borderLeftColor: done ? c.border : c.accent }] : null]}
+          onPress={() => router.push({ pathname: '/task', params: { id: task.id, day } })}>
           <Text numberOfLines={2} tone={done ? 'faint' : 'default'} style={[{ fontWeight: '500' }, done && { textDecorationLine: 'line-through' }]}>
             {task.title}
           </Text>
-          {(task.repeat !== 'none' || task.reminder != null) && (
-            <View style={{ flexDirection: 'row', gap: 6, marginTop: 2 }}>
+          {(task.repeat !== 'none' || task.reminder != null || task.duration) && (
+            <View style={{ flexDirection: 'row', gap: 6, marginTop: 2, alignItems: 'center' }}>
+              {task.duration ? (
+                <Text variant="small" tone="muted" style={{ fontSize: 12 }}>
+                  {formatDuration(task.duration)}
+                </Text>
+              ) : null}
               {task.repeat !== 'none' && <Icon name="repeat" size={13} color={c.textFaint} />}
               {task.reminder != null && <Icon name="notifications-outline" size={12} color={c.textFaint} />}
             </View>
@@ -120,6 +161,9 @@ const styles = StyleSheet.create({
   line: { position: 'absolute', top: 30, bottom: -8, width: 2, borderRadius: 1 },
   dot: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   body: { flex: 1, paddingLeft: 6, paddingTop: 2, paddingBottom: 8, paddingRight: 4 },
+  block: { borderRadius: radius.md, borderLeftWidth: 3, paddingLeft: 10, paddingTop: 6, marginBottom: 6, marginRight: 2 },
+  freeRow: { flexDirection: 'row', alignItems: 'center', height: 26 },
+  freeLine: { position: 'absolute', top: 0, bottom: 0, borderLeftWidth: 2, borderStyle: 'dashed' },
   nowRow: { flexDirection: 'row', alignItems: 'center', height: 18 },
   nowDot: { width: 8, height: 8, borderRadius: 4, marginLeft: 13, marginRight: -2 },
   nowLine: { flex: 1, height: 2, borderRadius: 1 },

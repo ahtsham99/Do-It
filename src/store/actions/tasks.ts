@@ -8,7 +8,7 @@ import { setState } from '../store';
 import type { Task } from '../types';
 
 export type TaskInput = Pick<Task, 'title' | 'date' | 'repeat' | 'reminder'> &
-  Partial<Pick<Task, 'notes' | 'time'>>;
+  Partial<Pick<Task, 'notes' | 'time' | 'duration'>>;
 
 export function addTask(input: TaskInput): Task {
   const now = Date.now();
@@ -67,4 +67,23 @@ export function moveToToday(ids: string[]) {
 /** "Remind me later": hide the reminder now and bring it back after `minutes`. */
 export function snoozeTask(id: string, minutes: number) {
   updateTask(id, { snoozedUntil: Date.now() + minutes * 60_000 });
+}
+
+/** Move one-off plans to another day (keeps their time). Returns [id, oldDate] pairs for undo. */
+export function moveToDay(ids: string[], date: DayKey): [string, DayKey][] {
+  const set = new Set(ids);
+  const moved: [string, DayKey][] = [];
+  setState((s) => ({
+    tasks: s.tasks.map((x) => {
+      if (!set.has(x.id) || x.repeat !== 'none') return x;
+      moved.push([x.id, x.date]);
+      return { ...x, date, snoozedUntil: null, updatedAt: Date.now() };
+    }),
+  }));
+  return moved;
+}
+
+export function restoreDates(moved: [string, DayKey][]) {
+  const map = new Map(moved);
+  setState((s) => ({ tasks: s.tasks.map((x) => (map.has(x.id) ? { ...x, date: map.get(x.id)!, updatedAt: Date.now() } : x)) }));
 }

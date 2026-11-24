@@ -13,6 +13,8 @@ export interface Task extends SyncMeta {
   notes?: string;
   date: DayKey;
   time?: TimeKey | null;
+  /** Length in minutes (shown as a block on the timeline). */
+  duration?: number | null;
   reminder: ReminderOffset;
   repeat: Repeat;
   /** Non-repeating: the single completion date. Repeating: one entry per finished occurrence. */

@@ -4,6 +4,8 @@ export interface ParsedQuickAdd {
   title: string;
   date?: DayKey;
   time?: TimeKey;
+  /** Minutes, from "7-8am", "9:00-10:30" or "for 1h". */
+  duration?: number;
 }
 
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -19,6 +21,7 @@ export function parseQuickAdd(input: string, today: DayKey = todayKey()): Parsed
   let text = ` ${input.trim()} `;
   let date: DayKey | undefined;
   let time: TimeKey | undefined;
+  let duration: number | undefined;
 
   const take = (re: RegExp, fn: (m: RegExpMatchArray) => void) => {
     const m = text.match(re);
@@ -28,8 +31,30 @@ export function parseQuickAdd(input: string, today: DayKey = todayKey()): Parsed
     }
   };
 
+  // Ranges: "7-8am", "7am-8:30am", "9:00-10:30", "from 2 to 4pm"
+  take(/\s(?:from\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:-|–|to)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i, (m) => {
+    const endMer = m[6]?.toLowerCase();
+    const startMer = m[3]?.toLowerCase() ?? endMer;
+    const to24 = (h: number, mer?: string) => (mer ? (h % 12) + (mer === 'pm' ? 12 : 0) : h);
+    let sh = to24(Number(m[1]), startMer);
+    const eh = to24(Number(m[4]), endMer);
+    // "11-1pm": start is am when it would otherwise be after the end
+    if (startMer && !m[3] && sh > eh) sh -= 12;
+    const start = sh * 60 + Number(m[2] ?? 0);
+    const end = eh * 60 + Number(m[5] ?? 0);
+    if (end > start && sh >= 0 && eh < 24) {
+      time = `${pad(Math.floor(start / 60))}:${pad(start % 60)}`;
+      duration = end - start;
+    }
+  });
+  // "for 1h", "for 30 min", "for 1.5 hours", "for 2 hrs"
+  take(/\sfor\s+(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours|m|min|mins|minutes)\b/i, (m) => {
+    const n = Number(m[1]);
+    duration = Math.round(/^h/i.test(m[2]) ? n * 60 : n);
+  });
+
   // Times: "at 3pm", "3:30 pm", "15:00", "at 9", "noon", "midnight"
-  take(/\s(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i, (m) => {
+  if (!time) take(/\s(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i, (m) => {
     let h = Number(m[1]) % 12;
     if (m[3].toLowerCase() === 'pm') h += 12;
     time = `${pad(h)}:${pad(Number(m[2] ?? 0))}`;
@@ -66,5 +91,5 @@ export function parseQuickAdd(input: string, today: DayKey = todayKey()): Parsed
     });
 
   const title = text.replace(/\s+/g, ' ').replace(/\s(on|at|by)\s*$/i, '').trim();
-  return { title: title || input.trim(), date, time };
+  return { title: title || input.trim(), date, time, ...(duration ? { duration } : {}) };
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Icon, Press, Text, showToast } from '@/components/ui';
-import { formatDay, formatTime, type DayKey } from '@/lib/dates';
+import { addMinutesToTime, formatDay, formatTime, type DayKey } from '@/lib/dates';
 import { addTask } from '@/store/actions/tasks';
 import { useSettings } from '@/store/hooks';
 import { font, radius, space, useTheme } from '@/theme';
@@ -23,7 +23,7 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
 
   const submit = () => {
     if (!parsed.title.trim() || !text.trim()) return;
-    addTask({ title: parsed.title, date: day, repeat: 'none', time: parsed.time ?? null, reminder: parsed.time ? 0 : null });
+    addTask({ title: parsed.title, date: day, repeat: 'none', time: parsed.time ?? null, duration: parsed.duration ?? null, reminder: parsed.time ? 0 : null });
     if (day !== date) showToast(`Added to ${formatDay(day)}${parsed.time ? ` at ${formatTime(parsed.time, use24h)}` : ''}`, 'calendar-outline');
     setText('');
   };
@@ -51,7 +51,12 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
       {understood ? (
         <View style={styles.preview}>
           <Chip icon="calendar-outline" label={formatDay(day)} />
-          {parsed.time && <Chip icon="time-outline" label={formatTime(parsed.time, use24h)} />}
+          {parsed.time && (
+            <Chip
+              icon="time-outline"
+              label={parsed.duration ? `${formatTime(parsed.time, use24h)}–${formatTime(addMinutesToTime(parsed.time, parsed.duration), use24h)}` : formatTime(parsed.time, use24h)}
+            />
+          )}
           {parsed.time && <Chip icon="notifications-outline" label="Reminder at that time" />}
         </View>
       ) : null}

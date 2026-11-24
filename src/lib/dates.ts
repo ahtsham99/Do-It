@@ -134,3 +134,24 @@ export function formatDay(key: DayKey, opts: { relative?: boolean; long?: boolea
 export function isoWeekId(key: DayKey, weekStartsOn: 0 | 1 = 1): DayKey {
   return startOfWeek(key, weekStartsOn);
 }
+
+/** HH:mm plus minutes (capped at 23:59). */
+export function addMinutesToTime(t: TimeKey, minutes: number): TimeKey {
+  const [h, m] = t.split(':').map(Number);
+  const total = Math.min(23 * 60 + 59, h * 60 + m + minutes);
+  return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+}
+
+/** Minutes between two HH:mm times (b - a). */
+export function minutesBetween(a: TimeKey, b: TimeKey) {
+  const [ah, am] = a.split(':').map(Number);
+  const [bh, bm] = b.split(':').map(Number);
+  return bh * 60 + bm - (ah * 60 + am);
+}
+
+/** 90 → "1h 30m", 45 → "45m". */
+export function formatDuration(min: number) {
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return h ? (m ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
+}

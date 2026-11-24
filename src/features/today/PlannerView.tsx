@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Empty, Icon, IconButton, Press, Section, Text, showDialog } from '@/components/ui';
+import { Empty, Icon, IconButton, Press, Section, Text, showDialog, showToast } from '@/components/ui';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { FocusNowCard } from '@/features/focus/FocusNowCard';
 import { GoalCard } from '@/features/goals/GoalCard';
@@ -24,6 +24,7 @@ import { StatCard } from '@/features/today/StatCard';
 import { addDays, addMonths, diffDays, formatDay, fromKey, monthName, range, startOfWeek, type DayKey } from '@/lib/dates';
 import { useCountdowns, useGoals, useHabits, useSettings, useTasks } from '@/store/hooks';
 import { recall, remember } from '@/lib/uiMemory';
+import { moveToDay, restoreDates } from '@/store/actions/tasks';
 import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
 
@@ -91,6 +92,19 @@ export function PlannerView() {
   }
   if (planTomorrow) nudges.push(planTomorrow);
   if (n.streakAtRisk) nudges.push({ key: 'streak', kind: 'warning', icon: 'flame-outline', title: `Keep your ${n.streak}-day streak going`, onPress: () => router.push('/streaks') });
+
+  // Evening: carry today's unfinished one-off plans over to tomorrow in one tap.
+  // (Anything still to come later tonight stays put.)
+  const nowHHMM = `${String(n.now.getHours()).padStart(2, '0')}:${String(n.now.getMinutes()).padStart(2, '0')}`;
+  const carryOver =
+    isToday && n.now.getHours() >= 17 ? items.filter((o) => !o.done && o.task.repeat === 'none' && (!o.task.time || o.task.time <= nowHHMM)) : [];
+  const moveUnfinished = () => {
+    const moved = moveToDay(
+      carryOver.map((o) => o.task.id),
+      addDays(n.today, 1),
+    );
+    showToast(`Moved ${moved.length} to tomorrow`, 'arrow-forward-circle-outline', { label: 'Undo', onPress: () => restoreDates(moved) });
+  };
 
   const pick = (d: DayKey) => {
     setDay(d);
@@ -194,6 +208,15 @@ export function PlannerView() {
             ) : undefined
           }>
           <DayPlan day={day} items={items} />
+          {carryOver.length > 0 && (
+            <Press onPress={moveUnfinished} style={[styles.carry, { borderColor: c.border, backgroundColor: c.surface }]} accessibilityRole="button">
+              <Icon name="arrow-forward-circle-outline" size={18} color={c.accent} />
+              <Text variant="small" style={{ flex: 1, fontWeight: '600' }}>
+                Move {carryOver.length} unfinished to tomorrow
+              </Text>
+              <Icon name="chevron-forward" size={16} color={c.textFaint} />
+            </Press>
+          )}
           <QuickAdd date={day} placeholder={isToday ? 'Add to today… e.g. Gym at 7am' : `Add to ${formatDay(day)}… e.g. Call mum 6pm`} />
           {isToday && n.open.length > 0 && timerIdle && (
             <Press onPress={() => router.push('/focus')} style={{ alignSelf: 'center', padding: space.xs }}>
@@ -302,6 +325,7 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   titleBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
   todayPill: { height: 34, paddingHorizontal: 12, borderRadius: 17, justifyContent: 'center' },
+  carry: { flexDirection: 'row', alignItems: 'center', gap: space.sm, height: 46, paddingHorizontal: space.lg, borderRadius: 999, borderWidth: 1 },
   span: { flexDirection: 'row', borderRadius: 999, borderWidth: 1, padding: 2 },
   spanOpt: { height: 26, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center' },
 });
