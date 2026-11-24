@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useNavigation } from 'expo-router';
+import { useEffect, useState } from 'react';
 
 import { Screen } from '@/components/ui';
 import { BrandRow, type MainMode } from '@/features/today/BrandRow';
@@ -19,6 +20,13 @@ export default function TodayScreen() {
     remember('main.mode', m);
     setModeState(m);
   };
+  // Tapping the Today tab (even while on it) always brings you back to the plan.
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = (navigation as unknown as { addListener: (e: string, cb: () => void) => () => void }).addListener('tabPress', () => setMode('plan'));
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <Screen contentStyle={{ gap: space.md + 2 }}>
       <BrandRow mode={mode} onMode={setMode} modes={MODES} />

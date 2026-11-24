@@ -1,6 +1,7 @@
 import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from 'expo-router/tabs';
-import { StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 
 import { Icon, Press, Text, type IconName } from '@/components/ui';
 import { useTabBarBottom } from '@/hooks/useTopInset';
@@ -18,11 +19,34 @@ export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const { c, dark } = useTheme();
   const tabBottom = useTabBarBottom();
   const active = c.accent;
+  // A single highlight that slides between tabs.
+  const visible = state.routes.map((r, i) => ({ r, i })).filter(({ r }) => TAB_META[r.name]);
+  const at = visible.findIndex(({ i }) => i === state.index);
+  const [barW, setBarW] = useState(0);
+  const [pillY, setPillY] = useState(12);
+  const [x] = useState(() => new Animated.Value(0));
+  const itemW = barW ? (barW - 2 - 8) / visible.length : 0;
+  const target = 4 + Math.max(0, at) * itemW + (itemW - 46) / 2;
+  const placed = useRef(false);
+  useEffect(() => {
+    if (!itemW) return;
+    // First time: jump into place; afterwards, slide.
+    if (!placed.current) {
+      x.setValue(target);
+      placed.current = true;
+      return;
+    }
+    Animated.spring(x, { toValue: target, useNativeDriver: true, friction: 9, tension: 90 }).start();
+  }, [target, itemW, x]);
+
   return (
     <View pointerEvents="box-none" style={[styles.outer, { paddingBottom: tabBottom }]}>
-      <View style={[styles.bar, { borderColor: c.border, boxShadow: `0px 10px 30px ${c.shadow}` }]}>
+      <View onLayout={(e) => setBarW(e.nativeEvent.layout.width)} style={[styles.bar, { borderColor: c.border, boxShadow: `0px 10px 30px ${c.shadow}` }]}>
         {/* Frosted glass: blurred content behind a translucent tint. */}
         <BlurView intensity={60} tint={dark ? 'dark' : 'light'} style={[StyleSheet.absoluteFill, styles.glass, { backgroundColor: c.tabBar }]} />
+        {itemW > 0 && at >= 0 && (
+          <Animated.View pointerEvents="none" style={[styles.slider, { top: pillY, backgroundColor: c.accentSoft, transform: [{ translateX: x }] }]} />
+        )}
         {state.routes.map((route, i) => {
           const meta = TAB_META[route.name];
           if (!meta) return null;
@@ -39,7 +63,7 @@ export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
               accessibilityState={{ selected: focused }}
               accessibilityLabel={meta.title}
               style={styles.item}>
-              <View style={[styles.iconPill, focused && { backgroundColor: c.accentSoft }]}>
+              <View style={styles.iconPill} onLayout={i === visible[0]?.i ? (e) => setPillY(e.nativeEvent.layout.y) : undefined}>
                 <Icon name={meta.icon} size={22} color={focused ? active : c.textMuted} />
               </View>
               <Text
@@ -70,5 +94,6 @@ const styles = StyleSheet.create({
   },
   glass: { borderRadius: radius.pill, overflow: 'hidden' },
   item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3, height: '100%' },
+  slider: { position: 'absolute', left: 0, width: 46, height: 34, borderRadius: 17 },
   iconPill: { width: 46, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
 });

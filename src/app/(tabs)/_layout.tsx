@@ -12,7 +12,7 @@ export default function TabLayout() {
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
-      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: c.bg } }}>
+      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: c.bg }, animation: 'shift' }}>
       {Object.entries(TAB_META).map(([name, meta]) => (
         <Tabs.Screen key={name} name={name} options={{ title: meta.title }} />
       ))}
