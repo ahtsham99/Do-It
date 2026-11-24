@@ -5,7 +5,7 @@ import { Card, Glyph, Icon, IconButton, Text } from '@/components/ui';
 import { addDays, diffDays, formatDay, range, startOfWeek, todayKey, weekdayShort } from '@/lib/dates';
 import { countFor } from '@/store/actions/habits';
 import type { Habit } from '@/store/types';
-import { SERIF, hexAlpha, radius, space, useTheme } from '@/theme';
+import { SERIF, hexAlpha, space, useTheme } from '@/theme';
 
 import { bestHabitStreak } from './logic';
 
@@ -122,6 +122,6 @@ const styles = StyleSheet.create({
   endCol: { width: 22, alignItems: 'center' },
   cell: { flex: 1, alignItems: 'center' },
   cellText: { flex: 1, textAlign: 'center', fontSize: 11 },
-  dot: { width: 20, height: 20, borderRadius: radius.sm - 4, borderWidth: 1 },
+  dot: { width: 22, height: 22, borderRadius: 11, borderWidth: 1 },
   totals: { flexDirection: 'row', borderTopWidth: StyleSheet.hairlineWidth, paddingTop: space.md, marginTop: 2 },
 });

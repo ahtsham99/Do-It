@@ -1,4 +1,4 @@
-import { useRef, type ComponentRef } from 'react';
+import { useRef, useState, type ComponentRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { Text } from '@/components/ui';
@@ -14,6 +14,7 @@ import { useTheme } from '@/theme';
 export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit; weekStartsOn: 0 | 1; weeks?: number }) {
   const { c, paint } = useTheme();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const [width, setWidth] = useState(300);
   const today = todayKey();
   const set = new Set(habit.history);
   const color = paint(habit.color);
@@ -32,7 +33,7 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
             <Text variant="caption" tone={d === today ? 'default' : 'faint'} style={{ fontSize: 10 }}>
               {weekdayShort(d).slice(0, 1)}
             </Text>
-            <View style={[{ width: '100%', aspectRatio: 1, maxWidth: 42, borderRadius: 8 }, fill(d)]} />
+            <View style={[{ width: '100%', aspectRatio: 1, maxWidth: 40, borderRadius: 999 }, fill(d)]} />
           </View>
         ))}
       </View>
@@ -41,17 +42,18 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
 
   const first = addDays(startOfWeek(today, weekStartsOn), -(weeks - 1) * 7);
   const cols = Array.from({ length: weeks }, (_, i) => addDays(first, i * 7));
-  // Fewer weeks → bigger squares; a year gets thin rows so it fits.
-  const h = weeks <= 5 ? 28 : weeks <= 13 ? 18 : weeks <= 26 ? 14 : 9;
-  const gap = weeks > 26 ? 2 : 3;
   const long = weeks > 53;
+  const gap = weeks > 26 ? 2 : weeks > 13 ? 3 : 5;
+  // Round dots: the size comes from the available width so every dot is a true circle.
+  const fit = (width - gap * (weeks - 1)) / weeks;
+  const size = long ? 7 : Math.max(4, Math.min(30, fit));
 
   const grid = (
     <View style={{ flexDirection: 'row', gap }}>
       {cols.map((w) => (
-        <View key={w} style={long ? { gap, width: 7 } : { gap, flex: 1, maxWidth: 44 }}>
+        <View key={w} style={{ gap }}>
           {range(w, 7).map((d) => (
-            <View key={d} style={[{ height: h, borderRadius: weeks <= 5 ? 6 : 3 }, fill(d)]} />
+            <View key={d} style={[{ width: size, height: size, borderRadius: size / 2 }, fill(d)]} />
           ))}
         </View>
       ))}
@@ -62,7 +64,7 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
     <View style={{ flexDirection: 'row', gap }}>
       <View style={{ gap, marginRight: 2 }}>
         {weekdayLetters(weekStartsOn).map((l, i) => (
-          <View key={i} style={{ height: h, justifyContent: 'center' }}>
+          <View key={i} style={{ height: size, justifyContent: 'center' }}>
             <Text variant="caption" tone="faint" style={{ fontSize: 9 }}>
               {i % 2 === 0 ? l : ''}
             </Text>
@@ -74,7 +76,9 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
           {grid}
         </ScrollView>
       ) : (
-        <View style={{ flex: 1 }}>{grid}</View>
+        <View style={{ flex: 1 }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+          {grid}
+        </View>
       )}
     </View>
   );
