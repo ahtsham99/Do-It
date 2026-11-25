@@ -29,9 +29,8 @@ export default function ReminderEditor() {
   const [date, setDate] = useState(initialAt ? toKey(initialAt) : todayKey());
   const [time, setTime] = useState(initialAt ? timeFromDate(initialAt) : '09:00');
 
-  // A short example that fits the chosen list.
   const listName = lists.find((l) => l.id === listId)?.name ?? '';
-  const placeholder = /grocer|shop|food|market/i.test(listName) ? 'e.g. Milk' : listId === INBOX_LIST ? 'e.g. Call the dentist for mum' : 'Add a reminder';
+  const placeholder = /grocer|shop|food|market/i.test(listName) ? 'Add an item' : 'Add a reminder';
   const canSave = title.trim().length > 0;
   const close = () => (router.canGoBack() ? router.back() : router.replace('/reminders'));
   const save = () => {

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Card, Empty, Icon, IconButton, Press, Screen, Section, Text, showDialog, showToast } from '@/components/ui';
@@ -11,14 +11,13 @@ import { recall, remember } from '@/lib/uiMemory';
 import { INBOX_LIST } from '@/store/types';
 import { font, radius, space, useTheme } from '@/theme';
 
-const ALL = 'all';
 
 /** Things to remember — not your schedule. Lists like Reminders and Groceries. */
 export default function RemindersScreen() {
   const { c, fonts } = useTheme();
   const lists = useLists();
   const items = useReminders();
-  const [listId, setListState] = useState(() => recall('reminders.list', ALL));
+  const [listId, setListState] = useState(() => recall('reminders.list', INBOX_LIST));
   const [showDone, setShowDone] = useState(false);
   const [newList, setNewList] = useState<string | null>(null);
   const setList = (id: string) => {
@@ -27,15 +26,15 @@ export default function RemindersScreen() {
   };
 
   const current = lists.find((l) => l.id === listId);
-  const activeId = current ? current.id : ALL;
-  const nameOf = useMemo(() => new Map(lists.map((l) => [l.id, l.name])), [lists]);
-  const inList = items.filter((r) => activeId === ALL || r.listId === activeId);
+  // Reminders is the main list; fall back to it if a list was deleted.
+  const activeId = current ? current.id : INBOX_LIST;
+  const inList = items.filter((r) => r.listId === activeId);
   // Alerts first (soonest first), then the rest in the order added.
   const open = inList
     .filter((r) => !r.done)
     .sort((a, b) => (a.remindAt && b.remindAt ? a.remindAt - b.remindAt : a.remindAt ? -1 : b.remindAt ? 1 : a.createdAt - b.createdAt));
   const done = inList.filter((r) => r.done).sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0));
-  const counts = (id: string) => items.filter((r) => !r.done && (id === ALL || r.listId === id)).length;
+  const counts = (id: string) => items.filter((r) => !r.done && r.listId === id).length;
 
   const createList = () => {
     const name = newList?.trim();
@@ -57,7 +56,7 @@ export default function RemindersScreen() {
             showDialog({
               title: `Delete “${current.name}”?`,
               message: 'The list and everything in it will be removed.',
-              actions: [{ label: 'Delete list', destructive: true, onPress: () => (deleteList(current.id), setList(ALL)) }],
+              actions: [{ label: 'Delete list', destructive: true, onPress: () => (deleteList(current.id), setList(INBOX_LIST)) }],
             }),
         },
       ],
@@ -65,11 +64,11 @@ export default function RemindersScreen() {
   };
 
   const clear = () => {
-    const ids = clearDone(activeId === ALL ? undefined : activeId);
+    const ids = clearDone(activeId);
     showToast(`Cleared ${ids.length} done`, 'checkmark-done-outline', { label: 'Undo', onPress: () => restoreReminders(ids) });
   };
 
-  const addTo = activeId === ALL ? INBOX_LIST : activeId;
+  const addTo = activeId;
   const isShopping = /grocer|shop|food|market/i.test(current?.name ?? '');
 
   return (
@@ -79,13 +78,13 @@ export default function RemindersScreen() {
       right={<IconButton icon="add" label="New reminder" onPress={() => router.push({ pathname: '/reminder', params: { listId: addTo } })} />}>
       {/* Lists */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm, paddingRight: space.lg }} style={{ marginHorizontal: -2 }}>
-        {[{ id: ALL, name: 'All', icon: '' }, ...lists].map((l) => {
+        {lists.map((l) => {
           const on = l.id === activeId;
           const n = counts(l.id);
           return (
             <Press
               key={l.id}
-              onPress={() => (on && l.id !== ALL ? listOptions() : setList(l.id))}
+              onPress={() => (on && l.id !== INBOX_LIST ? listOptions() : setList(l.id))}
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
               style={[styles.list, { backgroundColor: on ? c.accent : c.surface, borderColor: on ? c.accent : c.border }]}>
@@ -126,7 +125,7 @@ export default function RemindersScreen() {
 
       <ReminderAdd
         listId={addTo}
-        placeholder={isShopping ? 'Add an item… e.g. Milk' : 'Remember to… e.g. Call dentist for mum tomorrow 9am'}
+        placeholder={isShopping ? 'Add an item' : 'Add a reminder'}
       />
 
       {open.length === 0 && done.length === 0 ? (
@@ -139,7 +138,7 @@ export default function RemindersScreen() {
         open.length > 0 && (
           <Card padded={false} style={{ paddingHorizontal: space.lg, overflow: 'hidden' }}>
             {open.map((r, i) => (
-              <ReminderRow key={r.id} item={r} listName={activeId === ALL && r.listId !== INBOX_LIST ? nameOf.get(r.listId) : undefined} last={i === open.length - 1} />
+              <ReminderRow key={r.id} item={r} last={i === open.length - 1} />
             ))}
           </Card>
         )
