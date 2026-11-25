@@ -29,6 +29,9 @@ export default function ReminderEditor() {
   const [date, setDate] = useState(initialAt ? toKey(initialAt) : todayKey());
   const [time, setTime] = useState(initialAt ? timeFromDate(initialAt) : '09:00');
 
+  // A short example that fits the chosen list.
+  const listName = lists.find((l) => l.id === listId)?.name ?? '';
+  const placeholder = /grocer|shop|food|market/i.test(listName) ? 'e.g. Milk' : listId === INBOX_LIST ? 'e.g. Call the dentist for mum' : 'Add a reminder';
   const canSave = title.trim().length > 0;
   const close = () => (router.canGoBack() ? router.back() : router.replace('/reminders'));
   const save = () => {
@@ -46,7 +49,7 @@ export default function ReminderEditor() {
         <SheetHeader title={existing ? 'Reminder' : 'New reminder'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
-        <Field placeholder="What do you want to remember?" value={title} onChangeText={setTitle} autoFocus={!existing} returnKeyType="done" onSubmitEditing={save} style={{ fontSize: 20, fontWeight: '600', minHeight: 58 }} />
+        <Field placeholder={placeholder} value={title} onChangeText={setTitle} autoFocus={!existing} returnKeyType="done" onSubmitEditing={save} style={{ fontSize: 20, fontWeight: '600', minHeight: 58 }} />
 
         <View style={{ gap: space.sm }}>
           <Label>List</Label>
