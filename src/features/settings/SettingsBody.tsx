@@ -204,9 +204,6 @@ export function SettingsBody() {
           right={<Toggle value={s.weekStartsOn === 1} onValueChange={(v) => updateSettings({ weekStartsOn: v ? 1 : 0 })} />}
         />
         <ListRow label="24-hour time" last right={<Toggle value={s.use24h} onValueChange={(use24h) => updateSettings({ use24h })} />} />
-            </View>
-          }
-        />
       </Card>
 
       <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
