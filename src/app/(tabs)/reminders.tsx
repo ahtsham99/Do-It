@@ -1,14 +1,13 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Card, Empty, Icon, IconButton, Press, Screen, Section, Text, showDialog, showToast } from '@/components/ui';
-import { ReminderAdd } from '@/features/reminders/ReminderAdd';
+import { ReminderSheet } from '@/features/reminders/ReminderSheet';
 import { ReminderRow } from '@/features/reminders/ReminderRow';
 import { addList, clearDone, deleteList, restoreReminders } from '@/store/actions/reminders';
 import { useLists, useReminders } from '@/store/hooks';
 import { recall, remember } from '@/lib/uiMemory';
-import { INBOX_LIST } from '@/store/types';
+import { INBOX_LIST, type ReminderItem } from '@/store/types';
 import { font, radius, space, useTheme } from '@/theme';
 
 
@@ -20,6 +19,7 @@ export default function RemindersScreen() {
   const [listId, setListState] = useState(() => recall('reminders.list', INBOX_LIST));
   const [showDone, setShowDone] = useState(false);
   const [newList, setNewList] = useState<string | null>(null);
+  const [sheet, setSheet] = useState<{ open: boolean; item?: ReminderItem }>({ open: false });
   const setList = (id: string) => {
     remember('reminders.list', id);
     setListState(id);
@@ -72,10 +72,12 @@ export default function RemindersScreen() {
   const isShopping = /grocer|shop|food|market/i.test(current?.name ?? '');
 
   return (
+    <>
+    <ReminderSheet visible={sheet.open} existing={sheet.item} defaultListId={addTo} onClose={() => setSheet({ open: false })} />
     <Screen
       title="Reminders"
       subtitle={open.length ? `${open.length} to remember` : 'Nothing to remember'}
-      right={<IconButton icon="add" label="New reminder" onPress={() => router.push({ pathname: '/reminder', params: { listId: addTo } })} />}>
+      right={<IconButton icon="add" label="New reminder" onPress={() => setSheet({ open: true })} />}>
       {/* Lists */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm, paddingRight: space.lg }} style={{ marginHorizontal: -2 }}>
         {lists.map((l) => {
@@ -123,10 +125,13 @@ export default function RemindersScreen() {
         )}
       </ScrollView>
 
-      <ReminderAdd
-        listId={addTo}
-        placeholder={isShopping ? 'Add an item' : 'Add a reminder'}
-      />
+      {/* Tap to open the add sheet: type and set everything in one go. */}
+      <Press onPress={() => setSheet({ open: true })} accessibilityRole="button" accessibilityLabel={isShopping ? 'Add an item' : 'Add a reminder'} style={[styles.addField, { backgroundColor: c.surface, borderColor: c.border }]}>
+        <Icon name="add" size={22} color={c.textFaint} />
+        <Text tone="faint" style={{ fontSize: 16 }}>
+          {isShopping ? 'Add an item' : 'Add a reminder'}
+        </Text>
+      </Press>
 
       {open.length === 0 && done.length === 0 ? (
         <Empty
@@ -138,7 +143,7 @@ export default function RemindersScreen() {
         open.length > 0 && (
           <Card padded={false} style={{ paddingHorizontal: space.lg, overflow: 'hidden' }}>
             {open.map((r, i) => (
-              <ReminderRow key={r.id} item={r} last={i === open.length - 1} />
+              <ReminderRow key={r.id} item={r} last={i === open.length - 1} onOpen={(item) => setSheet({ open: true, item })} />
             ))}
           </Card>
         )
@@ -164,16 +169,18 @@ export default function RemindersScreen() {
           {showDone && (
             <Card padded={false} style={{ paddingHorizontal: space.lg, overflow: 'hidden' }}>
               {done.map((r, i) => (
-                <ReminderRow key={r.id} item={r} last={i === done.length - 1} />
+                <ReminderRow key={r.id} item={r} last={i === done.length - 1} onOpen={(item) => setSheet({ open: true, item })} />
               ))}
             </Card>
           )}
         </Section>
       )}
     </Screen>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  addField: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, height: 52, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth },
   list: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 38, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1 },
 });

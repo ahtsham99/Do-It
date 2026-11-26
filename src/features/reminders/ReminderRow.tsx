@@ -11,7 +11,7 @@ import { useNow } from '@/features/nudges/useNow';
 
 import { whenLabel } from './logic';
 
-export function ReminderRow({ item, listName, last }: { item: ReminderItem; listName?: string; last?: boolean }) {
+export function ReminderRow({ item, listName, last, onOpen }: { item: ReminderItem; listName?: string; last?: boolean; onOpen?: (item: ReminderItem) => void }) {
   const { c } = useTheme();
   const { use24h } = useSettings();
   const now = useNow().getTime();
@@ -29,7 +29,7 @@ export function ReminderRow({ item, listName, last }: { item: ReminderItem; list
       }}>
       <View style={[styles.row, { backgroundColor: c.surface }, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.border }]}>
         <Checkbox checked={item.done} onToggle={() => toggleReminder(item)} label={`Done: ${item.title}`} />
-        <Press haptic={false} style={{ flex: 1, gap: 2 }} onPress={() => router.push({ pathname: '/reminder', params: { id: item.id } })}>
+        <Press haptic={false} style={{ flex: 1, gap: 2 }} onPress={() => (onOpen ? onOpen(item) : router.push({ pathname: '/reminder', params: { id: item.id } }))}>
           <Text numberOfLines={2} tone={item.done ? 'faint' : 'default'} style={[{ fontWeight: '500' }, item.done && { textDecorationLine: 'line-through' }]}>
             {item.title}
           </Text>
