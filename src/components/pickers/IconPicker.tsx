@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Glyph, Icon, Press, Text, showDialog } from '@/components/ui';
@@ -77,7 +78,7 @@ export function IconPicker({
 /** Extra icons for the paid tier. */
 export const PREMIUM_ICONS = ['🕌', '🌙', '🕯️', '🎄', '🎃', '🏛️', '👶', '💒', '🏝️', '🗼', '🎡', '🎤', '🎨', '🧳', '🏁', '💎', '🌸', '🦋', '🐶', '🐱', '⚡', '🔥', '🌍', '👑'];
 
-export function ColorPicker({ colors, value, onChange }: { colors: string[]; value: string; onChange: (c: string) => void }) {
+export function ColorPicker({ colors, value, onChange, children }: { colors: string[]; value: string; onChange: (c: string) => void; children?: ReactNode }) {
   const { c, paint } = useTheme();
   return (
     <View style={styles.grid}>
@@ -90,6 +91,7 @@ export function ColorPicker({ colors, value, onChange }: { colors: string[]; val
           <View style={[styles.swatchInner, { backgroundColor: paint(col) }]} />
         </Press>
       ))}
+      {children}
     </View>
   );
 }

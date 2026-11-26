@@ -108,14 +108,8 @@ export default function CountdownEditor() {
 
         <View style={{ gap: space.sm }}>
           <Label>Colour</Label>
-          <ColorPicker colors={SWATCHES} value={color} onChange={(v) => (setColor(v), setTouchedLook(true))} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.xs }}>
-            <Icon name="sparkles" size={12} color="#E8B53A" />
-            <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', fontSize: 11 }}>
-              Premium colours
-            </Text>
-          </View>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {/* Premium palette colours sit with the others, locked on the free plan. */}
+          <ColorPicker colors={SWATCHES} value={color} onChange={(v) => (setColor(v), setTouchedLook(true))}>
             {PREMIUM_COLORS.map((k) => {
               const col = NIGHT_COLORS[k].shades![2];
               const on = color.toLowerCase() === col.toLowerCase();
@@ -140,7 +134,7 @@ export default function CountdownEditor() {
                 </Press>
               );
             })}
-          </View>
+          </ColorPicker>
         </View>
 
 
