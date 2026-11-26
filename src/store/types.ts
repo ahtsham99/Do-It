@@ -161,7 +161,7 @@ export interface Settings {
   /** Focus sound id (src/features/focus/sounds). */
   focusSound: string;
   /** Night-mode glow colour (src/theme/colors.ts NIGHT_COLORS). */
-  nightColor: 'forest' | 'ember' | 'electric' | 'violet' | 'mono' | 'custom';
+  nightColor: 'forest' | 'ember' | 'electric' | 'violet' | 'mono' | 'ruby' | 'ocean' | 'pine' | 'plum' | 'sunset' | 'graphite' | 'slate' | 'lavender' | 'custom';
   /** Used when nightColor is 'custom'. */
   customColor: string;
   dayBackground: 'paper' | 'linen' | 'sand';

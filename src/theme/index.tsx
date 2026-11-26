@@ -2,12 +2,15 @@ import * as Font from 'expo-font';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { entitlementsFor } from '@/lib/premium';
 import { useStore } from '@/store/store';
 
-import { darkFor, itemColor, light, lightFor, type DayBackground, type NightBackground, type ThemeColors } from './colors';
+import { NIGHT_COLORS, darkFor, itemColor, light, lightFor, type DayBackground, type NightBackground, type NightColor, type ThemeColors } from './colors';
+import { useColorPreview } from './preview';
 import { displayFont, faceForWeight, facesFor, textFont, type FontChoice } from './fonts';
 
-export { DAY_BACKGROUNDS, DEFAULT_ITEM_COLOR, NIGHT_BACKGROUNDS, NIGHT_COLORS, SWATCHES, customColor, hexAlpha, hslToHex } from './colors';
+export { setColorPreview, useColorPreview } from './preview';
+export { DAY_BACKGROUNDS, DEFAULT_ITEM_COLOR, FREE_COLORS, NIGHT_BACKGROUNDS, NIGHT_COLORS, PREMIUM_COLORS, SWATCHES, customColor, hexAlpha, hslToHex } from './colors';
 export type { DayBackground, NightBackground } from './colors';
 export type { NightColor, ThemeColors } from './colors';
 
@@ -74,7 +77,12 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
   const display = useStore((s) => s.settings.displayFont);
   const text = useStore((s) => s.settings.textFont);
   const logo = useStore((s) => s.settings.logoFont);
-  const night = useStore((s) => s.settings.nightColor);
+  const saved = useStore((s) => s.settings.nightColor);
+  const plan = useStore((s) => s.settings.plan);
+  const preview = useColorPreview();
+  // Premium palettes need Premium (a preview in Settings shows one for a moment).
+  const locked = NIGHT_COLORS[saved as NightColor]?.premium && !entitlementsFor(plan).has('themes');
+  const night = preview ?? (locked ? 'forest' : saved);
   const custom = useStore((s) => s.settings.customColor);
   const dayBg = useStore((s) => s.settings.dayBackground);
   const nightBg = useStore((s) => s.settings.nightBackground);

@@ -12,8 +12,10 @@ import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { resetAll } from '@/store/store';
 import type { ThemePreference, Tone } from '@/store/types';
-import { DAY_BACKGROUNDS, NIGHT_BACKGROUNDS, NIGHT_COLORS, customColor, radius, space, useTheme, type DayBackground, type NightBackground, type NightColor } from '@/theme';
+import { DAY_BACKGROUNDS, FREE_COLORS, NIGHT_BACKGROUNDS, NIGHT_COLORS, customColor, radius, setColorPreview, space, useTheme, type DayBackground, type NightBackground } from '@/theme';
 import { styleFor } from '@/theme/fonts';
+
+import { PremiumPalettes } from './PremiumPalettes';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
   { value: 'gentle', label: 'Gentle', blurb: 'Soft reminders, no pressure.' },
@@ -66,13 +68,13 @@ export function SettingsBody() {
             App colour
           </Text>
           <View style={styles.swatches}>
-            {(Object.keys(NIGHT_COLORS) as NightColor[]).map((k) => {
+            {FREE_COLORS.map((k) => {
               const n = NIGHT_COLORS[k];
               const on = s.nightColor === k;
               return (
                 <Press
                   key={k}
-                  onPress={() => updateSettings({ nightColor: k })}
+                  onPress={() => (setColorPreview(null), updateSettings({ nightColor: k }))}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: on }}
                   accessibilityLabel={`${n.label} app colour`}
@@ -106,6 +108,7 @@ export function SettingsBody() {
             </Press>
           </View>
         </View>
+        <PremiumPalettes />
         <View style={{ gap: space.sm }}>
           <Text variant="small" tone="muted">
             Day background
