@@ -49,7 +49,7 @@ function dayTitle(day: DayKey, today: DayKey) {
 export function PlannerView() {
   const { c } = useTheme();
   const n = useNudges();
-  const { tone, name, weekStartsOn } = useSettings();
+  const { tone, name, weekStartsOn, use24h } = useSettings();
   const tasks = useTasks();
   const habits = useHabits();
   const countdowns = useCountdowns();
@@ -229,7 +229,7 @@ export function PlannerView() {
               <Icon name="chevron-forward" size={16} color={c.textFaint} />
             </Press>
           )}
-          <QuickAdd date={day} placeholder={isToday ? 'Add to today… e.g. Gym at 7am' : `Add to ${formatDay(day)}… e.g. Call mum 6pm`} />
+          <QuickAdd date={day} placeholder={isToday ? `Add to today… e.g. Gym at ${use24h ? '07:00' : '7am'}` : `Add to ${formatDay(day)}… e.g. Call mum ${use24h ? '18:00' : '6pm'}`} />
           {isToday && n.open.length > 0 && timerIdle && (
             <Press onPress={() => router.push('/focus')} style={{ alignSelf: 'center', padding: space.xs }}>
               <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>

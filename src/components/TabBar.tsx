@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 
 import { Icon, Press, Text, type IconName } from '@/components/ui';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import { useTabBarBottom } from '@/hooks/useTopInset';
 import { radius, useTheme } from '@/theme';
 
@@ -38,6 +39,10 @@ export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
     }
     Animated.spring(x, { toValue: target, useNativeDriver: true, friction: 9, tension: 90 }).start();
   }, [target, itemW, x]);
+
+  // Out of the way while typing, so the field you're in stays in view.
+  const typing = useKeyboardVisible();
+  if (typing) return null;
 
   return (
     <View pointerEvents="box-none" style={[styles.outer, { paddingBottom: tabBottom }]}>

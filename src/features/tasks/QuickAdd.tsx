@@ -4,6 +4,7 @@ import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Icon, Press, Text, showToast } from '@/components/ui';
 import { addMinutesToTime, formatDay, formatTime, type DayKey } from '@/lib/dates';
+import { to24hText } from '@/lib/to24hText';
 import { addTask } from '@/store/actions/tasks';
 import { useSettings } from '@/store/hooks';
 import { font, radius, space, useTheme } from '@/theme';
@@ -46,7 +47,7 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
         </Press>
         <TextInput
           value={text}
-          onChangeText={setText}
+          onChangeText={(t) => setText(use24h ? to24hText(t) : t)}
           placeholder={placeholder}
           placeholderTextColor={c.textFaint}
           onSubmitEditing={submit}

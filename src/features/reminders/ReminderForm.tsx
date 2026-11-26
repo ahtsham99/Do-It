@@ -4,6 +4,7 @@ import { Platform, ScrollView, View, type StyleProp, type ViewStyle } from 'reac
 import { DateTimeField } from '@/components/pickers';
 import { Button, Card, Chip, Field, Label, Text, showDialog, showToast } from '@/components/ui';
 import { addDays, combine, timeFromDate, toKey, todayKey } from '@/lib/dates';
+import { to24hText } from '@/lib/to24hText';
 import { addReminder, deleteReminder, updateReminder } from '@/store/actions/reminders';
 import { useLists, useSettings } from '@/store/hooks';
 import { INBOX_LIST, type ReminderItem } from '@/store/types';
@@ -94,7 +95,7 @@ export function ReminderForm({
       <Field
         placeholder={shopping ? 'Add an item' : 'Add a reminder'}
         value={title}
-        onChangeText={setTitle}
+        onChangeText={(t) => setTitle(use24h ? to24hText(t) : t)}
         autoFocus={!existing}
         returnKeyType={shopping && !existing ? 'next' : 'done'}
         submitBehavior={shopping && !existing ? 'submit' : 'blurAndSubmit'}
@@ -123,9 +124,9 @@ export function ReminderForm({
         </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
           <Chip label="No alert" selected={!remind} onPress={() => (setRemind(false), setTouched(true))} />
-          <Chip label={later.date === todayKey() ? 'Later today' : 'Tomorrow 9am'} selected={remind && date === later.date && time === later.time} onPress={() => pickTime(later.date, later.time)} />
+          <Chip label={later.date === todayKey() ? 'Later today' : use24h ? 'Tomorrow 09:00' : 'Tomorrow 9am'} selected={remind && date === later.date && time === later.time} onPress={() => pickTime(later.date, later.time)} />
           {later.date === todayKey() && (
-            <Chip label="Tomorrow 9am" selected={remind && date === addDays(todayKey(), 1) && time === '09:00'} onPress={() => pickTime(addDays(todayKey(), 1), '09:00')} />
+            <Chip label={use24h ? 'Tomorrow 09:00' : 'Tomorrow 9am'} selected={remind && date === addDays(todayKey(), 1) && time === '09:00'} onPress={() => pickTime(addDays(todayKey(), 1), '09:00')} />
           )}
           <Chip label="In a week" selected={remind && date === addDays(todayKey(), 7)} onPress={() => pickTime(addDays(todayKey(), 7), time)} />
         </View>
