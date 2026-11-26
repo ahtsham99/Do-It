@@ -6,6 +6,7 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DialogHost, ToastHost } from '@/components/ui';
+import { FocusMode } from '@/features/focus/FocusMode';
 import { TimerWatcher } from '@/features/focus/TimerWatcher';
 import { NotificationSync } from '@/features/nudges/NotificationSync';
 import { hydrate, useStore } from '@/store/store';
@@ -71,6 +72,7 @@ function Navigator() {
       </Stack>
       <NotificationSync />
       <TimerWatcher />
+      <FocusMode />
       <ToastHost />
       <DialogHost />
     </ThemeProvider>

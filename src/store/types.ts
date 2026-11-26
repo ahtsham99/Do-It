@@ -116,6 +116,11 @@ export interface TimerState {
   label: string;
   taskId?: string | null;
   habitId?: string | null;
+  /** Focus rounds: total planned and the current one (1-based). */
+  rounds?: number;
+  round?: number;
+  /** Length of each focus round, in minutes. */
+  roundMinutes?: number;
 }
 
 /** A finished (or abandoned) focus session, kept for history and stats. */

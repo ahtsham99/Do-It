@@ -1,16 +1,18 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
-import { Button, Card, Chip, Field, Glyph, IconButton, Label, Press, Screen, Section, Text, showDialog } from '@/components/ui';
+import { Button, Card, Chip, Field, Glyph, Label, Press, Screen, Text, showDialog } from '@/components/ui';
 import { SOUNDS, playSound, soundsSupported, stopSound, type SoundId } from '@/features/focus/sounds';
 import { DurationSheet, nativeDurationWheel } from '@/features/focus/DurationSheet';
+import { setFocusExpanded } from '@/features/focus/focusMode';
 import { parseLength } from '@/features/focus/parseLength';
 import { TimerRing } from '@/features/focus/TimerRing';
 import { formatClock, useTick } from '@/features/focus/useTick';
 import { isDueToday } from '@/features/habits/logic';
 import { occurrencesOn } from '@/features/tasks/logic';
-import { addDays, formatDay, todayKey } from '@/lib/dates';
+import { addDays, todayKey } from '@/lib/dates';
+import { recall, remember } from '@/lib/uiMemory';
 import { updateSettings } from '@/store/actions/settings';
 import { addMinutes, pauseTimer, remainingSec, resumeTimer, startTimer, stopTimer } from '@/store/actions/timer';
 import { useHabits, useSettings, useTasks } from '@/store/hooks';
@@ -18,8 +20,7 @@ import { getState, useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
 const PRESETS = [5, 15, 25, 45];
-
-
+const ROUNDS = [1, 2, 3, 4];
 
 type Target = { kind: 'task' | 'habit' | 'none'; id: string | null; label: string; icon?: string };
 
@@ -34,6 +35,8 @@ export default function FocusScreen() {
   const now = useTick(timer.status === 'running');
 
   const [minutes, setMinutes] = useState(settings.focusMinutes);
+  const [rounds, setRoundsState] = useState(() => recall('focus.rounds', 1));
+  const setRounds = (n: number) => (remember('focus.rounds', n), setRoundsState(n));
   const [target, setTarget] = useState<Target>({ kind: 'none', id: null, label: '' });
   const [custom, setCustom] = useState('');
   // iPhone app: the system timer wheel. Web and Android: type the length.
@@ -96,7 +99,6 @@ export default function FocusScreen() {
       todayCount: todays.filter((x) => x.completed).length,
       todayMin: todays.reduce((n, x) => n + x.minutes, 0),
       weekMin: week.reduce((n, x) => n + x.minutes, 0),
-      recent: [...focus].reverse().slice(0, 5),
     };
   }, [sessions, today]);
 
@@ -119,7 +121,11 @@ export default function FocusScreen() {
       label,
       taskId: target.kind === 'task' ? target.id : null,
       habitId: target.kind === 'habit' ? target.id : null,
+      rounds,
+      round: 1,
+      roundMinutes: minutes,
     });
+    setFocusExpanded(true);
   };
 
   const stop = () =>
@@ -134,11 +140,46 @@ export default function FocusScreen() {
   const clockSize = Math.round(Math.min(58, 158 / (clockText.length * 0.64)));
 
   const status = idle ? 'Ready' : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
+  const roundOf = !idle && (timer.rounds ?? 1) > 1 ? `Round ${timer.round ?? 1} of ${timer.rounds}` : '';
+  const fmt = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ''}` : `${m} min`);
+  const plan = rounds > 1 ? `${rounds} × ${fmt(minutes)} with ${settings.breakMinutes}-min breaks` : minutes === 5 ? 'Just five minutes. You can keep going after.' : `${fmt(minutes)} of focus`;
+  const totalMin = rounds * minutes + (rounds - 1) * settings.breakMinutes;
 
   return (
     <>
     {editing && <DurationSheet visible minutes={minutes} onClose={() => setEditing(false)} onSet={setMinutes} />}
     <Screen title="Focus" subtitle="Can’t get started? Just do five minutes.">
+      {idle && (
+        <View style={{ gap: space.md }}>
+          <Label>What will you work on?</Label>
+          {options.length > 0 && (
+            <View style={[styles.row, { justifyContent: 'flex-start' }]}>
+              {options.map((o) => {
+                const sel = target.id === o.id;
+                return (
+                  <Press
+                    key={`${o.kind}:${o.id}`}
+                    onPress={() => setTarget(sel ? { kind: 'none', id: null, label: '' } : o)}
+                    accessibilityState={{ selected: sel }}
+                    style={[styles.option, { backgroundColor: sel ? c.accent : c.surface, borderColor: sel ? c.accent : c.border }]}>
+                    {o.icon ? <Glyph value={o.icon} size={15} color={sel ? c.accentText : c.textMuted} /> : null}
+                    <Text variant="small" numberOfLines={1} color={sel ? c.accentText : c.text} style={{ fontWeight: '500', maxWidth: 220 }}>
+                      {o.label}
+                    </Text>
+                  </Press>
+                );
+              })}
+            </View>
+          )}
+          {target.kind === 'none' && <Field placeholder={options.length ? 'Or type something else (optional)' : 'Type it here (optional)'} value={custom} onChangeText={setCustom} returnKeyType="go" onSubmitEditing={start} />}
+          {target.kind === 'habit' && (
+            <Text variant="small" tone="muted">
+              Finishing the session ticks this habit for today.
+            </Text>
+          )}
+        </View>
+      )}
+
       <Card style={{ alignItems: 'center', gap: space.md, paddingVertical: space.xl }}>
         <TimerRing size={212} stroke={9} progress={total ? left / total : 0} color={isBreak ? c.warning : c.accent}>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
@@ -170,6 +211,11 @@ export default function FocusScreen() {
               {nativeDurationWheel ? 'Tap to change' : 'Tap to type'}
             </Text>
           )}
+          {roundOf ? (
+            <Text variant="small" tone="muted" style={{ fontSize: 12 }}>
+              {roundOf}
+            </Text>
+          ) : null}
           {!idle && timer.label ? (
             <Text variant="small" tone="muted" numberOfLines={1} style={{ maxWidth: 190 }}>
               {timer.label}
@@ -179,35 +225,58 @@ export default function FocusScreen() {
 
         {idle ? (
           <>
-            <View style={[styles.row, { flexWrap: 'nowrap' }]}>
-              {PRESETS.map((m) => (
-                <Chip key={m} label={`${m} min`} selected={minutes === m} onPress={() => setMinutes(m)} />
-              ))}
-            </View>
-            <View style={[styles.row, { alignItems: 'center' }]}>
-              <IconButton icon="remove" label="Less time" size={16} diameter={36} onPress={() => setMinutes(Math.max(1, minutes - 5))} />
-              <Text tone="muted" style={{ minWidth: 96, textAlign: 'center' }}>
-                {minutes === 5 ? '5 · just start' : `${minutes} minutes`}
+            <Button label="Start focus" icon="play" onPress={start} style={styles.start} />
+            <Text variant="small" tone="muted" style={{ textAlign: 'center', marginTop: -4 }}>
+              {plan}
+              {rounds > 1 ? ` · ${fmt(totalMin)} total` : ''}
+            </Text>
+            <View style={[styles.divider, { backgroundColor: c.border }]} />
+            <View style={styles.setting}>
+              <Text variant="caption" tone="muted" style={styles.settingLabel}>
+                Length
               </Text>
-              <IconButton icon="add" label="More time" size={16} diameter={36} onPress={() => setMinutes(Math.min(180, minutes + 5))} />
+              <View style={[styles.row, { flexWrap: 'nowrap', justifyContent: 'space-between' }]}>
+                {PRESETS.map((m) => (
+                  <Chip key={m} label={`${m}m`} selected={minutes === m} onPress={() => setMinutes(m)} />
+                ))}
+              </View>
             </View>
-            <Button label={`Start ${minutes}-minute focus`} icon="play" onPress={start} style={{ alignSelf: 'stretch' }} />
+            <View style={styles.setting}>
+              <Text variant="caption" tone="muted" style={styles.settingLabel}>
+                Rounds
+              </Text>
+              <View style={[styles.row, { flexWrap: 'nowrap', justifyContent: 'space-between' }]}>
+                {ROUNDS.map((n) => (
+                  <Chip key={n} label={n === 1 ? 'Once' : `${n}×`} selected={rounds === n} onPress={() => setRounds(n)} />
+                ))}
+              </View>
+            </View>
+            {minutes !== settings.focusMinutes && (
+              <Press onPress={() => updateSettings({ focusMinutes: minutes })} style={{ alignSelf: 'center', padding: space.sm }}>
+                <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
+                  Make {minutes} minutes my default
+                </Text>
+              </Press>
+            )}
           </>
         ) : (
-          <View style={styles.row}>
+          <View style={{ alignSelf: 'stretch', gap: space.sm }}>
+          <View style={[styles.row, { flexWrap: 'nowrap' }]}>
             {timer.status === 'running' ? (
-              <Button label="Pause" icon="pause" onPress={() => (stopSound(), pauseTimer())} style={{ minWidth: 140 }} />
+              <Button label="Pause" icon="pause" onPress={() => (stopSound(), pauseTimer())} />
             ) : (
-              <Button label="Resume" icon="play" onPress={() => (playSound(sound), resumeTimer())} style={{ minWidth: 140 }} />
+              <Button label="Resume" icon="play" onPress={() => (playSound(sound), resumeTimer())} />
             )}
             <Button kind="secondary" label="+5 min" onPress={() => addMinutes(5)} />
             <Button kind="ghost" label="End" onPress={stop} />
           </View>
+            <Button kind="ghost" label="Full screen" icon="expand" onPress={() => setFocusExpanded(true)} />
+          </View>
         )}
         {soundsSupported && (
           <View style={{ alignSelf: 'stretch', gap: space.sm }}>
-            <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', textAlign: 'center', fontSize: 11 }}>
-              Focus sound
+            <Text variant="caption" tone="muted" style={styles.settingLabel}>
+              Sound
             </Text>
             <View style={styles.sounds}>
               {SOUNDS.map((x) => {
@@ -231,86 +300,11 @@ export default function FocusScreen() {
         )}
       </Card>
 
-      {idle && (
-        <View style={{ gap: space.md }}>
-          <Label>What will you work on? (optional)</Label>
-          {options.length > 0 && (
-            <View style={[styles.row, { justifyContent: 'flex-start' }]}>
-              {options.map((o) => {
-                const sel = target.id === o.id;
-                return (
-                  <Press
-                    key={`${o.kind}:${o.id}`}
-                    onPress={() => setTarget(sel ? { kind: 'none', id: null, label: '' } : o)}
-                    accessibilityState={{ selected: sel }}
-                    style={[styles.option, { backgroundColor: sel ? c.accent : c.surface, borderColor: sel ? c.accent : c.border }]}>
-                    {o.icon ? <Glyph value={o.icon} size={15} color={sel ? c.accentText : c.textMuted} /> : null}
-                    <Text variant="small" numberOfLines={1} color={sel ? c.accentText : c.text} style={{ fontWeight: '500', maxWidth: 220 }}>
-                      {o.label}
-                    </Text>
-                  </Press>
-                );
-              })}
-            </View>
-          )}
-          {target.kind === 'none' && <Field placeholder="Or type it here (optional)" value={custom} onChangeText={setCustom} returnKeyType="go" onSubmitEditing={start} />}
-          {target.kind === 'habit' && (
-            <Text variant="small" tone="muted">
-              Finishing the session ticks this habit for today.
-            </Text>
-          )}
-          {minutes !== settings.focusMinutes && (
-            <Press onPress={() => updateSettings({ focusMinutes: minutes })} style={{ alignSelf: 'center', padding: space.sm }}>
-              <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
-                Make {minutes} minutes my default
-              </Text>
-            </Press>
-          )}
-        </View>
-      )}
-
-      <View style={{ flexDirection: 'row', gap: space.md }}>
-        <Stat label="Sessions today" value={String(stats.todayCount)} />
-        <Stat label="Minutes today" value={String(stats.todayMin)} />
-        <Stat label="Last 7 days" value={`${stats.weekMin}m`} />
-      </View>
-
-      {stats.recent.length > 0 && (
-        <Section title="Recent sessions">
-          <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
-            {stats.recent.map((x, i) => (
-              <Press
-                key={x.id}
-                haptic={false}
-                disabled={!x.taskId}
-                onPress={() => x.taskId && router.push({ pathname: '/task', params: { id: x.taskId } })}
-                style={[styles.session, i < stats.recent.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.border }]}>
-                <View style={{ flex: 1 }}>
-                  <Text numberOfLines={1}>{x.label || 'Focus session'}</Text>
-                  <Text variant="small" tone="muted">
-                    {formatDay(x.day)}
-                    {x.completed ? '' : ' · ended early'}
-                  </Text>
-                </View>
-                <Text style={{ fontFamily: SERIF, fontSize: 24 }}>{x.minutes}m</Text>
-              </Press>
-            ))}
-          </Card>
-        </Section>
-      )}
+      <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
+        Today: {stats.todayCount} session{stats.todayCount === 1 ? '' : 's'} · {stats.todayMin} min · Last 7 days: {stats.weekMin} min
+      </Text>
     </Screen>
     </>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <Card style={{ flex: 1, alignItems: 'center', gap: 2, paddingHorizontal: space.sm }}>
-      <Text style={{ fontFamily: SERIF, fontSize: 32, lineHeight: 36 }}>{value}</Text>
-      <Text variant="small" tone="muted" style={{ fontSize: 12, textAlign: 'center' }}>
-        {label}
-      </Text>
-    </Card>
   );
 }
 
@@ -327,5 +321,7 @@ const styles = StyleSheet.create({
   },
   sounds: { flexDirection: 'row', justifyContent: 'space-between', gap: 6 },
   sound: { flex: 1, alignItems: 'center', gap: 2, paddingVertical: 8, borderRadius: radius.md, borderWidth: 1.5 },
-  session: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 62 },
-});
+  start: { alignSelf: 'stretch', height: 60, borderRadius: radius.pill },
+  divider: { alignSelf: 'stretch', height: 1, marginVertical: 2 },
+  setting: { alignSelf: 'stretch', gap: space.sm },
+  settingLabel: { textTransform: 'uppercase', fontSize: 11 },});

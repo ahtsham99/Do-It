@@ -5,7 +5,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '@/theme';
 
 /** Circular progress ring. `progress` is the share remaining, 0–1. */
-export function TimerRing({ progress, size = 260, stroke = 10, color, children }: { progress: number; size?: number; stroke?: number; color?: string; children?: ReactNode }) {
+export function TimerRing({ progress, size = 260, stroke = 10, color, track, children }: { progress: number; size?: number; stroke?: number; color?: string; track?: string; children?: ReactNode }) {
   const { c } = useTheme();
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
@@ -13,7 +13,7 @@ export function TimerRing({ progress, size = 260, stroke = 10, color, children }
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke={c.surfaceAlt} strokeWidth={stroke} fill="none" />
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke={track ?? c.surfaceAlt} strokeWidth={stroke} fill="none" />
         <Circle
           cx={size / 2}
           cy={size / 2}

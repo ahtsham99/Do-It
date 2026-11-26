@@ -6,6 +6,7 @@ import { remainingSec } from '@/store/actions/timer';
 import { useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
+import { setFocusExpanded } from './focusMode';
 import { TimerRing } from './TimerRing';
 import { formatClock, useTick } from './useTick';
 
@@ -18,7 +19,7 @@ export function FocusNowCard({ compact }: { compact?: boolean }) {
   const left = remainingSec(timer, now);
   const isBreak = timer.mode === 'break';
   return (
-    <Press onPress={() => router.push('/focus')} style={[styles.wrap, compact && styles.compact, { backgroundColor: c.surface, borderColor: c.border, boxShadow: `0px 6px 22px ${c.shadow}` }]}>
+    <Press onPress={() => (router.push('/focus'), setFocusExpanded(true))} style={[styles.wrap, compact && styles.compact, { backgroundColor: c.surface, borderColor: c.border, boxShadow: `0px 6px 22px ${c.shadow}` }]}>
       <TimerRing progress={timer.durationSec ? left / timer.durationSec : 0} size={compact ? 36 : 56} stroke={compact ? 4 : 5} color={isBreak ? c.warning : c.accent}>
         <Icon name={timer.status === 'paused' ? 'pause' : isBreak ? 'cafe-outline' : 'timer-outline'} size={compact ? 15 : 20} color={c.textMuted} />
       </TimerRing>
@@ -26,7 +27,7 @@ export function FocusNowCard({ compact }: { compact?: boolean }) {
         <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
           {timer.status === 'paused' ? 'Paused' : isBreak ? 'On a break' : 'Focusing'}
         </Text>
-        <Text numberOfLines={1}>{timer.label || 'Focus session'}</Text>
+        <Text numberOfLines={1}>{timer.label || 'Focus session'}{(timer.rounds ?? 1) > 1 ? ` · ${timer.round ?? 1}/${timer.rounds}` : ''}</Text>
       </View>
       <Text style={{ fontFamily: SERIF, fontSize: compact ? 26 : 34, lineHeight: compact ? 30 : 38, fontVariant: ['tabular-nums'] }}>{formatClock(left)}</Text>
     </Press>

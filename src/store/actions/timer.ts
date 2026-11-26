@@ -12,6 +12,9 @@ export interface StartTimerInput {
   label?: string;
   taskId?: string | null;
   habitId?: string | null;
+  rounds?: number;
+  round?: number;
+  roundMinutes?: number;
 }
 
 /** Seconds left on the timer right now. */
@@ -21,7 +24,7 @@ export function remainingSec(t: TimerState, now = Date.now()) {
   return t.durationSec;
 }
 
-export function startTimer({ minutes, mode = 'focus', label = '', taskId = null, habitId = null }: StartTimerInput) {
+export function startTimer({ minutes, mode = 'focus', label = '', taskId = null, habitId = null, rounds = 1, round = 1, roundMinutes }: StartTimerInput) {
   const durationSec = Math.round(minutes * 60);
   const now = Date.now();
   setState(() => ({
@@ -35,6 +38,9 @@ export function startTimer({ minutes, mode = 'focus', label = '', taskId = null,
       label,
       taskId,
       habitId,
+      rounds,
+      round,
+      roundMinutes: roundMinutes ?? (mode === 'focus' ? minutes : undefined),
     },
   }));
 }

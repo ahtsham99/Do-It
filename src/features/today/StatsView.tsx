@@ -10,7 +10,7 @@ import { RangePicker } from '@/features/habits/RangePicker';
 import { WeekGrid } from '@/features/habits/WeekGrid';
 import { useNudges } from '@/features/nudges/useNudges';
 import { occurrencesInRange } from '@/features/tasks/logic';
-import { addDays, range, weekdayShort } from '@/lib/dates';
+import { addDays, formatDay, range, weekdayShort } from '@/lib/dates';
 import { useGoals, useHabits, useReminders, useSettings, useTasks } from '@/store/hooks';
 import type { Habit } from '@/store/types';
 import { useStore } from '@/store/store';
@@ -54,6 +54,7 @@ export function StatsView() {
   const last14 = range(addDays(n.today, -13), 14);
   const maxMin = Math.max(30, ...week.perDay);
   const fmtMin = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`);
+  const recent = useMemo(() => sessions.filter((x) => x.mode === 'focus' && !x.deletedAt).slice(-5).reverse(), [sessions]);
   const achieved = goals.filter((g) => g.completedAt).length;
   const inProgress = goals.filter((g) => !g.completedAt);
 
@@ -158,6 +159,30 @@ export function StatsView() {
         </Card>
       </Section>
 
+      {recent.length > 0 && (
+        <Section title="Recent focus sessions">
+          <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
+            {recent.map((x, i) => (
+              <Press
+                key={x.id}
+                haptic={false}
+                disabled={!x.taskId}
+                onPress={() => x.taskId && router.push({ pathname: '/task', params: { id: x.taskId } })}
+                style={[styles.session, i < recent.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.border }]}>
+                <View style={{ flex: 1 }}>
+                  <Text numberOfLines={1}>{x.label || 'Focus session'}</Text>
+                  <Text variant="small" tone="muted">
+                    {formatDay(x.day)}
+                    {x.completed ? '' : ' · ended early'}
+                  </Text>
+                </View>
+                <Text style={{ fontFamily: SERIF, fontSize: 24 }}>{x.minutes}m</Text>
+              </Press>
+            ))}
+          </Card>
+        </Section>
+      )}
+
       {goals.length > 0 && (
         <Section title={`Goals · ${inProgress.length} in progress${achieved ? ` · ${achieved} achieved` : ''}`}>
           <View style={{ gap: space.sm }}>
@@ -196,6 +221,7 @@ function Stat({ value, label, icon, onPress }: { value: string; label: string; i
 }
 
 const styles = StyleSheet.create({
+  session: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 62 },
   dots: { flexDirection: 'row', justifyContent: 'space-between' },
   day: { width: 18, height: 18, borderRadius: 9, borderWidth: 1.5 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
