@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Platform, ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { DateTimeField } from '@/components/pickers';
-import { Button, Card, Chip, Field, Label, Text, Toggle, showDialog, showToast } from '@/components/ui';
+import { Button, Card, Chip, Field, Label, Text, showDialog, showToast } from '@/components/ui';
 import { addDays, combine, timeFromDate, toKey, todayKey } from '@/lib/dates';
 import { addReminder, deleteReminder, updateReminder } from '@/store/actions/reminders';
 import { useLists, useSettings } from '@/store/hooks';
@@ -10,6 +10,12 @@ import { INBOX_LIST, type ReminderItem } from '@/store/types';
 import { space } from '@/theme';
 
 import { parseReminder } from './logic';
+
+/** 6pm today, or 9am tomorrow if it's already late in the day. */
+function laterToday() {
+  const h = new Date().getHours();
+  return h < 17 ? { date: todayKey(), time: '18:00' } : { date: addDays(todayKey(), 1), time: '09:00' };
+}
 
 export const isShoppingList = (name: string) => /grocer|shop|food|market/i.test(name);
 
@@ -35,22 +41,39 @@ export function ReminderForm({
   const lists = useLists();
   const { use24h } = useSettings();
   const initialAt = existing?.remindAt ? new Date(existing.remindAt) : null;
+  const nameOf = (id: string) => lists.find((l) => l.id === id)?.name ?? '';
+  // New reminders start with an alert "later today" (or tomorrow morning in the
+  // evening); shopping lists start with no alert.
+  const later = laterToday();
+  const startList = existing?.listId ?? defaultListId;
   const [title, setTitle] = useState(existing?.title ?? '');
   const [notes, setNotes] = useState(existing?.notes ?? '');
-  const [listId, setListId] = useState(existing?.listId ?? defaultListId);
-  const [remind, setRemind] = useState(!!initialAt);
-  const [date, setDate] = useState(initialAt ? toKey(initialAt) : todayKey());
-  const [time, setTime] = useState(initialAt ? timeFromDate(initialAt) : '09:00');
+  const [listId, setListIdState] = useState(startList);
+  const [remind, setRemind] = useState(existing ? !!initialAt : !isShoppingList(nameOf(startList)));
+  const [date, setDate] = useState(initialAt ? toKey(initialAt) : later.date);
+  const [time, setTime] = useState(initialAt ? timeFromDate(initialAt) : later.time);
+  // Once you pick a time yourself, typed times in the title no longer override it.
+  const [touched, setTouched] = useState(!!existing);
+  const pickTime = (d: string, t: string) => {
+    setRemind(true);
+    setDate(d);
+    setTime(t);
+    setTouched(true);
+  };
+  const setListId = (id: string) => {
+    setListIdState(id);
+    if (!touched && !existing) setRemind(!isShoppingList(nameOf(id)));
+  };
 
-  const listName = lists.find((l) => l.id === listId)?.name ?? '';
+  const listName = nameOf(listId);
   const shopping = isShoppingList(listName);
   const canSave = title.trim().length > 0;
 
   const save = (keepOpen = false) => {
     if (!canSave) return;
     // "dentist tomorrow 9am" in the title → alert, unless one was set by hand.
-    const parsed = !remind && !existing ? parseReminder(title) : null;
-    const remindAt = remind ? combine(date, time).getTime() : (parsed?.remindAt ?? null);
+    const parsed = !touched && !existing ? parseReminder(title) : null;
+    const remindAt = parsed?.remindAt ?? (remind ? combine(date, time).getTime() : null);
     const data = { title: (parsed?.remindAt ? parsed.title : title).trim(), notes: notes.trim() || undefined, listId, remindAt };
     if (existing) updateReminder(existing.id, { ...data, snoozedUntil: null });
     else addReminder(data);
@@ -92,27 +115,25 @@ export function ReminderForm({
       )}
 
       <Card style={{ gap: space.md }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flex: 1 }}>
-            <Text>Remind me</Text>
-            <Text variant="small" tone="muted">
-              {Platform.OS === 'web' ? 'Shows on your main page when it’s time' : 'A notification at this time'}
-            </Text>
-          </View>
-          <Toggle value={remind} onValueChange={setRemind} />
+        <View>
+          <Text>Remind me</Text>
+          <Text variant="small" tone="muted">
+            {Platform.OS === 'web' ? 'Shows on your main page when it’s time' : 'A notification at this time'}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+          <Chip label="No alert" selected={!remind} onPress={() => (setRemind(false), setTouched(true))} />
+          <Chip label={later.date === todayKey() ? 'Later today' : 'Tomorrow 9am'} selected={remind && date === later.date && time === later.time} onPress={() => pickTime(later.date, later.time)} />
+          {later.date === todayKey() && (
+            <Chip label="Tomorrow 9am" selected={remind && date === addDays(todayKey(), 1) && time === '09:00'} onPress={() => pickTime(addDays(todayKey(), 1), '09:00')} />
+          )}
+          <Chip label="In a week" selected={remind && date === addDays(todayKey(), 7)} onPress={() => pickTime(addDays(todayKey(), 7), time)} />
         </View>
         {remind && (
-          <>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-              <Chip label="Later today" selected={date === todayKey() && time === '18:00'} onPress={() => (setDate(todayKey()), setTime('18:00'))} />
-              <Chip label="Tomorrow 9am" selected={date === addDays(todayKey(), 1) && time === '09:00'} onPress={() => (setDate(addDays(todayKey(), 1)), setTime('09:00'))} />
-              <Chip label="In a week" selected={date === addDays(todayKey(), 7)} onPress={() => setDate(addDays(todayKey(), 7))} />
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <DateTimeField mode="date" value={date} onChange={setDate} />
-              <DateTimeField mode="time" value={time} onChange={setTime} use24h={use24h} />
-            </View>
-          </>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <DateTimeField mode="date" value={date} onChange={(d) => pickTime(d, time)} />
+            <DateTimeField mode="time" value={time} onChange={(t) => pickTime(date, t)} use24h={use24h} />
+          </View>
         )}
       </Card>
 
