@@ -8,13 +8,15 @@ import { Button, Card, Chip, Field, Glyph, Icon, Label, Press, SheetHeader, Text
 import { openIconPicker } from '@/features/countdowns/iconPick';
 import { CATEGORY_DEFAULTS, DEFAULT_CATEGORIES, countdownLabel, daysUntil } from '@/features/countdowns/logic';
 import { addDays, todayKey } from '@/lib/dates';
+import { useEntitlements } from '@/lib/premium';
 import { addCountdown, deleteCountdown, updateCountdown } from '@/store/actions/countdowns';
 import { useCountdowns } from '@/store/hooks';
 import { useStore } from '@/store/store';
-import { SWATCHES, radius, space, useTheme } from '@/theme';
+import { NIGHT_COLORS, PREMIUM_COLORS, SWATCHES, radius, space, useTheme } from '@/theme';
 
 export default function CountdownEditor() {
   const { c, paint } = useTheme();
+  const premiumColours = useEntitlements().has('themes');
   const sheetTop = useSheetTopInset();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const existing = useStore((s) => s.countdowns.find((x) => x.id === id));
@@ -107,6 +109,38 @@ export default function CountdownEditor() {
         <View style={{ gap: space.sm }}>
           <Label>Colour</Label>
           <ColorPicker colors={SWATCHES} value={color} onChange={(v) => (setColor(v), setTouchedLook(true))} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.xs }}>
+            <Icon name="sparkles" size={12} color="#E8B53A" />
+            <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', fontSize: 11 }}>
+              Premium colours
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {PREMIUM_COLORS.map((k) => {
+              const col = NIGHT_COLORS[k].shades![2];
+              const on = color.toLowerCase() === col.toLowerCase();
+              return (
+                <Press
+                  key={k}
+                  onPress={() =>
+                    premiumColours
+                      ? (setColor(col), setTouchedLook(true))
+                      : showDialog({
+                          title: 'Premium colours',
+                          message: `${NIGHT_COLORS[k].label} and the other palette colours come with Do It Premium. Everything you use today stays free.`,
+                          actions: [{ label: 'Sounds good', onPress: () => {} }],
+                        })
+                  }
+                  accessibilityLabel={`${NIGHT_COLORS[k].label}${premiumColours ? '' : ', premium'}`}
+                  accessibilityState={{ selected: on }}
+                  style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2.5, padding: 3, borderColor: on ? c.text : 'transparent' }}>
+                  <View style={{ flex: 1, borderRadius: 20, backgroundColor: col, alignItems: 'center', justifyContent: 'center' }}>
+                    {!premiumColours && <Icon name="lock-closed" size={12} color="rgba(255,255,255,0.85)" />}
+                  </View>
+                </Press>
+              );
+            })}
+          </View>
         </View>
 
 
