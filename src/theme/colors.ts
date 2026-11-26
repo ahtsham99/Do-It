@@ -135,13 +135,13 @@ export const NIGHT_COLORS: Record<NightColor, AppColor> = {
 export const FREE_COLORS = (Object.keys(NIGHT_COLORS) as NightColor[]).filter((k) => !NIGHT_COLORS[k].premium);
 export const PREMIUM_COLORS = (Object.keys(NIGHT_COLORS) as NightColor[]).filter((k) => NIGHT_COLORS[k].premium);
 
-export type DayBackground = 'paper' | 'linen' | 'sand' | 'blush';
+export type DayBackground = 'paper' | 'peach' | 'sand' | 'blush';
 export type NightBackground = 'jet' | 'black' | 'matte';
 
 /** Day backgrounds: from bright paper to a soft beige that's easier on the eyes. */
 export const DAY_BACKGROUNDS: Record<DayBackground, { label: string; bg: string; surface: string; surfaceAlt: string; border: string }> = {
   paper: { label: 'Paper', bg: '#F8F7F3', surface: '#FFFFFF', surfaceAlt: '#F0EFE9', border: '#E5E3DB' },
-  linen: { label: 'Linen', bg: '#F3EFE7', surface: '#FCFAF6', surfaceAlt: '#EAE5DA', border: '#E0D9CC' },
+  peach: { label: 'Peach', bg: '#FAE3DD', surface: '#FFF8F5', surfaceAlt: '#F4D6CE', border: '#ECCAC1' },
   sand: { label: 'Sand', bg: '#EDE6D8', surface: '#F8F4EC', surfaceAlt: '#E3DACA', border: '#D9CFBC' },
   blush: { label: 'Blush', bg: '#F9E1E6', surface: '#FFF6F8', surfaceAlt: '#F3D3DB', border: '#EBC8D1' },
 };
@@ -199,7 +199,8 @@ function colorFor(choice: string, custom?: string) {
 /** Day mode with the chosen app colour and background. */
 export function lightFor(choice: string, custom?: string, bgChoice: DayBackground = 'paper'): ThemeColors {
   const d = colorFor(choice, custom).day;
-  const b = DAY_BACKGROUNDS[bgChoice] ?? DAY_BACKGROUNDS.paper;
+  // Linen was replaced by Peach.
+  const b = DAY_BACKGROUNDS[(bgChoice as string) === 'linen' ? 'peach' : bgChoice] ?? DAY_BACKGROUNDS.paper;
   return {
     ...light,
     bg: b.bg,

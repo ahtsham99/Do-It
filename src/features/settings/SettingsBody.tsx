@@ -115,7 +115,7 @@ export function SettingsBody() {
           </Text>
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             {(Object.keys(DAY_BACKGROUNDS) as DayBackground[]).map((k) => (
-              <BgChoice key={k} label={DAY_BACKGROUNDS[k].label} color={DAY_BACKGROUNDS[k].bg} card={DAY_BACKGROUNDS[k].surface} on={s.dayBackground === k} onPress={() => updateSettings({ dayBackground: k })} />
+              <BgChoice key={k} label={DAY_BACKGROUNDS[k].label} color={DAY_BACKGROUNDS[k].bg} card={DAY_BACKGROUNDS[k].surface} on={((s.dayBackground as string) === 'linen' ? 'peach' : s.dayBackground) === k} onPress={() => updateSettings({ dayBackground: k })} />
             ))}
           </View>
           <Text variant="small" tone="muted" style={{ marginTop: space.xs }}>
