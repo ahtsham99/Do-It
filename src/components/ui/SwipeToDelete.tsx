@@ -5,9 +5,11 @@ import { radius, useTheme } from '@/theme';
 
 import { Icon } from './Icon';
 import { Press, tap } from './Pressable';
-import { Text } from './Text';
 
-const ACTION_W = 96;
+const ACTION_W = 112;
+const GAP = 10;
+/** iOS system red. */
+const SYSTEM_RED = { light: '#FF3B30', dark: '#FF453A' };
 const FULL_SWIPE = 200;
 
 // Only one row stays open at a time.
@@ -30,7 +32,7 @@ export function SwipeToDelete({
   style?: StyleProp<ViewStyle>;
   label?: string;
 }) {
-  const { c } = useTheme();
+  const { dark } = useTheme();
   const [x] = useState(() => new Animated.Value(0));
   const offset = useRef(0);
   const [open, setOpen] = useState(false);
@@ -84,16 +86,19 @@ export function SwipeToDelete({
     }),
   );
 
-  const actionOpacity = x.interpolate({ inputRange: [-40, -8, 0], outputRange: [1, 0, 0], extrapolate: 'clamp' });
+  // The red pill sits apart from the row and grows in as you swipe.
+  const actionOpacity = x.interpolate({ inputRange: [-50, -12, 0], outputRange: [1, 0, 0], extrapolate: 'clamp' });
+  const actionScale = x.interpolate({ inputRange: [-ACTION_W, -20, 0], outputRange: [1, 0.6, 0.6], extrapolate: 'clamp' });
 
   return (
     <View style={style}>
-      <Animated.View style={[StyleSheet.absoluteFill, styles.under, { borderRadius, backgroundColor: c.danger, opacity: actionOpacity }]}>
-        <Press onPress={remove} accessibilityRole="button" accessibilityLabel={label} style={styles.action}>
-          <Icon name="trash-outline" size={20} color="#fff" />
-          <Text variant="small" color="#fff" style={{ fontWeight: '600' }}>
-            {label}
-          </Text>
+      <Animated.View pointerEvents={open ? 'box-none' : 'none'} style={[styles.under, { opacity: actionOpacity, transform: [{ scale: actionScale }] }]}>
+        <Press
+          onPress={remove}
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          style={[styles.action, { backgroundColor: dark ? SYSTEM_RED.dark : SYSTEM_RED.light, borderRadius: 999 }]}>
+          <Icon name="trash" size={22} color="#fff" />
         </Press>
       </Animated.View>
       <Animated.View {...responder.panHandlers} style={{ transform: [{ translateX: x }] }}>
@@ -106,6 +111,6 @@ export function SwipeToDelete({
 }
 
 const styles = StyleSheet.create({
-  under: { alignItems: 'flex-end', justifyContent: 'center', left: 8 },
-  action: { width: ACTION_W, height: '100%', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  under: { position: 'absolute', top: 0, bottom: 0, right: 0, width: ACTION_W - GAP, alignItems: 'flex-end', justifyContent: 'center', transformOrigin: 'right' },
+  action: { width: ACTION_W - GAP, height: '100%', maxHeight: 64, alignItems: 'center', justifyContent: 'center' },
 });
