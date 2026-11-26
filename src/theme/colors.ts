@@ -135,20 +135,22 @@ export const NIGHT_COLORS: Record<NightColor, AppColor> = {
 export const FREE_COLORS = (Object.keys(NIGHT_COLORS) as NightColor[]).filter((k) => !NIGHT_COLORS[k].premium);
 export const PREMIUM_COLORS = (Object.keys(NIGHT_COLORS) as NightColor[]).filter((k) => NIGHT_COLORS[k].premium);
 
-export type DayBackground = 'paper' | 'linen' | 'sand';
-export type NightBackground = 'black' | 'matte';
+export type DayBackground = 'paper' | 'linen' | 'sand' | 'blush';
+export type NightBackground = 'jet' | 'black' | 'matte';
 
 /** Day backgrounds: from bright paper to a soft beige that's easier on the eyes. */
 export const DAY_BACKGROUNDS: Record<DayBackground, { label: string; bg: string; surface: string; surfaceAlt: string; border: string }> = {
   paper: { label: 'Paper', bg: '#F8F7F3', surface: '#FFFFFF', surfaceAlt: '#F0EFE9', border: '#E5E3DB' },
   linen: { label: 'Linen', bg: '#F3EFE7', surface: '#FCFAF6', surfaceAlt: '#EAE5DA', border: '#E0D9CC' },
   sand: { label: 'Sand', bg: '#EDE6D8', surface: '#F8F4EC', surfaceAlt: '#E3DACA', border: '#D9CFBC' },
+  blush: { label: 'Blush', bg: '#FBF2F3', surface: '#FFFBFB', surfaceAlt: '#F5E7E9', border: '#EFDDE0' },
 };
 
-/** Night backgrounds: true black, or a softer matte black. */
+/** Night backgrounds: pitch black, classic black, or a soft matte black. */
 export const NIGHT_BACKGROUNDS: Record<NightBackground, { label: string; bg: string; surface: string; surfaceAlt: string; border: string; tabBar: string }> = {
+  jet: { label: 'Jet', bg: '#000000', surface: '#0E0E0E', surfaceAlt: '#181818', border: '#1E1E1E', tabBar: 'rgba(22,22,22,0.8)' },
   black: { label: 'Black', bg: '#050505', surface: '#141414', surfaceAlt: '#1F1F1F', border: '#262626', tabBar: 'rgba(30,30,30,0.78)' },
-  matte: { label: 'Matte', bg: '#161616', surface: '#212121', surfaceAlt: '#2B2B2B', border: '#343434', tabBar: 'rgba(42,42,42,0.8)' },
+  matte: { label: 'Matte', bg: '#0E0E0D', surface: '#1A1A19', surfaceAlt: '#232322', border: '#2B2B2A', tabBar: 'rgba(36,36,35,0.8)' },
 };
 
 // ---------- Custom colour ----------

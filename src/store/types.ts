@@ -164,8 +164,8 @@ export interface Settings {
   nightColor: 'forest' | 'ember' | 'electric' | 'violet' | 'mono' | 'ruby' | 'ocean' | 'pine' | 'plum' | 'sunset' | 'graphite' | 'slate' | 'lavender' | 'custom';
   /** Used when nightColor is 'custom'. */
   customColor: string;
-  dayBackground: 'paper' | 'linen' | 'sand';
-  nightBackground: 'black' | 'matte';
+  dayBackground: 'paper' | 'linen' | 'sand' | 'blush';
+  nightBackground: 'jet' | 'black' | 'matte';
 }
 
 export interface Stats {
