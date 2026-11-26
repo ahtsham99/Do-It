@@ -203,20 +203,7 @@ export function SettingsBody() {
           label="Week starts on Monday"
           right={<Toggle value={s.weekStartsOn === 1} onValueChange={(v) => updateSettings({ weekStartsOn: v ? 1 : 0 })} />}
         />
-        <ListRow
-          label="Clock"
-          last
-          right={
-            <View style={{ width: 150 }}>
-              <Segmented
-                tone="accent"
-                options={[
-                  { value: '12', label: '6pm' },
-                  { value: '24', label: '18:00' },
-                ]}
-                value={s.use24h ? '24' : '12'}
-                onChange={(v) => updateSettings({ use24h: v === '24' })}
-              />
+        <ListRow label="24-hour time" last right={<Toggle value={s.use24h} onValueChange={(use24h) => updateSettings({ use24h })} />} />
             </View>
           }
         />
