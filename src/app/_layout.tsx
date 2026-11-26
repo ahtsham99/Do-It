@@ -9,6 +9,7 @@ import { DialogHost, ToastHost } from '@/components/ui';
 import { FocusMode } from '@/features/focus/FocusMode';
 import { TimerWatcher } from '@/features/focus/TimerWatcher';
 import { NotificationSync } from '@/features/nudges/NotificationSync';
+import { start as fitViewport } from '@/lib/viewport';
 import { hydrate, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme';
 
@@ -19,6 +20,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     hydrate();
+    fitViewport();
   }, []);
 
   return (

@@ -33,9 +33,10 @@
       }
       input, textarea { -webkit-user-select: text; user-select: text; }
       @media (prefers-color-scheme: dark) { html, body { background: #050505; } }
-      #root { display: flex; height: 100%; flex: 1; }
-      /* iOS standalone: fill the whole screen incl. under the status bar */
-      @supports (height: 100dvh) { html, body, #root { height: 100dvh; } }
+      #root { display: flex; height: var(--app-h, 100%); flex: 1; }
+      /* iOS standalone: fill the whole screen incl. under the status bar.
+         While the keyboard is up, --app-h is the space above it. */
+      @supports (height: 100dvh) { html, body, #root { height: var(--app-h, 100dvh); } }
     </style>
   </head>
 
