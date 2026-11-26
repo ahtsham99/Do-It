@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Card, Empty, Icon, IconButton, Press, Screen, Section, Text, showDialog, showToast } from '@/components/ui';
+import { Card, Empty, Fab, Icon, Press, Screen, Section, Text, showDialog, showToast } from '@/components/ui';
 import { ReminderSheet } from '@/features/reminders/ReminderSheet';
 import { ReminderRow } from '@/features/reminders/ReminderRow';
 import { addList, clearDone, deleteList, restoreReminders } from '@/store/actions/reminders';
@@ -77,7 +77,7 @@ export default function RemindersScreen() {
     <Screen
       title="Reminders"
       subtitle={open.length ? `${open.length} to remember` : 'Nothing to remember'}
-      right={<IconButton icon="add" label="New reminder" onPress={() => setSheet({ open: true })} />}>
+>
       {/* Lists */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm, paddingRight: space.lg }} style={{ marginHorizontal: -2 }}>
         {lists.map((l) => {
@@ -176,6 +176,8 @@ export default function RemindersScreen() {
         </Section>
       )}
     </Screen>
+    {/* Within thumb reach, just above the tab bar. */}
+    <Fab label={isShopping ? 'Add an item' : 'Add a reminder'} onPress={() => setSheet({ open: true })} />
     </>
   );
 }
