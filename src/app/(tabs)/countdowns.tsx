@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Empty, Field, Icon, IconButton, Press, Screen, Section, Segmented, Text, showDialog } from '@/components/ui';
+import { Empty, Fab, Field, Icon, IconButton, Press, Screen, Section, Segmented, Text, showDialog } from '@/components/ui';
 import { useTabBarBottom } from '@/hooks/useTopInset';
 import { CountdownCard } from '@/features/countdowns/CountdownCard';
 import { groupCountdowns } from '@/features/countdowns/logic';
@@ -51,7 +51,7 @@ export default function CountdownsScreen() {
       <Screen
         title="Countdowns"
         subtitle="The days worth watching"
-        contentStyle={{ paddingBottom: TAB_BAR_SPACE + tabBottom + 96 }}
+        contentStyle={{ paddingBottom: TAB_BAR_SPACE + tabBottom + 160 }}
         right={
           <>
             <IconButton
@@ -63,7 +63,6 @@ export default function CountdownsScreen() {
                 setQuery('');
               }}
             />
-            <IconButton icon="add" label="Add countdown" onPress={add} />
             <IconButton icon="close" label="Close" size={20} onPress={() => (router.canGoBack() ? router.back() : router.replace({ pathname: '/habits', params: { view: 'goals' } }))} />
           </>
         }>
@@ -101,6 +100,7 @@ export default function CountdownsScreen() {
         )}
       </Screen>
 
+      <Fab label="Add countdown" onPress={add} lift={items.length > 0 ? 62 : 0} />
       {items.length > 0 && (
         <View pointerEvents="box-none" style={[styles.when, { bottom: TAB_BAR_SPACE + tabBottom - 2 }]}>
           <View style={{ width: '100%', maxWidth: 600 }}>

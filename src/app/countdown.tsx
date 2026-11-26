@@ -3,9 +3,10 @@ import { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { useSheetTopInset } from '@/hooks/useTopInset';
-import { ColorPicker, DateTimeField, IconPicker } from '@/components/pickers';
-import { Button, Card, Chip, Field, Glyph, Label, SheetHeader, Text, showDialog } from '@/components/ui';
-import { CATEGORY_DEFAULTS, COUNTDOWN_ICONS, DEFAULT_CATEGORIES, countdownLabel, daysUntil } from '@/features/countdowns/logic';
+import { ColorPicker, DateTimeField } from '@/components/pickers';
+import { Button, Card, Chip, Field, Glyph, Icon, Label, Press, SheetHeader, Text, showDialog } from '@/components/ui';
+import { openIconPicker } from '@/features/countdowns/iconPick';
+import { CATEGORY_DEFAULTS, DEFAULT_CATEGORIES, countdownLabel, daysUntil } from '@/features/countdowns/logic';
 import { addDays, todayKey } from '@/lib/dates';
 import { addCountdown, deleteCountdown, updateCountdown } from '@/store/actions/countdowns';
 import { useCountdowns } from '@/store/hooks';
@@ -63,9 +64,16 @@ export default function CountdownEditor() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-          <View style={{ width: 58, height: 58, borderRadius: 29, borderWidth: 3, borderColor: paint(color), backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
+          <Press
+            onPress={() => openIconPicker({ value: icon, color: paint(color), onPick: (v) => (setIcon(v), setTouchedLook(true)) })}
+            accessibilityRole="button"
+            accessibilityLabel="Change icon"
+            style={{ width: 58, height: 58, borderRadius: 29, borderWidth: 3, borderColor: paint(color), backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
             <Glyph value={icon} size={26} color={paint(color)} />
-          </View>
+            <View style={{ position: 'absolute', right: -4, bottom: -4, width: 22, height: 22, borderRadius: 11, backgroundColor: paint(color), borderWidth: 2, borderColor: c.bg, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="pencil" size={11} color="#FFFFFF" />
+            </View>
+          </Press>
           <View style={{ flex: 1 }}>
             <Field placeholder="What are you counting down to?" value={title} onChangeText={setTitle} autoFocus={!existing} />
           </View>
@@ -101,10 +109,6 @@ export default function CountdownEditor() {
           <ColorPicker colors={SWATCHES} value={color} onChange={(v) => (setColor(v), setTouchedLook(true))} />
         </View>
 
-        <View style={{ gap: space.sm }}>
-          <Label>Icon</Label>
-          <IconPicker icons={COUNTDOWN_ICONS} value={icon} color={paint(color)} onChange={(v) => (setIcon(v), setTouchedLook(true))} />
-        </View>
 
         <Button label={existing ? 'Save changes' : 'Add countdown'} onPress={save} disabled={!canSave} />
         {existing && (
