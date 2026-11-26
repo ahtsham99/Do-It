@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Pattern, Rect, Stop } from 'react-native-svg';
 
 import { AnyColorInput } from '@/components/pickers';
-import { Button, Card, Field, Label, Press, SheetHeader, Text } from '@/components/ui';
+import { Button, Card, Label, Press, SheetHeader, Text } from '@/components/ui';
 import { useSheetTopInset } from '@/hooks/useTopInset';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
@@ -14,20 +14,16 @@ const HUES = [0, 25, 45, 60, 100, 145, 175, 200, 225, 260, 290, 330];
 const SHADES = [0.38, 0.5, 0.62];
 const GREYS = ['#1E1C19', '#4A4744', '#7A7772', '#A8A49D'];
 
-/** Choose any app colour: palette, hex, or the system picker on iPhone. */
+/** Choose an app colour from the palette, or the system colour picker. */
 export default function ColorScreen() {
   const { c } = useTheme();
   const sheetTop = useSheetTopInset();
   const s = useSettings();
   const [hex, setHex] = useState(s.nightColor === 'custom' ? s.customColor : '#2F8A5F');
-  const [text, setText] = useState(hex);
   const valid = /^#[0-9a-f]{6}$/i.test(hex);
   const preview = customColor(valid ? hex : '#2F8A5F');
 
-  const choose = (h: string) => {
-    setHex(h);
-    setText(h);
-  };
+  const choose = (h: string) => setHex(h);
   const save = () => {
     if (!valid) return;
     updateSettings({ nightColor: 'custom', customColor: hex.toUpperCase() });
@@ -68,17 +64,6 @@ export default function ColorScreen() {
           </Card>
         </View>
 
-        <Field
-          label="Or type a colour code"
-          value={text}
-          autoCapitalize="none"
-          onChangeText={(v) => {
-            const t = v.startsWith('#') ? v : `#${v}`;
-            setText(t);
-            if (/^#[0-9a-f]{6}$/i.test(t)) setHex(t);
-          }}
-          placeholder="#2F8A5F"
-        />
 
         <Button label="Use this colour" onPress={save} disabled={!valid} />
         <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
