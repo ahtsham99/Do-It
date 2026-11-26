@@ -143,7 +143,7 @@ export const DAY_BACKGROUNDS: Record<DayBackground, { label: string; bg: string;
   paper: { label: 'Paper', bg: '#F8F7F3', surface: '#FFFFFF', surfaceAlt: '#F0EFE9', border: '#E5E3DB' },
   linen: { label: 'Linen', bg: '#F3EFE7', surface: '#FCFAF6', surfaceAlt: '#EAE5DA', border: '#E0D9CC' },
   sand: { label: 'Sand', bg: '#EDE6D8', surface: '#F8F4EC', surfaceAlt: '#E3DACA', border: '#D9CFBC' },
-  blush: { label: 'Blush', bg: '#FBF2F3', surface: '#FFFBFB', surfaceAlt: '#F5E7E9', border: '#EFDDE0' },
+  blush: { label: 'Blush', bg: '#F9E1E6', surface: '#FFF6F8', surfaceAlt: '#F3D3DB', border: '#EBC8D1' },
 };
 
 /** Night backgrounds: pitch black, classic black, or a soft matte black. */
