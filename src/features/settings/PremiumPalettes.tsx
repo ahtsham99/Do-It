@@ -80,6 +80,7 @@ export function PremiumPalettes() {
                   {p.label}
                 </Text>
                 {!unlocked && <Icon name={on ? 'eye-outline' : 'lock-closed'} size={12} color={c.textMuted} />}
+                {unlocked && on && <Icon name="checkmark-circle" size={16} color={c.accent} />}
               </View>
               <Text variant="small" tone="muted" numberOfLines={1} style={{ fontSize: 11.5 }}>
                 {p.blurb}
