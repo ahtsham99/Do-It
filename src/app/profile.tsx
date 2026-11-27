@@ -53,8 +53,7 @@ export default function ProfileScreen() {
     const times = [...activeDays.map((d) => new Date(`${d}T12:00:00`).getTime()), ...tasks.map((t) => t.createdAt)].filter((x) => x > 1_577_836_800_000); // ignore missing or placeholder dates (before 2020)
     if (!times.length) return '';
     const d = new Date(Math.min(...times));
-    const sameYear = d.getFullYear() === new Date().getFullYear();
-    return d.toLocaleDateString(undefined, sameYear ? { month: 'long' } : { month: 'long', year: 'numeric' });
+    return d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
   }, [activeDays, tasks]);
 
   const persona = PERSONAS.find((p) => p.value === s.persona);
