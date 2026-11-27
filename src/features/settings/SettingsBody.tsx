@@ -8,7 +8,7 @@ import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { Avatar } from '@/features/profile/Avatar';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
-import { useEntitlements } from '@/lib/premium';
+import { PREMIUM_AVAILABLE, useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { resetAll } from '@/store/store';
@@ -206,29 +206,32 @@ export function SettingsBody() {
         <ListRow label="24-hour time" last right={<Toggle value={s.use24h} onValueChange={(use24h) => updateSettings({ use24h })} />} />
       </Card>
 
-      <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-        <View style={{ flex: 1, gap: 4 }}>
-          <Text style={styles.label}>{isPremium ? 'Premium' : 'Free plan'}</Text>
-          <Text variant="small" tone="muted">
-            Unlimited tasks, habits and countdowns for now
-          </Text>
-        </View>
-        {!isPremium && (
-          <Button
-            small
-            kind="secondary"
-            label="Upgrade"
-            style={{ height: 44 }}
-            onPress={() =>
-              showDialog({
-                title: 'Premium is coming',
-                message: 'Sync across devices, more themes and deeper stats. Everything you use today stays free.',
-                actions: [{ label: 'Sounds good', onPress: () => {} }],
-              })
-            }
-          />
-        )}
-      </Card>
+      {/* Plan and upgrade: hidden until Premium can be bought. */}
+      {PREMIUM_AVAILABLE && (
+        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+          <View style={{ flex: 1, gap: 4 }}>
+            <Text style={styles.label}>{isPremium ? 'Premium' : 'Free plan'}</Text>
+            <Text variant="small" tone="muted">
+              Unlimited tasks, habits and countdowns for now
+            </Text>
+          </View>
+          {!isPremium && (
+            <Button
+              small
+              kind="secondary"
+              label="Upgrade"
+              style={{ height: 44 }}
+              onPress={() =>
+                showDialog({
+                  title: 'Premium is coming',
+                  message: 'Sync across devices, more themes and deeper stats. Everything you use today stays free.',
+                  actions: [{ label: 'Sounds good', onPress: () => {} }],
+                })
+              }
+            />
+          )}
+        </Card>
+      )}
 
       <Card padded={false} style={styles.group}>
         <ListRow

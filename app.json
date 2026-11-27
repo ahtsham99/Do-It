@@ -8,8 +8,11 @@
     "scheme": "doit",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "app.doit.planner"
+      "supportsTablet": false,
+      "bundleIdentifier": "app.doit.planner",
+      "buildNumber": "1",
+      "config": { "usesNonExemptEncryption": false },
+      "infoPlist": { "ITSAppUsesNonExemptEncryption": false }
     },
     "android": {
       "package": "app.doit.planner",

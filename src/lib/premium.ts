@@ -6,6 +6,13 @@ import type { Plan } from '@/store/types';
  * gate features by checking `useEntitlements()` / `<PremiumGate>` and wire
  * `setPlan` to the purchase provider (e.g. RevenueCat / StoreKit / Stripe).
  */
+/**
+ * Whether Premium can actually be bought. Until purchases ship, every plan /
+ * upgrade UI stays hidden (App Review rejects placeholder purchase screens).
+ * Flip to true once a purchase provider is wired up.
+ */
+export const PREMIUM_AVAILABLE = false;
+
 export type Feature =
   | 'unlimitedHabits'
   | 'unlimitedCountdowns'

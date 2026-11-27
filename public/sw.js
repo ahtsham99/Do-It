@@ -18,7 +18,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== location.origin) return;
+  // Static pages outside the app (the privacy policy) go straight to the network,
+  // and must never replace the cached app shell.
+  if (url.pathname === '/privacy' || url.pathname === '/privacy.html') return;
 
   if (req.mode === 'navigate') {
     event.respondWith(

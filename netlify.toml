@@ -15,6 +15,12 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# The privacy policy is a static page, not part of the app.
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
 # Single-page app: every unknown path serves the app shell.
 [[redirects]]
   from = "/*"

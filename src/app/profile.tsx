@@ -11,7 +11,7 @@ import { milestones } from '@/features/profile/milestones';
 import { pickProfilePhoto } from '@/features/profile/pickPhoto';
 import { useSheetTopInset } from '@/hooks/useTopInset';
 import { pickBackup, saveBackup } from '@/lib/backup';
-import { useEntitlements } from '@/lib/premium';
+import { PREMIUM_AVAILABLE, useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
 import { useGoals, useHabits, useReminders, useSettings, useTasks } from '@/store/hooks';
 import { restoreAll, useStore } from '@/store/store';
@@ -216,35 +216,37 @@ export default function ProfileScreen() {
 
         <AboutYou />
 
-        {/* Plan */}
-        <View style={{ gap: space.sm }}>
-          <Label>Plan</Label>
-          <View style={[styles.plan, { backgroundColor: c.accent }]}>
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text color={c.accentText} style={{ fontWeight: '700', fontSize: 16 }}>
-                {isPremium ? 'Premium' : 'Free plan'}
-              </Text>
-              <Text variant="small" color={c.accentText} style={{ opacity: 0.8 }}>
-                {isPremium ? 'Thanks for supporting Do It.' : 'Premium palettes, icons and sync are coming.'}
-              </Text>
-            </View>
-            {!isPremium && (
-              <Press
-                onPress={() =>
-                  showDialog({
-                    title: 'Premium is coming',
-                    message: 'Sync across devices, more themes and icons, and deeper stats. Everything you use today stays free.',
-                    actions: [{ label: 'Sounds good', onPress: () => {} }],
-                  })
-                }
-                style={[styles.planBtn, { backgroundColor: c.accentText }]}>
-                <Text variant="small" color={c.accent} style={{ fontWeight: '700' }}>
-                  See Premium
+        {/* Plan: hidden until Premium can be bought. */}
+        {PREMIUM_AVAILABLE && (
+          <View style={{ gap: space.sm }}>
+            <Label>Plan</Label>
+            <View style={[styles.plan, { backgroundColor: c.accent }]}>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text color={c.accentText} style={{ fontWeight: '700', fontSize: 16 }}>
+                  {isPremium ? 'Premium' : 'Free plan'}
                 </Text>
-              </Press>
-            )}
+                <Text variant="small" color={c.accentText} style={{ opacity: 0.8 }}>
+                  {isPremium ? 'Thanks for supporting Do It.' : 'Premium palettes, icons and sync are coming.'}
+                </Text>
+              </View>
+              {!isPremium && (
+                <Press
+                  onPress={() =>
+                    showDialog({
+                      title: 'Premium is coming',
+                      message: 'Sync across devices, more themes and icons, and deeper stats. Everything you use today stays free.',
+                      actions: [{ label: 'Sounds good', onPress: () => {} }],
+                    })
+                  }
+                  style={[styles.planBtn, { backgroundColor: c.accentText }]}>
+                  <Text variant="small" color={c.accent} style={{ fontWeight: '700' }}>
+                    See Premium
+                  </Text>
+                </Press>
+              )}
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Shortcuts */}
         <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
