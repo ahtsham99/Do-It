@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Icon, Press, Text } from '@/components/ui';
 import { StreakPill } from '@/features/nudges/StreakPill';
 import { useNudges } from '@/features/nudges/useNudges';
-import { useSettings } from '@/store/hooks';
+import { Avatar } from '@/features/profile/Avatar';
 import { LOGO, radius, space, useTheme } from '@/theme';
 
 export type MainMode = 'plan' | 'stats';
@@ -18,8 +18,6 @@ const META: Record<MainMode, { label: string; icon: 'calendar-outline' | 'stats-
 export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: MainMode) => void; modes: MainMode[] }) {
   const { c } = useTheme();
   const n = useNudges();
-  const { name } = useSettings();
-  const initials = (name.trim() || 'Me').slice(0, 2).toUpperCase();
   return (
     <View style={[styles.top, { paddingTop: space.sm }]}>
       <Text variant="display" accessibilityRole="header" style={{ fontFamily: LOGO, fontSize: 32, lineHeight: 38, letterSpacing: -0.8 }}>
@@ -45,10 +43,8 @@ export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: 
         })}
       </View>
       <StreakPill streak={n.streak} activeToday={n.activeToday} />
-      <Press onPress={() => router.push('/settings')} accessibilityLabel="Settings and profile" style={[styles.avatar, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
-        <Text variant="small" tone="muted" style={{ fontWeight: '500', letterSpacing: 0.5, fontSize: 12 }}>
-          {initials}
-        </Text>
+      <Press onPress={() => router.push('/settings')} accessibilityLabel="Settings and profile">
+        <Avatar size={36} small />
       </Press>
     </View>
   );

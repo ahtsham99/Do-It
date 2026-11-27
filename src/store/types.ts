@@ -166,6 +166,10 @@ export interface Settings {
   customColor: string;
   dayBackground: 'paper' | 'sand' | 'latte' | 'peach' | 'blush';
   nightBackground: 'jet' | 'black' | 'matte';
+  /** Profile picture: a photo (data URI), an emoji, or '' for initials. */
+  avatar: string;
+  /** "Your why", shown on Today when you're behind. */
+  why: string;
 }
 
 export interface Stats {
@@ -211,6 +215,8 @@ export const DEFAULT_SETTINGS: Settings = {
   customColor: '#2F8A5F',
   dayBackground: 'paper',
   nightBackground: 'black',
+  avatar: '',
+  why: '',
   focusSound: 'off',
 };
 

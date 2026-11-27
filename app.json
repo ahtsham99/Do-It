@@ -46,7 +46,11 @@
         "expo-notifications",
         { "color": "#E8613C" }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        { "photosPermission": "Do It uses your photos only to set your profile picture.", "cameraPermission": false, "microphonePermission": false }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

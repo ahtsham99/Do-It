@@ -5,19 +5,28 @@ import { completeTask } from '@/features/nudges/celebrate';
 import { daysOverdue, type Occurrence } from '@/features/tasks/logic';
 import { formatDay } from '@/lib/dates';
 import { deleteTask, moveToToday, skipOccurrence } from '@/store/actions/tasks';
-import { radius, space, useTheme } from '@/theme';
+import { useSettings } from '@/store/hooks';
+import { SERIF, radius, space, useTheme } from '@/theme';
 
 /**
  * Plans from earlier days that never got done: do them, move them to today,
  * or let them go — right on the Plan page.
  */
 export function FromEarlier({ items }: { items: Occurrence[] }) {
+  const { why } = useSettings();
+  const { c } = useTheme();
   if (items.length === 0) return null;
   const movable = items.filter((o) => o.task.repeat === 'none');
   return (
     <Section
       title={`From earlier · ${items.length}`}
       right={movable.length > 1 ? <Button small kind="secondary" label="All to today" onPress={() => moveToToday(movable.map((o) => o.task.id))} style={{ height: 32 }} /> : undefined}>
+      {/* Your why, from your profile: a reminder of what this is all for. */}
+      {why.trim() ? (
+        <Text style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 19, lineHeight: 25, color: c.textMuted, marginBottom: space.sm }}>
+          “{why.trim()}”
+        </Text>
+      ) : null}
       <Card padded={false} style={{ paddingHorizontal: space.lg }}>
         {items.map((o, i) => (
           <Leftover key={o.task.id + o.day} occ={o} last={i === items.length - 1} />

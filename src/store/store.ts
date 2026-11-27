@@ -84,22 +84,60 @@ export async function hydrate() {
     storage.read('lists', base.lists),
     storage.read('reminders', base.reminders),
   ]);
-  state = migrate(version, {
-    hydrated: true,
-    tasks,
-    habits,
-    countdowns,
-    // Merge with defaults so newly added fields get sensible values.
-    settings: { ...DEFAULT_SETTINGS, ...settings },
-    stats: { ...DEFAULT_STATS, ...stats },
-    timer: { ...DEFAULT_TIMER, ...timer },
-    sessions,
-    goals,
-    lists: lists.length ? lists : DEFAULT_LISTS,
-    reminders,
-  });
+  state = fromSaved(version, { tasks, habits, countdowns, settings, stats, timer, sessions, goals, lists, reminders });
   await storage.write('schemaVersion', SCHEMA_VERSION);
   listeners.forEach((l) => l());
+}
+
+/** Saved slices → full state, merged with defaults so newly added fields get sensible values. */
+function fromSaved(version: number, saved: Partial<Record<Slice, unknown>>): AppState {
+  const base = initialState(true);
+  const arr = <T,>(v: unknown, d: T[]) => (Array.isArray(v) ? (v as T[]) : d);
+  const obj = <T,>(v: unknown) => (v && typeof v === 'object' ? (v as Partial<T>) : {});
+  const lists = arr(saved.lists, base.lists);
+  return migrate(version, {
+    hydrated: true,
+    tasks: arr(saved.tasks, base.tasks),
+    habits: arr(saved.habits, base.habits),
+    countdowns: arr(saved.countdowns, base.countdowns),
+    settings: { ...DEFAULT_SETTINGS, ...obj<AppState['settings']>(saved.settings) },
+    stats: { ...DEFAULT_STATS, ...obj<AppState['stats']>(saved.stats) },
+    timer: { ...DEFAULT_TIMER, ...obj<AppState['timer']>(saved.timer) },
+    sessions: arr(saved.sessions, base.sessions),
+    goals: arr(saved.goals, base.goals),
+    lists: lists.length ? lists : DEFAULT_LISTS,
+    reminders: arr(saved.reminders, base.reminders),
+  });
+}
+
+const BACKUP_APP = 'do-it';
+
+/** Everything, as a backup file's contents. */
+export function exportAll(): string {
+  const data: Partial<Record<Slice, unknown>> = {};
+  for (const s of SLICES) data[s] = state[s];
+  return JSON.stringify({ app: BACKUP_APP, schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), data });
+}
+
+/**
+ * Replace everything with a backup. Throws if the file isn't a Do It backup.
+ * Returns a short summary of what came back.
+ */
+export async function restoreAll(json: string) {
+  let parsed: { app?: string; schemaVersion?: number; data?: Partial<Record<Slice, unknown>> };
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error('That file isn’t a Do It backup.');
+  }
+  if (parsed?.app !== BACKUP_APP || !parsed.data || typeof parsed.data !== 'object') throw new Error('That file isn’t a Do It backup.');
+  state = fromSaved(parsed.schemaVersion ?? SCHEMA_VERSION, parsed.data);
+  if (flushTimer) clearTimeout(flushTimer);
+  dirty.clear();
+  await Promise.all(SLICES.map((s) => storage.write(s, state[s])));
+  await storage.write('schemaVersion', SCHEMA_VERSION);
+  listeners.forEach((l) => l());
+  return { tasks: state.tasks.filter((t) => !t.deletedAt).length, habits: state.habits.filter((h) => !h.deletedAt).length };
 }
 
 /** Hook for future data shape changes. v2–v4 only added slices with defaults. */

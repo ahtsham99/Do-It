@@ -6,6 +6,7 @@ import { DateTimeField } from '@/components/pickers';
 import { Button, Card, Icon, IconButton, ListRow, Press, Segmented, Text, Toggle, showDialog, showToast } from '@/components/ui';
 import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
+import { Avatar } from '@/features/profile/Avatar';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
@@ -45,11 +46,7 @@ export function SettingsBody() {
     <>
       <Press onPress={() => router.push('/profile')} accessibilityLabel="Profile">
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
-          <View style={[styles.avatar, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
-            <Text tone="muted" style={{ fontWeight: '500', letterSpacing: 0.5 }}>
-              {(s.name.trim() || 'Me').slice(0, 2).toUpperCase()}
-            </Text>
-          </View>
+          <Avatar size={52} small />
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.label}>{s.name.trim() || 'Your profile'}</Text>
             <Text variant="small" tone="muted">
