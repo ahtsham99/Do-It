@@ -7,6 +7,7 @@ import { Button, Card, Icon, IconButton, ListRow, Press, Segmented, Text, Toggle
 import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { Avatar } from '@/features/profile/Avatar';
+import { APP_VERSION } from '@/lib/appInfo';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { PREMIUM_AVAILABLE, useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
@@ -233,16 +234,19 @@ export function SettingsBody() {
         </Card>
       )}
 
+      {/* Privacy & data: at the very bottom, like most apps. */}
+      <Text variant="caption" tone="muted" style={styles.groupLabel}>
+        Privacy & data
+      </Text>
       <Card padded={false} style={styles.group}>
         <ListRow
-          label="Stored on this device"
-          detail={
-            Platform.OS === 'web'
-              ? 'Your data lives in this browser. Removing the home-screen app or clearing Safari data deletes it.'
-              : 'Your data lives on this device. Accounts and sync are coming.'
-          }
+          icon="lock-closed-outline"
+          label="Privacy"
+          detail={Platform.OS === 'web' ? 'Your data stays in this browser, on this device.' : 'Your data stays on this device.'}
+          onPress={() => router.push('/privacy-policy')}
         />
         <ListRow
+          icon="trash-outline"
           label="Erase everything"
           danger
           last
@@ -257,7 +261,7 @@ export function SettingsBody() {
       </Card>
 
       <Text variant="small" tone="faint" style={{ textAlign: 'center' }}>
-        Do It · v1.0
+        Do It · Version {APP_VERSION}
       </Text>
     </>
   );
@@ -321,6 +325,7 @@ function Stepper({ value, min, max, step, onChange }: { value: number; min: numb
 }
 
 const styles = StyleSheet.create({
+  groupLabel: { textTransform: 'uppercase', fontSize: 11, marginBottom: -space.sm, marginLeft: space.xs },
   group: { paddingHorizontal: space.xl - 4 },
   avatar: { width: 52, height: 52, borderRadius: 26, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   label: { fontSize: 17 },

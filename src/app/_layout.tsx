@@ -68,6 +68,7 @@ function Navigator() {
         <Stack.Screen name="streaks" options={{ presentation: 'modal' }} />
         <Stack.Screen name="history" options={{ presentation: 'modal' }} />
         <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="privacy-policy" options={{ presentation: 'modal' }} />
         <Stack.Screen name="fonts" options={{ presentation: 'modal' }} />
         <Stack.Screen name="color" options={{ presentation: 'modal' }} />
         <Stack.Screen name="icons" options={{ presentation: 'modal' }} />
