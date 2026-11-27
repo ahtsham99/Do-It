@@ -2,9 +2,10 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Card, Chip, Glow, Icon, Label, ListRow, Press, SheetHeader, Text, showDialog, showToast } from '@/components/ui';
+import { Card, Glow, Icon, Label, ListRow, Press, SheetHeader, Text, showDialog, showToast } from '@/components/ui';
 import { useNudges } from '@/features/nudges/useNudges';
 import { PERSONAS } from '@/features/onboarding/suggestions';
+import { AboutYou } from '@/features/profile/AboutYou';
 import { Avatar, isPhoto } from '@/features/profile/Avatar';
 import { milestones } from '@/features/profile/milestones';
 import { pickProfilePhoto } from '@/features/profile/pickPhoto';
@@ -148,7 +149,7 @@ export default function ProfileScreen() {
             style={[styles.name, { color: c.text, fontFamily: fonts.display }, { outlineStyle: 'none' } as object]}
           />
           <Text tone="muted" style={{ textAlign: 'center' }}>
-            {[persona && persona.value !== 'other' ? persona.label : null, since ? `with Do It since ${since}` : null].filter(Boolean).join(' · ') || 'Tap your name to change it'}
+            {[s.persona === 'other' && s.personaLabel.trim() ? s.personaLabel.trim() : persona && persona.value !== 'other' ? persona.label : null, since ? `with Do It since ${since}` : null].filter(Boolean).join(' · ') || 'Tap your name to change it'}
           </Text>
           {n.bestStreak > 0 && (
             <View style={[styles.pill, { backgroundColor: c.accentSoft }]}>
@@ -214,18 +215,7 @@ export default function ProfileScreen() {
           </Card>
         </View>
 
-        {/* About you */}
-        <View style={{ gap: space.sm }}>
-          <Label>About you</Label>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-            {PERSONAS.map((p) => (
-              <Chip key={p.value} label={p.label} icon={p.icon} selected={s.persona === p.value} onPress={() => updateSettings({ persona: p.value })} />
-            ))}
-          </View>
-          <Text variant="small" tone="muted">
-            Only used to suggest habits and reminders.
-          </Text>
-        </View>
+        <AboutYou />
 
         {/* Plan */}
         <View style={{ gap: space.sm }}>

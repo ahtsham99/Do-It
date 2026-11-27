@@ -20,11 +20,20 @@ export interface HabitSuggestion {
 }
 export type Suggestion = TaskSuggestion | HabitSuggestion;
 
-export const PERSONAS: { value: Persona; label: string; icon: IconName; blurb: string }[] = [
+/** The main four come first; `more` ones show under "More" in your profile. */
+export const PERSONAS: { value: Persona; label: string; icon: IconName; blurb: string; more?: boolean }[] = [
   { value: 'student', label: 'Student', icon: 'school-outline', blurb: 'Classes, assignments, exams' },
   { value: 'professional', label: 'Professional', icon: 'briefcase-outline', blurb: 'Work, meetings, deadlines' },
   { value: 'athlete', label: 'Athlete', icon: 'barbell-outline', blurb: 'Training, recovery, competitions' },
   { value: 'other', label: 'Something else', icon: 'sparkles-outline', blurb: 'Life admin, side projects, me' },
+  { value: 'parent', label: 'Parent', icon: 'people-outline', blurb: 'Family, school runs, home', more: true },
+  { value: 'creative', label: 'Creative', icon: 'color-palette-outline', blurb: 'Projects, practice, ideas', more: true },
+  { value: 'founder', label: 'Founder', icon: 'rocket-outline', blurb: 'Building, selling, shipping', more: true },
+  { value: 'freelancer', label: 'Freelancer', icon: 'laptop-outline', blurb: 'Clients, invoices, deadlines', more: true },
+  { value: 'teacher', label: 'Teacher', icon: 'easel-outline', blurb: 'Lessons, marking, classes', more: true },
+  { value: 'healthcare', label: 'Healthcare', icon: 'medkit-outline', blurb: 'Shifts, rest, recovery', more: true },
+  { value: 'jobseeker', label: 'Job hunting', icon: 'search-outline', blurb: 'Applications, interviews', more: true },
+  { value: 'retired', label: 'Retired', icon: 'leaf-outline', blurb: 'Health, hobbies, people', more: true },
 ];
 
 const COMMON: Suggestion[] = [
@@ -68,6 +77,78 @@ export const SUGGESTIONS: Record<Persona, Suggestion[]> = {
     { kind: 'habit', name: 'Read 20 pages', icon: '📖', color: '#7A5C8E', frequency: 'daily' },
     { kind: 'habit', name: 'Move for 30 minutes', icon: '🏃', color: '#2F4F40', frequency: 'daily' },
     { kind: 'habit', name: 'Journal', icon: '✍️', color: '#8A5A44', frequency: 'daily' },
+    ...COMMON,
+  ],
+  parent: [
+    { kind: 'task', title: 'Pack school bags', repeat: 'weekdays', time: '20:30' },
+    { kind: 'task', title: 'Plan the family meals', repeat: 'weekly', time: '18:00' },
+    { kind: 'task', title: 'Check the school calendar', repeat: 'weekly' },
+    { kind: 'habit', name: '10 minutes just for me', icon: '☕', color: '#8A5A44', frequency: 'daily' },
+    { kind: 'habit', name: 'Read with the kids', icon: '📚', color: '#7A5C8E', frequency: 'daily' },
+    { kind: 'habit', name: 'Move for 20 minutes', icon: '🏃', color: '#2F4F40', frequency: 'weekly', timesPerWeek: 4 },
+    ...COMMON,
+  ],
+  creative: [
+    { kind: 'task', title: 'Share one piece of work', repeat: 'weekly' },
+    { kind: 'task', title: 'Back up your files', repeat: 'monthly' },
+    { kind: 'task', title: 'Plan this week’s project time', repeat: 'weekly', time: '09:00' },
+    { kind: 'habit', name: 'Create for 30 minutes', icon: '🎨', color: '#A8554B', frequency: 'daily' },
+    { kind: 'habit', name: 'Sketch / write ideas', icon: '✍️', color: '#8A5A44', frequency: 'daily' },
+    { kind: 'habit', name: 'Walk for inspiration', icon: '🚶', color: '#2F4F40', frequency: 'weekly', timesPerWeek: 3 },
+    ...COMMON,
+  ],
+  founder: [
+    { kind: 'task', title: 'Write down today’s one big thing', repeat: 'weekdays', time: '08:30' },
+    { kind: 'task', title: 'Review the numbers', repeat: 'weekly', time: '16:00' },
+    { kind: 'task', title: 'Talk to a customer', repeat: 'weekly' },
+    { kind: 'habit', name: 'Deep work block', icon: '💻', color: '#4A6B8A', frequency: 'daily' },
+    { kind: 'habit', name: 'Exercise', icon: '🏋️', color: '#A8554B', frequency: 'weekly', timesPerWeek: 3 },
+    { kind: 'habit', name: 'Switch off by 10pm', icon: '🌙', color: '#22201D', frequency: 'daily' },
+    ...COMMON,
+  ],
+  freelancer: [
+    { kind: 'task', title: 'Send invoices', repeat: 'monthly' },
+    { kind: 'task', title: 'Follow up with clients', repeat: 'weekly', time: '10:00' },
+    { kind: 'task', title: 'Set aside money for tax', repeat: 'monthly' },
+    { kind: 'habit', name: 'Start work by 9', icon: '⏰', color: '#B5873A', frequency: 'daily' },
+    { kind: 'habit', name: 'Look for new work', icon: '🔎', color: '#4A6B8A', frequency: 'weekly', timesPerWeek: 2 },
+    { kind: 'habit', name: 'Take a proper lunch break', icon: '🥗', color: '#2F4F40', frequency: 'daily' },
+    ...COMMON,
+  ],
+  teacher: [
+    { kind: 'task', title: 'Plan tomorrow’s lessons', repeat: 'weekdays', time: '17:00' },
+    { kind: 'task', title: 'Marking', repeat: 'weekly' },
+    { kind: 'task', title: 'Prep resources for next week', repeat: 'weekly' },
+    { kind: 'habit', name: 'Leave work at work', icon: '🏡', color: '#3F7C7A', frequency: 'daily' },
+    { kind: 'habit', name: 'Read 20 pages', icon: '📖', color: '#7A5C8E', frequency: 'daily' },
+    { kind: 'habit', name: 'Exercise', icon: '🏃', color: '#2F4F40', frequency: 'weekly', timesPerWeek: 3 },
+    ...COMMON,
+  ],
+  healthcare: [
+    { kind: 'task', title: 'Check next week’s shifts', repeat: 'weekly' },
+    { kind: 'task', title: 'Prep meals for shifts', repeat: 'weekly' },
+    { kind: 'task', title: 'Renew training or registration', repeat: 'none' },
+    { kind: 'habit', name: 'Sleep 7+ hours', icon: '😴', color: '#22201D', frequency: 'daily' },
+    { kind: 'habit', name: 'Decompress after work', icon: '🧘', color: '#3F7C7A', frequency: 'daily' },
+    { kind: 'habit', name: 'Stretch', icon: '🤸', color: '#B5873A', frequency: 'weekly', timesPerWeek: 3 },
+    ...COMMON,
+  ],
+  jobseeker: [
+    { kind: 'task', title: 'Apply to two jobs', repeat: 'weekdays', time: '10:00' },
+    { kind: 'task', title: 'Update your CV', repeat: 'monthly' },
+    { kind: 'task', title: 'Follow up on applications', repeat: 'weekly' },
+    { kind: 'habit', name: 'Learn a new skill', icon: '🧠', color: '#7A5C8E', frequency: 'daily' },
+    { kind: 'habit', name: 'Reach out to someone', icon: '🤝', color: '#4A6B8A', frequency: 'weekly', timesPerWeek: 3 },
+    { kind: 'habit', name: 'Get outside', icon: '🌳', color: '#2F4F40', frequency: 'daily' },
+    ...COMMON,
+  ],
+  retired: [
+    { kind: 'task', title: 'Call family or a friend', repeat: 'weekly' },
+    { kind: 'task', title: 'Take your medication', repeat: 'daily', time: '09:00' },
+    { kind: 'task', title: 'Book check-ups', repeat: 'none' },
+    { kind: 'habit', name: 'Walk 30 minutes', icon: '🚶', color: '#2F4F40', frequency: 'daily' },
+    { kind: 'habit', name: 'Time for a hobby', icon: '🪴', color: '#5F6B4E', frequency: 'weekly', timesPerWeek: 3 },
+    { kind: 'habit', name: 'Read', icon: '📖', color: '#7A5C8E', frequency: 'daily' },
     ...COMMON,
   ],
 };

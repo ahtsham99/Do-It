@@ -50,7 +50,7 @@ export function SettingsBody() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.label}>{s.name.trim() || 'Your profile'}</Text>
             <Text variant="small" tone="muted">
-              {PERSONAS.find((p) => p.value === s.persona)?.label ?? 'Tell us who you are'}
+              {(s.persona === 'other' && s.personaLabel.trim()) || PERSONAS.find((p) => p.value === s.persona)?.label || 'Tell us who you are'}
             </Text>
           </View>
           <Icon name="chevron-forward" size={18} color={c.textFaint} />

@@ -90,7 +90,7 @@ export default function Onboarding() {
         <View style={{ gap: space.lg }}>
           <Heading title="Who are you?" sub="We’ll suggest habits and reminders that fit. Everything else stays the same." />
           <View style={{ gap: space.sm }}>
-            {PERSONAS.map((p) => {
+            {PERSONAS.filter((p) => !p.more).map((p) => {
               const sel = persona === p.value;
               return (
                 <Press

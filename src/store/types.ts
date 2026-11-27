@@ -1,7 +1,7 @@
 import type { DayKey, TimeKey } from '@/lib/dates';
 import type { SyncMeta } from '@/lib/storage';
 
-export type Persona = 'student' | 'professional' | 'athlete' | 'other';
+export type Persona = 'student' | 'professional' | 'athlete' | 'other' | 'parent' | 'creative' | 'founder' | 'freelancer' | 'teacher' | 'healthcare' | 'jobseeker' | 'retired';
 
 export type Repeat = 'none' | 'daily' | 'weekdays' | 'weekly' | 'monthly';
 
@@ -143,6 +143,8 @@ export type Plan = 'free' | 'premium';
 export interface Settings {
   onboarded: boolean;
   persona: Persona | null;
+  /** Your own description, when none of the options fit (persona is 'other'). */
+  personaLabel: string;
   name: string;
   theme: ThemePreference;
   tone: Tone;
@@ -197,6 +199,7 @@ export interface AppState {
 export const DEFAULT_SETTINGS: Settings = {
   onboarded: false,
   persona: null,
+  personaLabel: '',
   name: '',
   theme: 'system',
   tone: 'balanced',
