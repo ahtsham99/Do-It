@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Chip, Icon, Label, Press, Text } from '@/components/ui';
-import { PERSONAS } from '@/features/onboarding/suggestions';
+import { MAIN_PERSONAS, MORE_PERSONAS } from '@/features/onboarding/suggestions';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { radius, space, useTheme } from '@/theme';
@@ -12,7 +12,7 @@ export function AboutYou() {
   const { c } = useTheme();
   const { persona, personaLabel } = useSettings();
   const custom = persona === 'other' && personaLabel.trim() ? personaLabel.trim() : '';
-  const inMore = !!custom || !!PERSONAS.find((p) => p.value === persona)?.more;
+  const inMore = !!custom || MORE_PERSONAS.some((p) => p.value === persona);
   const [open, setOpen] = useState(inMore);
   const [text, setText] = useState('');
   const shown = open || inMore;
@@ -28,14 +28,8 @@ export function AboutYou() {
     <View style={{ gap: space.sm }}>
       <Label>About you</Label>
       <View style={styles.wrap}>
-        {PERSONAS.filter((p) => !p.more).map((p) => (
-          <Chip
-            key={p.value}
-            label={p.label}
-            icon={p.icon}
-            selected={persona === p.value && !(p.value === 'other' && custom)}
-            onPress={() => updateSettings({ persona: p.value, personaLabel: '' })}
-          />
+        {MAIN_PERSONAS.map((p) => (
+          <Chip key={p.value} label={p.label} icon={p.icon} selected={persona === p.value} onPress={() => updateSettings({ persona: p.value, personaLabel: '' })} />
         ))}
         <Press
           onPress={() => setOpen(!shown)}
@@ -52,8 +46,14 @@ export function AboutYou() {
       {shown && (
         <>
           <View style={styles.wrap}>
-            {PERSONAS.filter((p) => p.more).map((p) => (
-              <Chip key={p.value} label={p.label} icon={p.icon} selected={persona === p.value} onPress={() => updateSettings({ persona: p.value, personaLabel: '' })} />
+            {MORE_PERSONAS.map((p) => (
+              <Chip
+                key={p.value}
+                label={p.label}
+                icon={p.icon}
+                selected={persona === p.value && !(p.value === 'other' && custom)}
+                onPress={() => updateSettings({ persona: p.value, personaLabel: '' })}
+              />
             ))}
             {custom ? <Chip label={custom} icon="person-outline" selected onPress={() => {}} /> : null}
           </View>

@@ -20,21 +20,27 @@ export interface HabitSuggestion {
 }
 export type Suggestion = TaskSuggestion | HabitSuggestion;
 
-/** The main four come first; `more` ones show under "More" in your profile. */
-export const PERSONAS: { value: Persona; label: string; icon: IconName; blurb: string; more?: boolean }[] = [
+/** In display order. The first four show in your profile; the rest under "More". */
+export const PERSONAS: { value: Persona; label: string; icon: IconName; blurb: string }[] = [
   { value: 'student', label: 'Student', icon: 'school-outline', blurb: 'Classes, assignments, exams' },
   { value: 'professional', label: 'Professional', icon: 'briefcase-outline', blurb: 'Work, meetings, deadlines' },
+  { value: 'parent', label: 'Parent', icon: 'people-outline', blurb: 'Family, school runs, home' },
   { value: 'athlete', label: 'Athlete', icon: 'barbell-outline', blurb: 'Training, recovery, competitions' },
+  { value: 'creative', label: 'Creative', icon: 'color-palette-outline', blurb: 'Projects, practice, ideas' },
+  { value: 'founder', label: 'Founder', icon: 'rocket-outline', blurb: 'Building, selling, shipping' },
+  { value: 'freelancer', label: 'Freelancer', icon: 'laptop-outline', blurb: 'Clients, invoices, deadlines' },
+  { value: 'teacher', label: 'Teacher', icon: 'easel-outline', blurb: 'Lessons, marking, classes' },
+  { value: 'healthcare', label: 'Healthcare', icon: 'medkit-outline', blurb: 'Shifts, rest, recovery' },
+  { value: 'jobseeker', label: 'Job hunting', icon: 'search-outline', blurb: 'Applications, interviews' },
+  { value: 'retired', label: 'Retired', icon: 'leaf-outline', blurb: 'Health, hobbies, people' },
   { value: 'other', label: 'Something else', icon: 'sparkles-outline', blurb: 'Life admin, side projects, me' },
-  { value: 'parent', label: 'Parent', icon: 'people-outline', blurb: 'Family, school runs, home', more: true },
-  { value: 'creative', label: 'Creative', icon: 'color-palette-outline', blurb: 'Projects, practice, ideas', more: true },
-  { value: 'founder', label: 'Founder', icon: 'rocket-outline', blurb: 'Building, selling, shipping', more: true },
-  { value: 'freelancer', label: 'Freelancer', icon: 'laptop-outline', blurb: 'Clients, invoices, deadlines', more: true },
-  { value: 'teacher', label: 'Teacher', icon: 'easel-outline', blurb: 'Lessons, marking, classes', more: true },
-  { value: 'healthcare', label: 'Healthcare', icon: 'medkit-outline', blurb: 'Shifts, rest, recovery', more: true },
-  { value: 'jobseeker', label: 'Job hunting', icon: 'search-outline', blurb: 'Applications, interviews', more: true },
-  { value: 'retired', label: 'Retired', icon: 'leaf-outline', blurb: 'Health, hobbies, people', more: true },
 ];
+
+/** Shown up front; everything else sits under "More". */
+export const MAIN_PERSONAS = PERSONAS.slice(0, 4);
+export const MORE_PERSONAS = PERSONAS.slice(4);
+/** First-time setup: the main four, plus "Something else". */
+export const ONBOARDING_PERSONAS = [...MAIN_PERSONAS, PERSONAS[PERSONAS.length - 1]];
 
 const COMMON: Suggestion[] = [
   { kind: 'habit', name: 'Drink 2L of water', icon: '💧', color: '#4A6B8A', frequency: 'daily' },

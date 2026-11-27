@@ -7,7 +7,7 @@ import { useTopInset } from '@/hooks/useTopInset';
 import { Button, Card, Field, Icon, Press, Segmented, Text } from '@/components/ui';
 import { applySuggestions } from '@/features/onboarding/applySuggestions';
 import { SuggestionPicker } from '@/features/onboarding/SuggestionPicker';
-import { PERSONAS, SUGGESTIONS, suggestionKey } from '@/features/onboarding/suggestions';
+import { ONBOARDING_PERSONAS, SUGGESTIONS, suggestionKey } from '@/features/onboarding/suggestions';
 import { pick } from '@/features/nudges/messages';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { updateSettings } from '@/store/actions/settings';
@@ -90,7 +90,7 @@ export default function Onboarding() {
         <View style={{ gap: space.lg }}>
           <Heading title="Who are you?" sub="We’ll suggest habits and reminders that fit. Everything else stays the same." />
           <View style={{ gap: space.sm }}>
-            {PERSONAS.filter((p) => !p.more).map((p) => {
+            {ONBOARDING_PERSONAS.map((p) => {
               const sel = persona === p.value;
               return (
                 <Press
