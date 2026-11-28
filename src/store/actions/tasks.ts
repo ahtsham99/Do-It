@@ -8,7 +8,7 @@ import { setState } from '../store';
 import type { Task } from '../types';
 
 export type TaskInput = Pick<Task, 'title' | 'date' | 'repeat' | 'reminder'> &
-  Partial<Pick<Task, 'notes' | 'time' | 'duration'>>;
+  Partial<Pick<Task, 'notes' | 'time' | 'duration' | 'color'>>;
 
 export function addTask(input: TaskInput): Task {
   const now = Date.now();

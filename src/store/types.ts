@@ -23,6 +23,8 @@ export interface Task extends SyncMeta {
   skippedDates?: DayKey[];
   /** Snoozed reminder: show/notify again at this epoch ms. */
   snoozedUntil?: number | null;
+  /** Optional colour, shown on the timeline and week. */
+  color?: string | null;
 }
 
 /** A list of things to remember (e.g. "Reminders", "Groceries"). */

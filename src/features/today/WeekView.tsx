@@ -94,7 +94,7 @@ export function WeekView({ days, tasks, onOpenDay }: { days: DayKey[]; tasks: Ta
 }
 
 function Line({ occ }: { occ: Occurrence }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
   const { use24h } = useSettings();
   const { task, day, done } = occ;
   const late = !done && (day < todayKey() || (day === todayKey() && !!task.time && task.time < nowTime()));
@@ -111,6 +111,7 @@ function Line({ occ }: { occ: Occurrence }) {
         {done && <Icon name="checkmark" size={11} color={c.accentText} />}
       </Press>
       <Press haptic={false} onPress={() => router.push({ pathname: '/task', params: { id: task.id, day } })} style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+        {task.color ? <View style={[styles.bar, { backgroundColor: done ? c.border : paint(task.color) }]} /> : null}
         {task.time ? (
           <Text variant="small" tone={late ? 'danger' : 'muted'} style={{ fontSize: 12, minWidth: 40 }}>
             {formatTime(task.time, use24h)}
@@ -132,6 +133,7 @@ const styles = StyleSheet.create({
   num: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   empty: { minHeight: 44, justifyContent: 'center' },
   line: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 30 },
+  bar: { width: 3, height: 14, borderRadius: 2, alignSelf: 'center' },
   tick: { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   side: { alignItems: 'flex-end', justifyContent: 'space-between', gap: space.sm, minHeight: 44, paddingTop: 4 },
   add: { width: 26, height: 26, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },

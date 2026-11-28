@@ -3,15 +3,15 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { useSheetTopInset } from '@/hooks/useTopInset';
-import { DateTimeField } from '@/components/pickers';
-import { Button, Card, Chip, Field, Label, SheetHeader, Text, Toggle, showDialog } from '@/components/ui';
+import { ColorPicker, DateTimeField, PremiumColorDots } from '@/components/pickers';
+import { Button, Card, Chip, Field, Icon, Label, Press, SheetHeader, Text, Toggle, showDialog } from '@/components/ui';
 import { REMINDER_OPTIONS, REPEAT_LABELS } from '@/features/tasks/logic';
 import { addDays, addMinutesToTime, formatDay, formatDuration, formatTime, todayKey, type DayKey } from '@/lib/dates';
 import { addTask, deleteTask, skipOccurrence, updateTask } from '@/store/actions/tasks';
 import { useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import type { Repeat } from '@/store/types';
-import { space, useTheme } from '@/theme';
+import { SWATCHES, space, useTheme } from '@/theme';
 
 const REPEATS = Object.keys(REPEAT_LABELS) as Repeat[];
 
@@ -29,13 +29,14 @@ export default function TaskEditor() {
   const [duration, setDuration] = useState<number | null>(existing?.duration ?? (params.duration ? Number(params.duration) : null));
   const [reminder, setReminder] = useState<number | null>(existing?.reminder ?? (params.time ? 0 : null));
   const [repeat, setRepeat] = useState<Repeat>(existing?.repeat ?? 'none');
+  const [color, setColor] = useState<string | null>(existing?.color ?? null);
 
   const canSave = title.trim().length > 0;
   const close = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
   const save = () => {
     if (!canSave) return;
-    const data = { title: title.trim(), notes: notes.trim() || undefined, date, time, duration: time ? duration : null, reminder, repeat };
+    const data = { title: title.trim(), notes: notes.trim() || undefined, date, time, duration: time ? duration : null, reminder, repeat, color };
     if (existing) updateTask(existing.id, data);
     else addTask(data);
     close();
@@ -154,6 +155,22 @@ export default function TaskEditor() {
               <Chip key={r} label={REPEAT_LABELS[r]} selected={repeat === r} onPress={() => setRepeat(r)} />
             ))}
           </View>
+        </View>
+
+        <View style={{ gap: space.sm }}>
+          <Label>Colour</Label>
+          <ColorPicker colors={SWATCHES} value={color ?? ''} onChange={setColor}>
+            <PremiumColorDots value={color} onChange={setColor} />
+            <Press
+              onPress={() => setColor(null)}
+              accessibilityLabel="No colour"
+              accessibilityState={{ selected: !color }}
+              style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2.5, padding: 3, borderColor: !color ? c.text : 'transparent' }}>
+              <View style={{ flex: 1, borderRadius: 20, borderWidth: 1.5, borderColor: c.border, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="ban-outline" size={18} color={c.textFaint} />
+              </View>
+            </Press>
+          </ColorPicker>
         </View>
 
         <Field label="Notes" placeholder="Details, links, sub-steps…" value={notes} onChangeText={setNotes} multiline />

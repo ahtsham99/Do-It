@@ -9,7 +9,7 @@ import type { Occurrence } from '@/features/tasks/logic';
 import { setDisplay, useDisplay } from '@/features/today/display';
 import { addMinutesToTime, formatDuration, formatTime, minutesBetween, nowTime, todayKey, type DayKey } from '@/lib/dates';
 import { useSettings } from '@/store/hooks';
-import { radius, space, useTheme } from '@/theme';
+import { hexAlpha, radius, space, useTheme } from '@/theme';
 
 const TIME_W = 54;
 
@@ -126,13 +126,14 @@ function NowLine({ now, use24h }: { now: string; use24h: boolean }) {
 }
 
 function Row({ occ, label, last }: { occ: Occurrence; label: string; last: boolean }) {
-  const { c } = useTheme();
+  const { c, paint } = useTheme();
   const { task, day, done } = occ;
   const late = !done && (day < todayKey() || (day === todayKey() && !!task.time && task.time < nowTime()));
   const { use24h } = useSettings();
   const end = task.time && task.duration ? addMinutesToTime(task.time, task.duration) : null;
   // Longer plans get taller blocks, so the day's shape is visible at a glance.
   const blockH = task.duration ? Math.min(140, Math.max(50, task.duration * 0.8)) : 50;
+  const tint = task.color ? paint(task.color) : c.accent;
   return (
     <SwipeToDelete onDelete={() => deleteTaskWithUndo(task, day)} borderRadius={radius.md}>
       <View style={[styles.row, { backgroundColor: c.surface, minHeight: blockH }]}>
@@ -161,7 +162,12 @@ function Row({ occ, label, last }: { occ: Occurrence; label: string; last: boole
         </View>
         <Press
           haptic={false}
-          style={[styles.body, task.duration ? [styles.block, { backgroundColor: done ? c.surfaceAlt : c.accentSoft, borderLeftColor: done ? c.border : c.accent }] : null]}
+          style={[
+            styles.body,
+            task.duration || task.color
+              ? [styles.block, { backgroundColor: done ? c.surfaceAlt : hexAlpha(tint, 0.16), borderLeftColor: done ? c.border : tint }]
+              : null,
+          ]}
           onPress={() => router.push({ pathname: '/task', params: { id: task.id, day } })}>
           <Text numberOfLines={2} tone={done ? 'faint' : 'default'} style={[{ fontWeight: '500' }, done && { textDecorationLine: 'line-through' }]}>
             {task.title}
