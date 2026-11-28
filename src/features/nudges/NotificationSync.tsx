@@ -12,13 +12,14 @@ export function NotificationSync() {
   const timer = useStore((s) => s.timer);
   const goals = useStore((s) => s.goals);
   const reminders = useStore((s) => s.reminders);
+  const habits = useStore((s) => s.habits);
 
   useEffect(() => configureNotifications(), []);
 
   useEffect(() => {
     const id = setTimeout(() => rescheduleAll(getState()).catch((e) => console.warn('[notifications]', e)), 800);
     return () => clearTimeout(id);
-  }, [tasks, settings, stats, timer, goals, reminders]);
+  }, [tasks, settings, stats, timer, goals, reminders, habits]);
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', (s) => {

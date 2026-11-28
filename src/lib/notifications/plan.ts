@@ -1,6 +1,8 @@
-import { pick } from '@/features/nudges/messages';
+import { isDueToday } from '@/features/habits/logic';
+import { pick, titleFor } from '@/features/nudges/messages';
 import { isDone, occurrencesOn, occursOn } from '@/features/tasks/logic';
 import { addDays, combine, diffDays, formatTime, fromKey, todayKey } from '@/lib/dates';
+import { currentStreak } from '@/store/actions/stats';
 import type { AppState } from '@/store/types';
 
 export interface PlannedNotification {
@@ -9,6 +11,12 @@ export interface PlannedNotification {
   title: string;
   body: string;
   url?: string;
+}
+
+/** "2 plans today, 2 overdue." */
+function summary(planned: number, overdue: number) {
+  const bits = [planned ? `${planned} plan${planned === 1 ? '' : 's'} today` : null, overdue ? `${overdue} overdue` : null].filter(Boolean);
+  return bits.length ? `${bits.join(', ')}.` : '';
 }
 
 const MAX = 60; // timer and snoozes are added first so they always fit // iOS keeps at most 64 pending local notifications.
@@ -20,12 +28,21 @@ const MAX = 60; // timer and snoozes are added first so they always fit // iOS k
 export function planNotifications(state: AppState, now = new Date()): PlannedNotification[] {
   const { settings, tasks: all, stats } = state;
   const tasks = all.filter((t) => !t.deletedAt);
+  const habits = state.habits.filter((h) => !h.deletedAt && !h.archived);
   const today = todayKey();
+  const tone = settings.tone;
+  const name = settings.name;
   const out: PlannedNotification[] = [];
+  // Overdue: plans from before today that are still open (shown in today's morning title).
+  const overdue = (() => {
+    let n = 0;
+    for (let d = 1; d <= 14; d++) n += occurrencesOn(tasks, addDays(today, -d)).filter((o) => !o.done && o.task.repeat === 'none').length;
+    return n;
+  })();
 
   for (let i = 0; i < 7; i++) {
     const day = addDays(today, i);
-    const count = occurrencesOn(tasks, day).length;
+    const planned = occurrencesOn(tasks, day);
 
     // Morning: plan your day.
     const morning = combine(day, settings.dailyPromptTime);
@@ -33,26 +50,31 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
       out.push({
         id: `plan-${day}`,
         date: morning,
-        title: count ? `Plan your day · ${count} task${count === 1 ? '' : 's'} waiting` : 'Plan your day',
-        body: pick('planPrompt', settings.tone, day),
+        title: titleFor('plan', tone, { name }),
+        body: [summary(planned.length, i === 0 ? overdue : 0), pick(i === 0 && overdue ? 'overdue' : 'planPrompt', tone, day)].filter(Boolean).join(' '),
         url: '/',
       });
     }
 
-    // Evening: unfinished check.
+    // Evening: what's left (plans and habits), or a quick review.
     const evening = combine(day, settings.eveningCheckTime);
     if (evening > now) {
-      const open = occurrencesOn(tasks, day).filter((o) => !o.done).length;
-      if (i > 0 || open > 0) {
-        out.push({
-          id: `evening-${day}`,
-          date: evening,
-          title: i === 0 ? `${open} task${open === 1 ? '' : 's'} still open today` : 'How did today go?',
-          body: pick('unfinished', settings.tone, day),
-          url: '/',
-        });
-      }
+      const openPlans = planned.filter((o) => !o.done).length;
+      const openHabits = i === 0 ? habits.filter((h) => isDueToday(h, day, settings.weekStartsOn)).length : 0;
+      const left = openPlans + openHabits;
+      out.push(
+        i === 0 && left > 0
+          ? { id: `evening-${day}`, date: evening, title: titleFor('evening', tone, { n: left }), body: pick('unfinished', tone, day), url: '/' }
+          : { id: `evening-${day}`, date: evening, title: titleFor('review', tone, { name }), body: pick('eveningReview', tone, day), url: '/' },
+      );
     }
+  }
+
+  // Streak at risk: an hour before bedtime-ish, if you haven't shown up today.
+  const streak = currentStreak(stats.activeDays, today);
+  if (streak >= 2 && !stats.activeDays.includes(today)) {
+    const at = combine(today, '21:30');
+    if (at > now) out.push({ id: `streak-${today}`, date: at, title: titleFor('streak', tone, { streak }), body: pick('streakRisk', tone, today), url: '/' });
   }
 
   // The focus timer, if one is running.
@@ -64,8 +86,8 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
       title: timer.mode === 'focus' ? 'Focus session complete' : 'Break’s over',
       body:
         timer.mode === 'focus'
-          ? `${timer.label ? `${timer.label}: ` : ''}nicely done. Take a short break, or keep going.`
-          : 'Ready for another round?',
+          ? `${timer.label ? `${timer.label} · ` : ''}${pick('focusDone', settings.tone, timer.endsAt)}`
+          : pick('breakDone', settings.tone, timer.endsAt),
       url: '/focus',
     });
   }
@@ -85,7 +107,7 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
         id: `goals-${day}`,
         date: at,
         title: `This week: ${g.title}`,
-        body: next ? `Next small step: ${next}.` : 'A little progress this week is enough.',
+        body: next ? `Next small step: ${next}.` : pick('goalWeek', settings.tone, day),
         url: `/goal?id=${g.id}`,
       });
     }
@@ -93,7 +115,7 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
       if (!g.targetDate) continue;
       const at = combine(addDays(g.targetDate, -1), settings.dailyPromptTime);
       if (at > now && diffDays(today, g.targetDate) <= 14) {
-        out.push({ id: `goal-due-${g.id}`, date: at, title: `Tomorrow: ${g.title}`, body: 'Your target date is tomorrow. One more step today?', url: `/goal?id=${g.id}` });
+        out.push({ id: `goal-due-${g.id}`, date: at, title: `Tomorrow: ${g.title}`, body: pick('goalDue', settings.tone, g.id), url: `/goal?id=${g.id}` });
       }
     }
   }
@@ -134,7 +156,9 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
         body: task.time
           ? task.reminder === 0
             ? pick('remindNow', settings.tone, task.id)
-            : `At ${formatTime(task.time, settings.use24h)} · ${pick('remindToday', settings.tone, task.id)}`
+            : settings.tone === 'savage'
+              ? `At ${formatTime(task.time, settings.use24h)}. ${pick('remindSoon', settings.tone, task.id)}`
+              : `Coming up at ${formatTime(task.time, settings.use24h)}.`
           : pick('remindToday', settings.tone, task.id),
         url: `/task?id=${task.id}&day=${day}`,
       });
