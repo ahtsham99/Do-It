@@ -71,7 +71,7 @@ export default function CountdownsScreen() {
 
         {items.length > 0 && (
           <Press onPress={chooseCategory} style={[styles.filter, { backgroundColor: c.surface, borderColor: c.border, ...cardShadow(c) }]}>
-            <Text style={{ fontSize: 17 }}>{category ?? 'All events'}</Text>
+            <Text style={{ fontSize: 17 }}>{category ?? t('All events')}</Text>
             <Icon name="chevron-down" size={18} color={c.textMuted} />
           </Press>
         )}
@@ -86,7 +86,7 @@ export default function CountdownsScreen() {
           />
         ) : groups.length === 0 ? (
           <Text tone="muted" style={{ textAlign: 'center', paddingVertical: space.xl }}>
-            {query ? t('No matches.') : when === 'future' ? 'Nothing coming up here.' : 'Nothing in the past yet.'}
+            {query ? t('No matches.') : when === 'future' ? t('Nothing coming up here.') : t('Nothing in the past yet.')}
           </Text>
         ) : (
           groups.map((g) => (

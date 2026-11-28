@@ -8,7 +8,7 @@ import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { Avatar } from '@/features/profile/Avatar';
 import { APP_VERSION } from '@/lib/appInfo';
-import { LANGUAGES, deviceLanguage, t } from '@/lib/i18n';
+import { LANGUAGES, deviceLanguage, t, tk } from '@/lib/i18n';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { PREMIUM_AVAILABLE, useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
@@ -21,14 +21,14 @@ import { styleFor } from '@/theme/fonts';
 import { PremiumPalettes } from './PremiumPalettes';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
-  { value: 'gentle', label: t('Gentle'), blurb: t('Soft reminders, no pressure.') },
-  { value: 'balanced', label: t('Firm'), blurb: t('Clear and steady. The default.') },
-  { value: 'savage', label: t('Relentless'), blurb: t('Direct reminders that keep you moving.') },
+  { value: 'gentle', label: tk('Gentle'), blurb: tk('Soft reminders, no pressure.') },
+  { value: 'balanced', label: tk('Firm'), blurb: tk('Clear and steady. The default.') },
+  { value: 'savage', label: tk('Relentless'), blurb: tk('Direct reminders that keep you moving.') },
 ];
 const THEMES: { value: ThemePreference; label: string; icon?: 'sunny-outline' | 'moon-outline' }[] = [
-  { value: 'system', label: t('Auto') },
-  { value: 'light', label: t('Light'), icon: 'sunny-outline' },
-  { value: 'dark', label: t('Dark'), icon: 'moon-outline' },
+  { value: 'system', label: tk('Auto') },
+  { value: 'light', label: tk('Light'), icon: 'sunny-outline' },
+  { value: 'dark', label: tk('Dark'), icon: 'moon-outline' },
 ];
 
 /** All settings, as cards. Used by the Settings screen (and can be embedded). */
@@ -50,9 +50,9 @@ export function SettingsBody() {
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
           <Avatar size={52} small />
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={styles.label}>{s.name.trim() || 'Your profile'}</Text>
+            <Text style={styles.label}>{s.name.trim() || t('Your profile')}</Text>
             <Text variant="small" tone="muted">
-              {(s.persona === 'other' && s.personaLabel.trim()) || PERSONAS.find((p) => p.value === s.persona)?.label || 'Tell us who you are'}
+              {(s.persona === 'other' && s.personaLabel.trim()) || PERSONAS.find((p) => p.value === s.persona)?.label || t('Tell us who you are')}
             </Text>
           </View>
           <Icon name="chevron-forward" size={18} color={c.textFaint} />
@@ -76,13 +76,13 @@ export function SettingsBody() {
                   onPress={() => (setColorPreview(null), updateSettings({ nightColor: k }))}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: on }}
-                  accessibilityLabel={t('{label} app colour', { label: n.label })}
+                  accessibilityLabel={t('{label} app colour', { label: t(n.label) })}
                   style={{ alignItems: 'center', gap: 6 }}>
                   <View style={[styles.swatch, { borderColor: on ? c.text : 'transparent' }]}>
                     <GradientSwatch from={n.swatch[0]} to={n.swatch[1]} id={k} />
                   </View>
                   <Text variant="small" tone={on ? 'default' : 'muted'} style={{ fontSize: 12, fontWeight: on ? '600' : '400' }}>
-                    {n.label}
+                    {t(n.label)}
                   </Text>
                 </Press>
               );
@@ -130,7 +130,7 @@ export function SettingsBody() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.label}>{t('Fonts')}</Text>
             <Text variant="small" tone="muted">
-              {styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont })?.label ?? t('Custom')} style
+              {styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont }) ? t('{name} style', { name: t(styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont })!.label) }) : t('Custom style')}
             </Text>
           </View>
           <Icon name="chevron-forward" size={18} color={c.textFaint} />
@@ -142,12 +142,12 @@ export function SettingsBody() {
         <Text tone="muted" style={{ lineHeight: 23 }}>
           How firmly should the app remind you? “{pick('overdue', s.tone, 'preview')}”
         </Text>
-        {TONES.map((t) => {
-          const on = s.tone === t.value;
+        {TONES.map((tone) => {
+          const on = s.tone === tone.value;
           return (
             <Press
-              key={t.value}
-              onPress={() => updateSettings({ tone: t.value })}
+              key={tone.value}
+              onPress={() => updateSettings({ tone: tone.value })}
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
               style={[
@@ -155,9 +155,9 @@ export function SettingsBody() {
                 { borderColor: on ? c.accent : c.border, backgroundColor: on ? c.accentSoft : c.bg },
               ]}>
               <View style={{ flex: 1, gap: 4 }}>
-                <Text style={styles.label}>{t.label}</Text>
+                <Text style={styles.label}>{t(tone.label)}</Text>
                 <Text variant="small" tone="muted">
-                  {t.blurb}
+                  {t(tone.blurb)}
                 </Text>
               </View>
               <View style={[styles.radio, { backgroundColor: on ? c.accent : c.border }]} />
@@ -230,7 +230,7 @@ export function SettingsBody() {
       {PREMIUM_AVAILABLE && (
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
           <View style={{ flex: 1, gap: 4 }}>
-            <Text style={styles.label}>{isPremium ? 'Premium' : 'Free plan'}</Text>
+            <Text style={styles.label}>{isPremium ? t('Premium') : t('Free plan')}</Text>
             <Text variant="small" tone="muted">
               {t('Unlimited tasks, habits and countdowns for now')}
             </Text>
@@ -261,7 +261,7 @@ export function SettingsBody() {
         <ListRow
           icon="lock-closed-outline"
           label={t('Privacy')}
-          detail={Platform.OS === 'web' ? 'Your data stays in this browser, on this device.' : t('Your data stays on this device.')}
+          detail={Platform.OS === 'web' ? t('Your data stays in this browser, on this device.') : t('Your data stays on this device.')}
           onPress={() => router.push('/privacy-policy')}
         />
         <ListRow

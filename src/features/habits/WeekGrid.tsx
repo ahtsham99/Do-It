@@ -45,7 +45,7 @@ export function WeekGrid({ habits, weekStartsOn }: { habits: Habit[]; weekStarts
       <View style={styles.head}>
         <IconButton icon="chevron-back" label={t('Previous week')} size={14} diameter={30} onPress={() => setStart(addDays(start, -7))} />
         <Text variant="small" style={{ flex: 1, textAlign: 'center', fontWeight: '600' }}>
-          {isThisWeek ? t('This week') : diffDays(start, startOfWeek(today, weekStartsOn)) === 7 ? 'Last week' : `${formatDay(start, { relative: false })} – ${formatDay(addDays(start, 6), { relative: false })}`}
+          {isThisWeek ? t('This week') : diffDays(start, startOfWeek(today, weekStartsOn)) === 7 ? t('Last week') : `${formatDay(start, { relative: false })} – ${formatDay(addDays(start, 6), { relative: false })}`}
         </Text>
         <IconButton icon="chevron-forward" label={t('Next week')} size={14} diameter={30} onPress={() => !isThisWeek && setStart(addDays(start, 7))} />
       </View>

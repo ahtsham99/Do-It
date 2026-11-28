@@ -5,6 +5,7 @@ import { formatDay, formatTime } from '@/lib/dates';
 import { radius, useTheme } from '@/theme';
 
 import type { DateTimeFieldProps } from './types';
+import { t } from '@/lib/i18n';
 
 /**
  * Web: a styled pill with an invisible native <input> on top, so tapping it on
@@ -26,7 +27,7 @@ export function DateTimeField({ mode, value, onChange, use24h }: DateTimeFieldPr
       <input
         type={mode}
         value={value}
-        aria-label={mode === 'date' ? 'Date' : 'Time'}
+        aria-label={mode === 'date' ? t('Date') : t('Time')}
         onChange={(e) => e.target.value && onChange(e.target.value)}
         style={{
           position: 'absolute',

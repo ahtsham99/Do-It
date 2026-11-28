@@ -7,11 +7,11 @@ import type { Habit } from '@/store/types';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
 import { consistency } from './logic';
-import { t } from '@/lib/i18n';
+import { t, tk } from '@/lib/i18n';
 
 const PERIODS = [
-  { key: 'week', label: t('Week'), days: 7 },
-  { key: 'month', label: t('Month'), days: 30 },
+  { key: 'week', label: tk('Week'), days: 7 },
+  { key: 'month', label: tk('Month'), days: 30 },
 ] as const;
 
 /** "Habits / Consistency": share of check-ins kept, with a daily bar chart. */
@@ -45,7 +45,7 @@ export function ConsistencyCard({ habits }: { habits: Habit[] }) {
           accessibilityLabel={t('Change period')}
           style={[styles.period, { backgroundColor: c.surfaceAlt }]}>
           <Text variant="small" style={{ fontWeight: '500' }}>
-            {period.label}
+            {t(period.label)}
           </Text>
           <Icon name="caret-down" size={10} color={c.textMuted} />
         </Press>

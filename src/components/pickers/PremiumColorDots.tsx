@@ -26,7 +26,7 @@ export function PremiumColorDots({ value, onChange }: { value?: string | null; o
                       actions: [{ label: t('Sounds good'), onPress: () => {} }],
                     })
               }
-              accessibilityLabel={`${NIGHT_COLORS[k].label}${unlocked ? '' : t(', premium')}`}
+              accessibilityLabel={`${t(NIGHT_COLORS[k].label)}${unlocked ? '' : t(', premium')}`}
               accessibilityState={{ selected: on }}
               style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2.5, padding: 3, borderColor: on ? c.text : 'transparent' }}>
               <View style={{ flex: 1, borderRadius: 20, backgroundColor: col, alignItems: 'center', justifyContent: 'center' }}>

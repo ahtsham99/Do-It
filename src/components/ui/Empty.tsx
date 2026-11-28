@@ -5,6 +5,7 @@ import { radius, space, useTheme } from '@/theme';
 import { Button } from './Button';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 /** Dashed empty-state card with an optional action. */
 export function Empty({
@@ -35,14 +36,14 @@ export function Empty({
       }}>
       <Icon name={icon} size={24} color={c.textFaint} />
       <Text variant="heading" style={{ marginTop: space.sm, textAlign: 'center' }}>
-        {title}
+        {t(title)}
       </Text>
       {body && (
         <Text tone="muted" style={{ textAlign: 'center', maxWidth: 290, lineHeight: 23 }}>
-          {body}
+          {typeof body === 'string' ? t(body) : body}
         </Text>
       )}
-      {action && <Button kind="secondary" label={action} onPress={onAction} style={{ marginTop: space.md, minHeight: 46 }} />}
+      {action && <Button kind="secondary" label={t(action)} onPress={onAction} style={{ marginTop: space.md, minHeight: 46 }} />}
     </View>
   );
 }

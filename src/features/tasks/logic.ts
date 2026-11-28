@@ -9,6 +9,7 @@ import {
   type DayKey,
 } from '@/lib/dates';
 import type { Repeat, Task } from '@/store/types';
+import { t } from '@/lib/i18n';
 
 export const REPEAT_LABELS: Record<Repeat, string> = {
   none: 'Never',
@@ -28,9 +29,10 @@ export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [
 ];
 
 export function reminderLabel(r: number | null) {
-  if (r == null) return 'No reminder';
-  if (r === 0) return 'At time';
-  return `${REMINDER_OPTIONS.find((o) => o.value === r)?.label ?? `${r} min`} before`;
+  if (r == null) return t('No reminder');
+  if (r === 0) return t('At time');
+  const o = REMINDER_OPTIONS.find((x) => x.value === r);
+  return t('{time} before', { time: o ? t(o.label) : t('{m} min', { m: r }) });
 }
 
 /** Does the task have an occurrence on `day`? */

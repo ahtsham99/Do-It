@@ -11,7 +11,7 @@ import { TimerRing } from '@/features/focus/TimerRing';
 import { formatClock, useTick } from '@/features/focus/useTick';
 import { isDueToday } from '@/features/habits/logic';
 import { occurrencesOn } from '@/features/tasks/logic';
-import { addDays, todayKey } from '@/lib/dates';
+import { addDays, formatDuration, todayKey } from '@/lib/dates';
 import { recall, remember } from '@/lib/uiMemory';
 import { updateSettings } from '@/store/actions/settings';
 import { addMinutes, pauseTimer, remainingSec, resumeTimer, startTimer, stopTimer } from '@/store/actions/timer';
@@ -140,10 +140,10 @@ export default function FocusScreen() {
   const clockText = formatClock(left);
   const clockSize = Math.round(Math.min(58, 158 / (clockText.length * 0.64)));
 
-  const status = idle ? t('Ready') : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
+  const status = idle ? t('Ready') : timer.status === 'paused' ? t('Paused') : isBreak ? t('Break') : t('Focusing');
   const roundOf = !idle && (timer.rounds ?? 1) > 1 ? t('Round {round} of {rounds}', { round: timer.round ?? 1, rounds: timer.rounds }) : '';
-  const fmt = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ''}` : `${m} min`);
-  const plan = rounds > 1 ? t('{rounds} × {length} with {breakMinutes}-min breaks', { rounds, length: fmt(minutes), breakMinutes: settings.breakMinutes }) : minutes === 5 ? 'Just five minutes. You can keep going after.' : `${fmt(minutes)} of focus`;
+  const fmt = (m: number) => (m >= 60 ? formatDuration(m) : t('{m} min', { m }));
+  const plan = rounds > 1 ? t('{rounds} × {length} with {breakMinutes}-min breaks', { rounds, length: fmt(minutes), breakMinutes: settings.breakMinutes }) : minutes === 5 ? t('Just five minutes. You can keep going after.') : t('{length} of focus', { length: fmt(minutes) });
   const totalMin = rounds * minutes + (rounds - 1) * settings.breakMinutes;
 
   return (
@@ -172,7 +172,7 @@ export default function FocusScreen() {
               })}
             </View>
           )}
-          {target.kind === 'none' && <Field placeholder={options.length ? 'Or type something else (optional)' : t('Type it here (optional)')} value={custom} onChangeText={setCustom} returnKeyType="go" onSubmitEditing={start} />}
+          {target.kind === 'none' && <Field placeholder={options.length ? t('Or type something else (optional)') : t('Type it here (optional)')} value={custom} onChangeText={setCustom} returnKeyType="go" onSubmitEditing={start} />}
           {target.kind === 'habit' && (
             <Text variant="small" tone="muted">
               {t('Finishing the session ticks this habit for today.')}
@@ -248,7 +248,7 @@ export default function FocusScreen() {
               </Text>
               <View style={[styles.row, { flexWrap: 'nowrap', justifyContent: 'space-between' }]}>
                 {ROUNDS.map((n) => (
-                  <Chip key={n} label={n === 1 ? 'Once' : `${n}×`} selected={rounds === n} onPress={() => setRounds(n)} />
+                  <Chip key={n} label={n === 1 ? t('Once') : `${n}×`} selected={rounds === n} onPress={() => setRounds(n)} />
                 ))}
               </View>
             </View>
@@ -291,7 +291,7 @@ export default function FocusScreen() {
                     style={[styles.sound, { backgroundColor: on ? c.accentSoft : c.surfaceAlt, borderColor: on ? c.accent : 'transparent' }]}>
                     <Text style={{ fontSize: 16 }}>{x.icon}</Text>
                     <Text variant="small" color={on ? c.accent : c.textMuted} style={{ fontSize: 11, fontWeight: '600' }}>
-                      {x.label}
+                      {t(x.label)}
                     </Text>
                   </Press>
                 );

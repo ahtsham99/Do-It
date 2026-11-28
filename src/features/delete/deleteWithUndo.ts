@@ -6,10 +6,11 @@ import { deleteHabit, updateHabit } from '@/store/actions/habits';
 import { deleteTask, skipOccurrence, updateTask } from '@/store/actions/tasks';
 import { getState } from '@/store/store';
 import type { Countdown, Goal, Habit, Task } from '@/store/types';
+import { t } from '@/lib/i18n';
 
 // Every delete is a soft delete, so undo just clears deletedAt.
 const undoToast = (title: string, undo: () => void) =>
-  showToast(`Deleted “${title.length > 28 ? `${title.slice(0, 27)}…` : title}”`, 'trash-outline', { label: 'Undo', onPress: undo });
+  showToast(t('Deleted “{title}”', { title: title.length > 28 ? `${title.slice(0, 27)}…` : title }), 'trash-outline', { label: t('Undo'), onPress: undo });
 
 export function deleteGoalWithUndo(goal: Goal) {
   const habitIds = deleteGoal(goal.id);
@@ -34,11 +35,11 @@ export function deleteTaskWithUndo(task: Task, day: DayKey) {
     return;
   }
   showDialog({
-    title: 'Delete repeating plan',
+    title: t('Delete repeating plan'),
     message: `“${task.title}”`,
     actions: [
       {
-        label: `Only ${formatDay(day)}`,
+        label: t('Only {day}', { day: formatDay(day) }),
         onPress: () => {
           skipOccurrence(task, day);
           undoToast(task.title, () => {
@@ -48,7 +49,7 @@ export function deleteTaskWithUndo(task: Task, day: DayKey) {
         },
       },
       {
-        label: 'Every time',
+        label: t('Every time'),
         destructive: true,
         onPress: () => {
           deleteTask(task.id);

@@ -26,7 +26,7 @@ export function FocusNowCard({ compact }: { compact?: boolean }) {
       </TimerRing>
       <View style={{ flex: 1, gap: 2 }}>
         <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-          {timer.status === 'paused' ? 'Paused' : isBreak ? 'On a break' : 'Focusing'}
+          {timer.status === 'paused' ? t('Paused') : isBreak ? t('On a break') : t('Focusing')}
         </Text>
         <Text numberOfLines={1}>{timer.label || t('Focus session')}{(timer.rounds ?? 1) > 1 ? ` · ${timer.round ?? 1}/${timer.rounds}` : ''}</Text>
       </View>

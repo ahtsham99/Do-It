@@ -1,5 +1,6 @@
 import { isDueToday } from '@/features/habits/logic';
 import { pick, titleFor } from '@/features/nudges/messages';
+import { t, tn } from '@/lib/i18n';
 import { isDone, occurrencesOn, occursOn } from '@/features/tasks/logic';
 import { addDays, combine, diffDays, formatTime, fromKey, todayKey } from '@/lib/dates';
 import { currentStreak } from '@/store/actions/stats';
@@ -15,8 +16,10 @@ export interface PlannedNotification {
 
 /** "2 plans today, 2 overdue." */
 function summary(planned: number, overdue: number) {
-  const bits = [planned ? `${planned} plan${planned === 1 ? '' : 's'} today` : null, overdue ? `${overdue} overdue` : null].filter(Boolean);
-  return bits.length ? `${bits.join(', ')}.` : '';
+  if (planned && overdue) return t('{planned} today, {overdue} overdue.', { planned: tn(planned, '{n} plan', '{n} plans'), overdue });
+  if (planned) return tn(planned, '{n} plan today.', '{n} plans today.');
+  if (overdue) return t('{n} overdue.', { n: overdue });
+  return '';
 }
 
 const MAX = 60; // timer and snoozes are added first so they always fit // iOS keeps at most 64 pending local notifications.
@@ -83,7 +86,7 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
     out.push({
       id: 'timer',
       date: new Date(timer.endsAt),
-      title: timer.mode === 'focus' ? 'Focus session complete' : 'Break’s over',
+      title: timer.mode === 'focus' ? t('Focus session complete') : t('Break’s over'),
       body:
         timer.mode === 'focus'
           ? `${timer.label ? `${timer.label} · ` : ''}${pick('focusDone', settings.tone, timer.endsAt)}`
@@ -106,8 +109,8 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
       out.push({
         id: `goals-${day}`,
         date: at,
-        title: `This week: ${g.title}`,
-        body: next ? `Next small step: ${next}.` : pick('goalWeek', settings.tone, day),
+        title: t('This week: {goal}', { goal: g.title }),
+        body: next ? t('Next small step: {step}.', { step: next }) : pick('goalWeek', settings.tone, day),
         url: `/goal?id=${g.id}`,
       });
     }
@@ -115,7 +118,7 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
       if (!g.targetDate) continue;
       const at = combine(addDays(g.targetDate, -1), settings.dailyPromptTime);
       if (at > now && diffDays(today, g.targetDate) <= 14) {
-        out.push({ id: `goal-due-${g.id}`, date: at, title: `Tomorrow: ${g.title}`, body: pick('goalDue', settings.tone, g.id), url: `/goal?id=${g.id}` });
+        out.push({ id: `goal-due-${g.id}`, date: at, title: t('Tomorrow: {goal}', { goal: g.title }), body: pick('goalDue', settings.tone, g.id), url: `/goal?id=${g.id}` });
       }
     }
   }
@@ -157,8 +160,8 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
           ? task.reminder === 0
             ? pick('remindNow', settings.tone, task.id)
             : settings.tone === 'savage'
-              ? `At ${formatTime(task.time, settings.use24h)}. ${pick('remindSoon', settings.tone, task.id)}`
-              : `Coming up at ${formatTime(task.time, settings.use24h)}.`
+              ? `${t('At {time}.', { time: formatTime(task.time, settings.use24h) })} ${pick('remindSoon', settings.tone, task.id)}`
+              : t('Coming up at {time}.', { time: formatTime(task.time, settings.use24h) })
           : pick('remindToday', settings.tone, task.id),
         url: `/task?id=${task.id}&day=${day}`,
       });

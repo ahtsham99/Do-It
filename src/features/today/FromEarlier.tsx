@@ -48,7 +48,7 @@ function Leftover({ occ, last }: { occ: Occurrence; last: boolean }) {
           {task.title}
         </Text>
         <Text variant="small" tone="danger">
-          {formatDay(day)} · {daysOverdue(day)}d ago
+          {formatDay(day)} · {t('{n}d ago', { n: daysOverdue(day) })}
         </Text>
       </View>
       {task.repeat === 'none' && (

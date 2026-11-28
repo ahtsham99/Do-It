@@ -67,7 +67,7 @@ export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
               onPress={onPress}
               accessibilityRole="tab"
               accessibilityState={{ selected: focused }}
-              accessibilityLabel={meta.title}
+              accessibilityLabel={t(meta.title)}
               style={styles.item}>
               <View style={styles.iconPill} onLayout={i === visible[0]?.i ? (e) => setPillY(e.nativeEvent.layout.y) : undefined}>
                 <Icon name={meta.icon} size={22} color={focused ? active : c.textMuted} />
@@ -76,7 +76,7 @@ export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
                 numberOfLines={1}
                 color={focused ? active : c.textMuted}
                 style={{ fontSize: 10.5, fontWeight: focused ? '600' : '400' }}>
-                {meta.title}
+                {t(meta.title)}
               </Text>
             </Press>
           );

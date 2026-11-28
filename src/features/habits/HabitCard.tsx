@@ -20,7 +20,7 @@ export function tickHabit(habit: Habit, day: string, tone: Parameters<typeof ran
   tap(wasDone ? 'light' : 'success');
   if (stepHabit(habit, day) && day === todayKey()) {
     const s = habitStreak({ ...habit, history: [...habit.history, day] }, day, weekStartsOn);
-    showToast(s > 1 ? `${streakLabel(habit, s)} in a row. ${randomLine('done', tone)}` : randomLine('done', tone), 'flame');
+    showToast(s > 1 ? `${t('{length} in a row.', { length: streakLabel(habit, s) })} ${randomLine('done', tone)}` : randomLine('done', tone), 'flame');
   }
 }
 
@@ -76,7 +76,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
           </Text>
           <Text variant="small" tone="muted">
             {(habit.perDay ?? 1) > 1 ? t('{count}/{perDay} today · ', { count: countFor(habit, today), perDay: habit.perDay }) : ''}
-            {streak > 0 ? `${streakLabel(habit, streak)} streak` : t('No streak yet')} · best {best}
+            {streak > 0 ? t('{length} streak', { length: streakLabel(habit, streak) }) : t('No streak yet')} · {t('best {n}', { n: best })}
             {habit.frequency === 'weekly' ? ` · ${weekCount(habit, today, weekStartsOn)}/${habit.timesPerWeek} this week` : ''}
           </Text>
         </Press>

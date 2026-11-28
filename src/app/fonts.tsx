@@ -55,13 +55,13 @@ export default function FontsScreen() {
           <View style={styles.grid}>
             {FONT_STYLES.map((st) => {
               const d = displayFont(st.choice.display).face?.family;
-              const t = faceForWeight(textFont(st.choice.text), 400)?.family;
+              const tf = faceForWeight(textFont(st.choice.text), 400)?.family;
               const on = styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont })?.id === st.id;
               return (
                 <Option key={st.id} selected={on} onPress={() => updateSettings({ logoFont: st.choice.logo, displayFont: st.choice.display, textFont: st.choice.text })}>
-                  <Text style={[{ fontSize: 26, lineHeight: 32 }, own(d), !d && { fontWeight: '600' }]}>{st.label}</Text>
-                  <Text variant="small" tone="muted" style={own(t)}>
-                    {st.blurb}
+                  <Text style={[{ fontSize: 26, lineHeight: 32 }, own(d), !d && { fontWeight: '600' }]}>{t(st.label)}</Text>
+                  <Text variant="small" tone="muted" style={own(tf)}>
+                    {t(st.blurb)}
                   </Text>
                 </Option>
               );
@@ -84,7 +84,7 @@ export default function FontsScreen() {
               <Option key={f.id} selected={s.logoFont === f.id} onPress={() => updateSettings({ logoFont: f.id })}>
                 <Text style={[{ fontSize: 30, lineHeight: 38 }, own(f.face?.family), !f.face && { fontWeight: '600' }]}>{t('Do It')}</Text>
                 <Text variant="small" tone="muted">
-                  {f.label}
+                  {t(f.label)}
                 </Text>
               </Option>
             ))}
@@ -97,7 +97,7 @@ export default function FontsScreen() {
               <Option key={f.id} selected={s.displayFont === f.id} onPress={() => updateSettings({ displayFont: f.id })}>
                 <Text style={[{ fontSize: 26, lineHeight: 34 }, own(f.face?.family), !f.face && { fontWeight: '600' }]}>{t('Habits')}</Text>
                 <Text variant="small" tone="muted">
-                  {f.label} · {f.blurb}
+                  {t(f.label)} · {t(f.blurb)}
                 </Text>
               </Option>
             ))}
@@ -116,9 +116,9 @@ export default function FontsScreen() {
                   accessibilityState={{ selected: on }}
                   style={[styles.textRow, i < TEXT_FONTS.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.border }]}>
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={[{ fontSize: 17 }, own(faceForWeight(f, 400)?.family)]}>{f.label}</Text>
+                    <Text style={[{ fontSize: 17 }, own(faceForWeight(f, 400)?.family)]}>{t(f.label)}</Text>
                     <Text variant="small" tone="muted" style={own(faceForWeight(f, 400)?.family)}>
-                      {f.blurb}
+                      {t(f.blurb)}
                     </Text>
                   </View>
                   {on && <Icon name="checkmark-circle" size={22} color={c.accent} />}

@@ -1,5 +1,6 @@
 import { addDays, diffDays, startOfWeek, toKey, todayKey, type DayKey } from '@/lib/dates';
 import type { Habit } from '@/store/types';
+import { tn } from '@/lib/i18n';
 
 export const HABIT_ICONS = [
   '💧', '📖', '📚', '🏃', '🏋️', '🚴', '🧘', '😴',
@@ -42,8 +43,7 @@ export function habitStreak(habit: Habit, today: DayKey = todayKey(), weekStarts
 }
 
 export function streakLabel(habit: Habit, streak: number) {
-  const unit = habit.frequency === 'daily' ? 'day' : 'week';
-  return `${streak} ${unit}${streak === 1 ? '' : 's'}`;
+  return habit.frequency === 'daily' ? tn(streak, '{n} day', '{n} days') : tn(streak, '{n} week', '{n} weeks');
 }
 
 /** Is the habit still "due" today (for nudges)? */

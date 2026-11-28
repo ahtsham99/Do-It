@@ -109,7 +109,7 @@ export function ReminderForm({
           <Label>{t('List')}</Label>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {lists.map((l) => (
-              <Chip key={l.id} label={`${l.icon}  ${l.name}`} selected={listId === l.id} onPress={() => setListId(l.id)} />
+              <Chip key={l.id} label={`${l.icon}  ${t(l.name)}`} selected={listId === l.id} onPress={() => setListId(l.id)} />
             ))}
           </View>
         </View>
@@ -119,12 +119,12 @@ export function ReminderForm({
         <View>
           <Text>{t('Remind me')}</Text>
           <Text variant="small" tone="muted">
-            {Platform.OS === 'web' ? 'Shows on your main page when it’s time' : 'A notification at this time'}
+            {Platform.OS === 'web' ? t('Shows on your main page when it’s time') : t('A notification at this time')}
           </Text>
         </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
           <Chip label={t('No alert')} selected={!remind} onPress={() => (setRemind(false), setTouched(true))} />
-          <Chip label={later.date === todayKey() ? 'Later today' : use24h ? 'Tomorrow 09:00' : t('Tomorrow 9am')} selected={remind && date === later.date && time === later.time} onPress={() => pickTime(later.date, later.time)} />
+          <Chip label={later.date === todayKey() ? t('Later today') : use24h ? t('Tomorrow 09:00') : t('Tomorrow 9am')} selected={remind && date === later.date && time === later.time} onPress={() => pickTime(later.date, later.time)} />
           {later.date === todayKey() && (
             <Chip label={use24h ? t('Tomorrow 09:00') : t('Tomorrow 9am')} selected={remind && date === addDays(todayKey(), 1) && time === '09:00'} onPress={() => pickTime(addDays(todayKey(), 1), '09:00')} />
           )}

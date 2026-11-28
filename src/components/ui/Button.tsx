@@ -5,6 +5,7 @@ import { cardShadow, radius, space, useTheme } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Press } from './Pressable';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 type Kind = 'primary' | 'secondary' | 'ghost' | 'danger';
 
@@ -48,7 +49,7 @@ export function Button({
         <View style={styles.row}>
           {icon && <Icon name={icon} size={small ? 16 : 19} color={fg} />}
           <Text variant={small ? 'small' : 'bodyStrong'} color={fg} style={{ fontWeight: '500' }}>
-            {label}
+            {t(label)}
           </Text>
         </View>
       )}
@@ -78,7 +79,7 @@ export function IconButton({
   return (
     <Press
       onPress={onPress}
-      accessibilityLabel={label}
+      accessibilityLabel={t(label)}
       accessibilityRole="button"
       hitSlop={8}
       style={[

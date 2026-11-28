@@ -27,12 +27,12 @@ export function SheetHeader({
   return (
     <View style={[styles.wrap, { borderBottomColor: c.border }]}>
       <Press onPress={() => (sheetClose ? sheetClose() : router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={10} style={styles.side}>
-        <Text tone="muted">{cancelLabel}</Text>
+        <Text tone="muted">{t(cancelLabel)}</Text>
       </Press>
-      <Text variant="bodyStrong">{title}</Text>
+      <Text variant="bodyStrong">{t(title)}</Text>
       <Press onPress={onSave} disabled={!canSave || !onSave} hitSlop={10} style={[styles.side, { alignItems: 'flex-end' }]}>
         <Text tone="accent" style={{ fontWeight: '600', opacity: canSave ? 1 : 0.35 }}>
-          {onSave ? saveLabel : ''}
+          {onSave ? t(saveLabel) : ''}
         </Text>
       </Press>
     </View>

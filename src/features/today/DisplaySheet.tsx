@@ -7,7 +7,7 @@ import type { PlanDisplay } from '@/store/types';
 import { radius, space, useTheme } from '@/theme';
 
 import { setDisplay, useDisplay } from './display';
-import { t } from '@/lib/i18n';
+import { t, tk } from '@/lib/i18n';
 
 /** Layout and what shows on Today. Changes apply straight away. */
 export function DisplaySheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
@@ -106,14 +106,14 @@ function Row({ icon, label, value, onChange }: { icon: IconName; label: string; 
   );
 }
 
-const LABELS: Record<PlanDisplay['layout'], string> = { day: t('Day'), week: t('Week'), month: t('Month') };
+const LABELS: Record<PlanDisplay['layout'], string> = { day: tk('Day'), week: tk('Week'), month: tk('Month') };
 
 /** A little phone drawing of each layout. */
 function LayoutOption({ kind, on, onPress }: { kind: PlanDisplay['layout']; on: boolean; onPress: () => void }) {
   const { c } = useTheme();
   const ink = on ? c.accent : c.textFaint;
   return (
-    <Press onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected: on }} accessibilityLabel={`${LABELS[kind]} layout`} style={styles.layout}>
+    <Press onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected: on }} accessibilityLabel={t('{name} layout', { name: t(LABELS[kind]) })} style={styles.layout}>
       <View style={[styles.phone, { borderColor: ink, backgroundColor: on ? c.accentSoft : 'transparent' }]}>
         {kind === 'day' &&
           [0, 1, 2, 3, 4].map((i) => (
@@ -139,7 +139,7 @@ function LayoutOption({ kind, on, onPress }: { kind: PlanDisplay['layout']; on: 
       </View>
       <View style={[styles.layoutLabel, on && { backgroundColor: c.accent }]}>
         <Text variant="small" color={on ? c.accentText : c.text} style={{ fontWeight: '600' }}>
-          {LABELS[kind]}
+          {t(LABELS[kind])}
         </Text>
       </View>
     </Press>

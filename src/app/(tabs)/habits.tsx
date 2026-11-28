@@ -53,9 +53,9 @@ export default function HabitsScreen() {
 
   return (
     <Screen
-      title={view === 'habits' ? 'Habits' : 'Goals'}
+      title={view === 'habits' ? t('Habits') : t('Goals')}
       subtitle={subtitle}
-      right={<IconButton icon="add" label={view === 'habits' ? 'Add habit' : 'Add goal'} onPress={() => router.push(view === 'habits' ? '/habit' : '/goal')} />}>
+      right={<IconButton icon="add" label={view === 'habits' ? t('Add habit') : t('Add goal')} onPress={() => router.push(view === 'habits' ? '/habit' : '/goal')} />}>
       <Segmented<View_>
         tone="accent"
         value={view}
@@ -99,8 +99,8 @@ export default function HabitsScreen() {
           />
           <Section title={t('Ideas to start from')}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-              {GOAL_TEMPLATES.map((t, i) => (
-                <Chip key={t.title} label={`${t.icon}  ${t.title}`} onPress={() => router.push({ pathname: '/goal', params: { template: String(i) } })} />
+              {GOAL_TEMPLATES.map((tpl, i) => (
+                <Chip key={tpl.title} label={`${tpl.icon}  ${t(tpl.title)}`} onPress={() => router.push({ pathname: '/goal', params: { template: String(i) } })} />
               ))}
             </View>
           </Section>

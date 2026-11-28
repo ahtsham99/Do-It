@@ -40,7 +40,7 @@ export function Banner({
         <Icon name={icon} size={22} color={map.fg} />
       </View>
       <View style={{ flex: 1, gap: 3 }}>
-        <Text variant="heading">{title}</Text>
+        <Text variant="heading">{t(title)}</Text>
         {body && (
           <Text variant="small" tone="muted" style={{ lineHeight: 20 }}>
             {body}

@@ -6,6 +6,7 @@ import { space, useTheme } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Press } from './Pressable';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 /** Settings-style row inside a Card. */
 export function ListRow({
@@ -30,10 +31,10 @@ export function ListRow({
     <View style={[styles.row, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.border }]}>
       {icon && <Icon name={icon} size={20} color={danger ? c.danger : c.textMuted} />}
       <View style={{ flex: 1 }}>
-        <Text tone={danger ? 'danger' : 'default'}>{label}</Text>
+        <Text tone={danger ? 'danger' : 'default'}>{t(label)}</Text>
         {detail && (
           <Text variant="small" tone="muted">
-            {detail}
+            {typeof detail === 'string' ? t(detail) : detail}
           </Text>
         )}
       </View>

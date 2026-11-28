@@ -7,6 +7,7 @@ import { radius, space, useTheme } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Press } from './Pressable';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 interface ToastAction {
   label: string;
@@ -37,7 +38,7 @@ function hide() {
 }
 
 export function ToastHost() {
-  const t = useSyncExternalStore(
+  const toast = useSyncExternalStore(
     (f) => (subs.add(f), () => subs.delete(f)),
     () => current,
     () => current,
@@ -47,13 +48,13 @@ export function ToastHost() {
   const [anim] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
-    Animated.spring(anim, { toValue: t ? 1 : 0, useNativeDriver: true, friction: 8 }).start();
-  }, [t, anim]);
+    Animated.spring(anim, { toValue: toast ? 1 : 0, useNativeDriver: true, friction: 8 }).start();
+  }, [toast, anim]);
 
   return (
     <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, { alignItems: 'center' }]}>
       <Animated.View
-        pointerEvents={t?.action ? 'auto' : 'none'}
+        pointerEvents={toast?.action ? 'auto' : 'none'}
         style={[
           styles.toast,
           {
@@ -63,14 +64,14 @@ export function ToastHost() {
             transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-30, 0] }) }],
           },
         ]}>
-        {t?.icon && <Icon name={t.icon} size={20} color={c.flame} />}
+        {toast?.icon && <Icon name={toast.icon} size={20} color={c.flame} />}
         <Text variant="bodyStrong" color={c.inkText} style={{ flexShrink: 1 }}>
-          {t?.text ?? ''}
+          {toast ? t(toast.text) : ''}
         </Text>
-        {t?.action && (
+        {toast?.action && (
           <Press
             onPress={() => {
-              const a = t.action!;
+              const a = toast.action!;
               hide();
               a.onPress();
             }}
@@ -78,7 +79,7 @@ export function ToastHost() {
             accessibilityRole="button"
             style={{ marginLeft: space.sm, paddingHorizontal: space.md, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: 'rgba(127,127,127,0.25)' }}>
             <Text variant="bodyStrong" color={c.inkText}>
-              {t.action.label}
+              {t(toast.action.label)}
             </Text>
           </Press>
         )}

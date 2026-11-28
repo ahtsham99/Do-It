@@ -1,4 +1,5 @@
 import type { Tone } from '@/store/types';
+import { t, tn } from '@/lib/i18n';
 
 /**
  * Copy for nudges. Each situation has lines per tone; `pick` chooses one
@@ -149,12 +150,12 @@ function hash(s: string) {
 
 export function pick(situation: Situation, tone: Tone, seed: string | number = new Date().toDateString()) {
   const list = MESSAGES[situation][tone];
-  return list[hash(`${situation}:${seed}`) % list.length];
+  return t(list[hash(`${situation}:${seed}`) % list.length]);
 }
 
 export function randomLine(situation: Situation, tone: Tone) {
   const list = MESSAGES[situation][tone];
-  return list[Math.floor(Math.random() * list.length)];
+  return t(list[Math.floor(Math.random() * list.length)]);
 }
 
 /**
@@ -162,22 +163,21 @@ export function randomLine(situation: Situation, tone: Tone) {
  */
 export function titleFor(kind: 'plan' | 'evening' | 'review' | 'streak', tone: Tone, o: { n?: number; name?: string; streak?: number } = {}) {
   const name = o.name?.trim();
-  const plural = (k: number, w: string) => `${k} ${w}${k === 1 ? '' : 's'}`;
   switch (kind) {
     case 'plan':
-      return tone === 'savage' ? (name ? `${name}, plan your day!` : 'Plan your day!') : name ? `Good morning, ${name}` : 'Good morning';
+      return tone === 'savage' ? (name ? t('{name}, plan your day!', { name }) : t('Plan your day!')) : name ? t('Good morning, {name}', { name }) : t('Good morning');
     case 'evening':
-      return tone === 'savage' ? `${plural(o.n ?? 0, 'thing')} still not done!` : `${plural(o.n ?? 0, 'thing')} left today`;
+      return tone === 'savage' ? tn(o.n ?? 0, '{n} thing still not done!', '{n} things still not done!') : tn(o.n ?? 0, '{n} thing left today', '{n} things left today');
     case 'review':
-      return tone === 'savage' ? 'Plan tomorrow now!' : name ? `How did today go, ${name}?` : 'How did today go?';
+      return tone === 'savage' ? t('Plan tomorrow now!') : name ? t('How did today go, {name}?', { name }) : t('How did today go?');
     case 'streak':
-      return tone === 'savage' ? `🔥 ${o.streak}-day streak at risk!` : `🔥 Keep your ${o.streak}-day streak`;
+      return tone === 'savage' ? t('🔥 {n}-day streak at risk!', { n: o.streak }) : t('🔥 Keep your {n}-day streak', { n: o.streak });
   }
 }
 
 export function greeting(hour = new Date().getHours()) {
-  if (hour < 5) return 'Up late';
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 5) return t('Up late');
+  if (hour < 12) return t('Good morning');
+  if (hour < 18) return t('Good afternoon');
+  return t('Good evening');
 }

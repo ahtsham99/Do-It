@@ -16,7 +16,7 @@ import { t } from '@/lib/i18n';
 
 function celebrate(title: string) {
   showDialog({
-    title: 'Goal achieved 🎉',
+    title: t('Goal achieved 🎉'),
     message: t('“{title}” is done. You started, you kept going, and you finished.', { title }),
     actions: [{ label: t('Lovely'), onPress: () => {} }],
   });
@@ -37,16 +37,16 @@ export default function GoalScreen() {
     existing
       ? { ...existing }
       : {
-          title: template?.title ?? '',
-          why: template?.why ?? '',
+          title: template ? t(template.title) : '',
+          why: template?.why ? t(template.why) : '',
           icon: template?.icon ?? '🎯',
           color: SWATCHES[0],
           kind: template?.kind ?? 'steps',
           targetDate: null,
-          steps: (template?.steps ?? []).map(newStep),
+          steps: (template?.steps ?? []).map((x) => newStep(t(x))),
           target: template?.target ?? 10,
           current: 0,
-          unit: template?.unit ?? '',
+          unit: template?.unit ? t(template.unit) : '',
         },
   );
   const [stepText, setStepText] = useState('');
@@ -115,11 +115,11 @@ export default function GoalScreen() {
           <View style={{ gap: space.sm }}>
             <Label>{t('Or start from an idea')}</Label>
             <View style={styles.wrap}>
-              {GOAL_TEMPLATES.map((t) => (
+              {GOAL_TEMPLATES.map((tpl) => (
                 <Chip
-                  key={t.title}
-                  label={`${t.icon}  ${t.title}`}
-                  onPress={() => setDraft((d) => ({ ...d, title: t.title, icon: t.icon, kind: t.kind, steps: (t.steps ?? []).map(newStep), target: t.target ?? d.target, unit: t.unit ?? '' }))}
+                  key={tpl.title}
+                  label={`${tpl.icon}  ${t(tpl.title)}`}
+                  onPress={() => setDraft((d) => ({ ...d, title: t(tpl.title), icon: tpl.icon, kind: tpl.kind, steps: (tpl.steps ?? []).map((x) => newStep(t(x))), target: tpl.target ?? d.target, unit: tpl.unit ? t(tpl.unit) : '' }))}
                 />
               ))}
             </View>

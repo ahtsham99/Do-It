@@ -31,17 +31,15 @@ import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
 
 import { dismissed } from './dismissed';
-import { t } from '@/lib/i18n';
-
-const WEEKDAYS = ['Sunday', t('Monday'), t('Tuesday'), t('Wednesday'), t('Thursday'), t('Friday'), t('Saturday')];
+import { t, locale } from '@/lib/i18n';
 
 /** Big day title: Today / Tomorrow / Yesterday, or the weekday. */
 function dayTitle(day: DayKey, today: DayKey) {
   const d = diffDays(today, day);
-  if (d === 0) return 'Today';
-  if (d === 1) return 'Tomorrow';
-  if (d === -1) return 'Yesterday';
-  return WEEKDAYS[fromKey(day).getDay()];
+  if (d === 0) return t('Today');
+  if (d === 1) return t('Tomorrow');
+  if (d === -1) return t('Yesterday');
+  return new Intl.DateTimeFormat(locale(), { weekday: 'long' }).format(fromKey(day));
 }
 
 /**
@@ -125,7 +123,7 @@ export function PlannerView() {
   const weekLabel = (() => {
     const thisWeek = startOfWeek(n.today, weekStartsOn);
     const d = diffDays(thisWeek, weekStart);
-    return d === 0 ? 'This week' : d === 7 ? 'Next week' : d === -7 ? 'Last week' : `Week of ${formatDay(weekStart, { relative: false })}`;
+    return d === 0 ? t('This week') : d === 7 ? t('Next week') : d === -7 ? t('Last week') : `Week of ${formatDay(weekStart, { relative: false })}`;
   })();
 
   // Shrink the big title so long words (Tomorrow, November, Wednesday) always fit.
@@ -137,7 +135,7 @@ export function PlannerView() {
       {/* Day title + calendar controls */}
       <View style={{ gap: 2 }}>
         <View style={styles.titleRow}>
-          <Press haptic={false} disabled={layout === 'month'} onPress={() => setMonthOpen(!monthOpen)} onLayout={(e) => setTitleW(e.nativeEvent.layout.width)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : t('Show month')} style={styles.titleBtn}>
+          <Press haptic={false} disabled={layout === 'month'} onPress={() => setMonthOpen(!monthOpen)} onLayout={(e) => setTitleW(e.nativeEvent.layout.width)} accessibilityRole="button" accessibilityLabel={monthOpen ? t('Hide month') : t('Show month')} style={styles.titleBtn}>
             <Text style={{ fontFamily: SERIF, fontSize: titleSize, lineHeight: titleSize + 4, letterSpacing: -0.8, flexShrink: 1 }} numberOfLines={1}>
               {titleText}
             </Text>
@@ -150,8 +148,8 @@ export function PlannerView() {
               </Text>
             </Press>
           )}
-          <IconButton icon="chevron-back" label={showMonth ? 'Previous month' : 'Previous week'} size={16} diameter={34} onPress={() => step(-1)} />
-          <IconButton icon="chevron-forward" label={showMonth ? 'Next month' : 'Next week'} size={16} diameter={34} onPress={() => step(1)} />
+          <IconButton icon="chevron-back" label={showMonth ? t('Previous month') : t('Previous week')} size={16} diameter={34} onPress={() => step(-1)} />
+          <IconButton icon="chevron-forward" label={showMonth ? t('Next month') : t('Next week')} size={16} diameter={34} onPress={() => step(1)} />
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
           <Text variant="small" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
@@ -164,7 +162,7 @@ export function PlannerView() {
           <Press onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={`Display: ${layout} layout`} style={[styles.displayBtn, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
             <Icon name="options-outline" size={14} color={c.text} />
             <Text variant="small" style={{ fontWeight: '600', fontSize: 12 }}>
-              {layout === 'day' ? 'Day' : layout === 'week' ? 'Week' : 'Month'}
+              {layout === 'day' ? t('Day') : layout === 'week' ? t('Week') : t('Month')}
             </Text>
           </Press>
         </View>

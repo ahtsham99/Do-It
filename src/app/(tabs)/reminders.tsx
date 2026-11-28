@@ -93,7 +93,7 @@ export default function RemindersScreen() {
               style={[styles.list, { backgroundColor: on ? c.accent : c.surface, borderColor: on ? c.accent : c.border }]}>
               {l.icon ? <Text style={{ fontSize: 14 }}>{l.icon}</Text> : null}
               <Text variant="small" color={on ? c.accentText : c.text} style={{ fontWeight: '600' }}>
-                {l.name}
+                {t(l.name)}
               </Text>
               {n > 0 && (
                 <Text variant="small" color={on ? c.accentText : c.textMuted} style={{ opacity: 0.75 }}>
@@ -127,7 +127,7 @@ export default function RemindersScreen() {
       </ScrollView>
 
       {/* Tap to open the add sheet: type and set everything in one go. */}
-      <Press onPress={() => setSheet({ open: true })} accessibilityRole="button" accessibilityLabel={isShopping ? 'Add an item' : t('Add a reminder')} style={[styles.addField, { backgroundColor: c.surface, borderColor: c.border }]}>
+      <Press onPress={() => setSheet({ open: true })} accessibilityRole="button" accessibilityLabel={isShopping ? t('Add an item') : t('Add a reminder')} style={[styles.addField, { backgroundColor: c.surface, borderColor: c.border }]}>
         <Icon name="add" size={22} color={c.textFaint} />
         <Text tone="faint" style={{ fontSize: 16 }}>
           {isShopping ? t('Add an item') : t('Add a reminder')}

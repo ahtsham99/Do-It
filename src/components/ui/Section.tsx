@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { space } from '@/theme';
 
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 export function Section({ title, right, children }: { title?: string; right?: ReactNode; children: ReactNode }) {
   return (
@@ -12,7 +13,7 @@ export function Section({ title, right, children }: { title?: string; right?: Re
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 20 }}>
           {title ? (
             <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-              {title}
+              {t(title)}
             </Text>
           ) : (
             <View />

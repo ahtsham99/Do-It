@@ -5,6 +5,7 @@ import { cardShadow, radius, useTheme } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Press } from './Pressable';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 export function Segmented<T extends string>({
   options,
@@ -40,7 +41,7 @@ export function Segmented<T extends string>({
             style={[styles.item, active && { backgroundColor: activeBg }, active && tone === 'surface' && cardShadow(c)]}>
             {o.icon && <Icon name={o.icon} size={16} color={fg} />}
             <Text variant="small" color={fg} style={{ fontWeight: '500' }} numberOfLines={1}>
-              {o.label}
+              {t(o.label)}
             </Text>
             {o.badge != null && (
               <Text variant="small" color={fg} style={{ opacity: 0.6 }}>

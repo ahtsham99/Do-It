@@ -74,7 +74,7 @@ export default function HistoryScreen() {
 
         <Card style={{ gap: space.md }}>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-            All habits · {HISTORY_RANGES.find((x) => x.id === r)!.title.toLowerCase()}
+            {t('All habits')} · {t(HISTORY_RANGES.find((x) => x.id === r)!.title).toLowerCase()}
           </Text>
           <View style={{ flexDirection: 'row' }}>
             <Big value={`${all.pct}%`} label={t('Kept')} />
@@ -103,7 +103,7 @@ export default function HistoryScreen() {
                           {h.name}
                         </Text>
                         <Text variant="small" tone="muted">
-                          {s.done} of {s.expected} · {streak > 0 ? `${streakLabel(h, streak)} streak` : t('no streak now')}
+                          {s.done} of {s.expected} · {streak > 0 ? t('{length} streak', { length: streakLabel(h, streak) }) : t('no streak now')}
                         </Text>
                       </View>
                       <Text style={{ fontFamily: SERIF, fontSize: 30, lineHeight: 34 }} color={color}>

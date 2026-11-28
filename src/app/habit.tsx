@@ -82,7 +82,7 @@ export default function HabitEditor() {
               <View style={{ flex: 1 }}>
                 <Text>{t('Times a day')}</Text>
                 <Text variant="small" tone="muted">
-                  {perDay === 1 ? 'Once is enough' : `Tap the ring ${perDay} times, e.g. glasses of water`}
+                  {perDay === 1 ? t('Once is enough') : t('Tap the ring {n} times, e.g. glasses of water', { n: perDay })}
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>

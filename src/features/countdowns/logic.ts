@@ -1,5 +1,6 @@
 import { diffDays, todayKey } from '@/lib/dates';
 import type { Countdown } from '@/store/types';
+import { t, tn } from '@/lib/i18n';
 
 export const DEFAULT_CATEGORIES = ['Exams', 'Appointments', 'Holidays', 'Birthdays', 'Deadlines', 'Events'];
 
@@ -25,11 +26,9 @@ export function daysUntil(c: Countdown, today = todayKey()) {
 }
 
 export function countdownLabel(days: number) {
-  if (days === 0) return { big: 'Today', small: '' };
-  if (days === 1) return { big: '1', small: 'day left' };
-  if (days > 0) return { big: String(days), small: 'days left' };
-  if (days === -1) return { big: '1', small: 'day ago' };
-  return { big: String(-days), small: 'days ago' };
+  if (days === 0) return { big: t('Today'), small: '' };
+  if (days > 0) return { big: String(days), small: tn(days, 'day left', 'days left') };
+  return { big: String(-days), small: tn(-days, 'day ago', 'days ago') };
 }
 
 export interface CountdownGroup {

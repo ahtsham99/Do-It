@@ -112,10 +112,10 @@ export default function Onboarding() {
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text variant="bodyStrong" color={sel ? c.accentText : c.text}>
-                      {p.label}
+                      {t(p.label)}
                     </Text>
                     <Text variant="small" color={sel ? c.accentText : c.textMuted} style={{ opacity: sel ? 0.75 : 1 }}>
-                      {p.blurb}
+                      {t(p.blurb)}
                     </Text>
                   </View>
                   {sel && <Icon name="checkmark-circle" size={22} color={c.accentText} />}
@@ -143,7 +143,7 @@ export default function Onboarding() {
           {persona && (
             <>
               <Text variant="caption" tone="muted" style={styles.group}>
-                {`Starter kit · ${PERSONAS.find((p) => p.value === persona)?.label ?? ''}`}
+                {t('Starter kit · {role}', { role: t(PERSONAS.find((p) => p.value === persona)?.label ?? '') })}
               </Text>
               <SuggestionPicker items={SUGGESTIONS[persona]} selected={selected} onToggle={toggle} />
             </>

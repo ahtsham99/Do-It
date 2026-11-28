@@ -33,9 +33,9 @@ export default function PrivacyPolicyScreen() {
         </View>
         {SECTIONS.map((s) => (
           <Card key={s.title} style={{ gap: 6 }}>
-            <Text style={{ fontFamily: SERIF, fontSize: 22, lineHeight: 28 }}>{s.title}</Text>
+            <Text style={{ fontFamily: SERIF, fontSize: 22, lineHeight: 28 }}>{t(s.title)}</Text>
             <Text tone="muted" style={{ lineHeight: 23 }}>
-              {s.body}
+              {t(s.body)}
             </Text>
           </Card>
         ))}

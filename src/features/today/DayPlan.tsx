@@ -63,9 +63,9 @@ export function DayPlan({ day, items: all, compact }: { day: DayKey; items: Occu
     return (
       <Card style={{ alignItems: 'center', paddingVertical: space.xl, gap: 4 }}>
         <Icon name="calendar-clear-outline" size={22} color={c.textFaint} />
-        <Text style={{ fontWeight: '500', marginTop: 4 }}>{day === today ? 'Nothing planned yet' : 'A free day'}</Text>
+        <Text style={{ fontWeight: '500', marginTop: 4 }}>{day === today ? t('Nothing planned yet') : t('A free day')}</Text>
         <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
-          {day === today ? 'Add the first thing below. Try “Gym at 7am”.' : t('Tap below to plan it, or type “Gym at 7am”.')}
+          {day === today ? t('Add the first thing below. Try “Gym at 7am”.') : t('Tap below to plan it, or type “Gym at 7am”.')}
         </Text>
         {/* Today already has the add field right underneath; other days get a clear button. */}
         {day !== today && (
@@ -78,7 +78,7 @@ export function DayPlan({ day, items: all, compact }: { day: DayKey; items: Occu
   return (
     <Card padded={false} style={{ paddingVertical: space.sm, paddingHorizontal: space.md, overflow: 'hidden' }}>
       {anytime.map((o, i) => (
-        <Row key={`${o.task.id}:${o.day}`} occ={o} label={i === 0 ? 'Anytime' : ''} last={i === anytime.length - 1 && timed.length === 0} />
+        <Row key={`${o.task.id}:${o.day}`} occ={o} label={i === 0 ? t('Anytime') : ''} last={i === anytime.length - 1 && timed.length === 0} />
       ))}
       {timed.map((o, i) => {
         // Free time between the end of the previous plan and this one.

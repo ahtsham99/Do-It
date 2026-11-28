@@ -10,7 +10,7 @@ import { getState, useStore } from '@/store/store';
 
 import { chime } from './chime';
 import { playSound, stopSound, type SoundId } from './sounds';
-import { t } from '@/lib/i18n';
+import { t, tn } from '@/lib/i18n';
 
 /**
  * Finishes the timer when its end time passes, including when the app was in
@@ -59,7 +59,9 @@ export function TimerWatcher() {
       const all = rounds > 1 ? rounds * roundMinutes : minutes;
       showDialog({
         title: rounds > 1 ? t('All {rounds} rounds done', { rounds }) : t('Session complete'),
-        message: `${all} focused minute${all === 1 ? '' : 's'}${done.label ? ` on ${done.label}` : ''}. That’s real progress.`,
+        message: done.label
+          ? tn(all, '{n} focused minute on {label}. That’s real progress.', '{n} focused minutes on {label}. That’s real progress.', { label: done.label })
+          : tn(all, '{n} focused minute. That’s real progress.', '{n} focused minutes. That’s real progress.'),
         actions: [
           ...(task
             ? [{ label: t('Mark task as done'), onPress: () => completeTask(task, task.repeat === 'none' ? task.date : todayKey()) }]

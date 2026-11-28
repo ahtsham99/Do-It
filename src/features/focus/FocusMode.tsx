@@ -120,7 +120,7 @@ function FocusModeView() {
           {controls ? (
             <>
               <Round icon="add" label={t('+5 min')} onPress={() => (poke(), addMinutes(5))} />
-              <Round icon={paused ? 'play' : 'pause'} label={paused ? 'Resume' : 'Pause'} onPress={pause} big color={ringColor} />
+              <Round icon={paused ? 'play' : 'pause'} label={paused ? t('Resume') : t('Pause')} onPress={pause} big color={ringColor} />
               <Round icon="stop" label={t('End')} onPress={end} />
             </>
           ) : null}

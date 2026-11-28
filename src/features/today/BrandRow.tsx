@@ -37,7 +37,7 @@ export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: 
               style={[styles.option, on && { backgroundColor: c.accent }]}>
               <Icon name={META[m].icon} size={14} color={on ? c.accentText : c.textMuted} />
               <Text variant="small" color={on ? c.accentText : c.textMuted} style={{ fontWeight: '600', fontSize: 13 }}>
-                {META[m].label}
+                {t(META[m].label)}
               </Text>
             </Press>
           );

@@ -57,7 +57,7 @@ export function ReminderSheet({ visible, onClose, defaultListId, existing }: { v
                       <Press onPress={onClose} hitSlop={10} style={{ minWidth: 64 }}>
                         <Text tone="muted">{t('Cancel')}</Text>
                       </Press>
-                      <Text variant="bodyStrong">{existing ? 'Reminder' : 'New reminder'}</Text>
+                      <Text variant="bodyStrong">{existing ? t('Reminder') : t('New reminder')}</Text>
                       <Press onPress={save} disabled={!canSave} hitSlop={10} style={{ minWidth: 64, alignItems: 'flex-end' }}>
                         <Text tone="accent" style={{ fontWeight: '600', opacity: canSave ? 1 : 0.35 }}>
                           {existing ? t('Save') : t('Add')}

@@ -73,10 +73,10 @@ function Row({ s, on, onToggle, last }: { s: Suggestion; on: boolean; onToggle: 
         </View>
       )}
       <View style={{ flex: 1 }}>
-        <Text style={{ fontWeight: '500' }}>{s.kind === 'habit' ? s.name : s.title}</Text>
+        <Text style={{ fontWeight: '500' }}>{t(s.kind === 'habit' ? s.name : s.title)}</Text>
         <Text variant="small" tone="muted" numberOfLines={1}>
           {s.kind === 'goal'
-            ? `First steps: ${s.steps.join(' · ')}`
+            ? t('First steps: {steps}', { steps: s.steps.map((x) => t(x)).join(' · ') })
             : s.kind === 'habit'
               ? s.frequency === 'daily'
                 ? t('Every day')

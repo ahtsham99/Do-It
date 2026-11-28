@@ -58,7 +58,7 @@ export default function ProfileScreen() {
   }, [activeDays, tasks]);
 
   const persona = PERSONAS.find((p) => p.value === s.persona);
-  const focus = totals.focusMin >= 60 ? `${Math.floor(totals.focusMin / 60)}h` : `${totals.focusMin}m`;
+  const focus = totals.focusMin >= 60 ? t('{h}h', { h: Math.floor(totals.focusMin / 60) }) : t('{m}m', { m: totals.focusMin });
 
   const choosePhoto = async () => {
     try {
@@ -149,12 +149,12 @@ export default function ProfileScreen() {
             style={[styles.name, { color: c.text, fontFamily: fonts.display }, { outlineStyle: 'none' } as object]}
           />
           <Text tone="muted" style={{ textAlign: 'center' }}>
-            {[s.persona === 'other' && s.personaLabel.trim() ? s.personaLabel.trim() : persona && persona.value !== 'other' ? persona.label : null, since ? `with Do It since ${since}` : null].filter(Boolean).join(' · ') || t('Tap your name to change it')}
+            {[s.persona === 'other' && s.personaLabel.trim() ? s.personaLabel.trim() : persona && persona.value !== 'other' ? t(persona.label) : null, since ? t('with Do It since {date}', { date: since }) : null].filter(Boolean).join(' · ') || t('Tap your name to change it')}
           </Text>
           {n.bestStreak > 0 && (
             <View style={[styles.pill, { backgroundColor: c.accentSoft }]}>
               <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
-                🔥 {n.streak}-day streak{n.bestStreak > n.streak ? t(' · best {bestStreak}', { bestStreak: n.bestStreak }) : ''}
+                🔥 {t('{n}-day streak', { n: n.streak })}{n.bestStreak > n.streak ? ` · ${t('best {n}', { n: n.bestStreak })}` : ''}
               </Text>
             </View>
           )}
@@ -197,7 +197,7 @@ export default function ProfileScreen() {
           <Card padded={false}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badges}>
               {badges.map((b) => (
-                <View key={b.id} style={styles.badge} accessibilityLabel={`${b.label}${b.done ? t(', earned') : t(', not yet')}`}>
+                <View key={b.id} style={styles.badge} accessibilityLabel={`${t(b.label)}${b.done ? t(', earned') : t(', not yet')}`}>
                   <View style={[styles.badgeIcon, { backgroundColor: b.done ? b.tint : c.surfaceAlt, opacity: b.done ? 1 : 0.55 }]}>
                     <Text style={{ fontSize: 26, opacity: b.done ? 1 : 0.35 }}>{b.icon}</Text>
                   </View>
@@ -207,7 +207,7 @@ export default function ProfileScreen() {
                     </View>
                   )}
                   <Text variant="small" tone={b.done ? 'default' : 'muted'} numberOfLines={2} style={{ fontSize: 11, textAlign: 'center' }}>
-                    {b.label}
+                    {t(b.label)}
                   </Text>
                 </View>
               ))}

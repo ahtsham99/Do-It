@@ -13,7 +13,7 @@ import type { Habit } from '@/store/types';
 import { useHabits, useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
-import { t } from '@/lib/i18n';
+import { t, tn } from '@/lib/i18n';
 
 
 /** Your streak: how many days in a row you've shown up. */
@@ -64,7 +64,7 @@ export default function StreaksScreen() {
           <Icon name={n.activeToday ? 'flame' : 'flame-outline'} size={34} color={c.flame} />
           <Text style={{ fontFamily: SERIF, fontSize: 88, lineHeight: 92 }}>{n.streak}</Text>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-            {n.streak === 1 ? 'day in a row' : 'days in a row'}
+            {tn(n.streak, 'day in a row', 'days in a row')}
           </Text>
           <Text tone="muted" style={{ textAlign: 'center', maxWidth: 300, lineHeight: 23, marginTop: space.sm }}>
             {line}

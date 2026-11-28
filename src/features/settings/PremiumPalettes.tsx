@@ -66,7 +66,7 @@ export function PremiumPalettes() {
           {preview && !unlocked ? (
             <View style={[styles.previewBar, { backgroundColor: c.accentSoft }]}>
               <Text variant="small" style={{ flex: 1 }}>
-                {t('Previewing')} <Text variant="small" style={{ fontWeight: '700' }}>{NIGHT_COLORS[preview].label}</Text>. Premium palettes are coming soon.
+                {t('Previewing')} <Text variant="small" style={{ fontWeight: '700' }}>{t(NIGHT_COLORS[preview].label)}</Text>. Premium palettes are coming soon.
               </Text>
               <Press onPress={() => setColorPreview(null)} hitSlop={8} accessibilityLabel={t('Stop preview')}>
                 <Text variant="small" color={c.accent} style={{ fontWeight: '700' }}>
@@ -95,7 +95,7 @@ function GlowTile({ id, on, unlocked, onPress, ring }: { id: NightColor; on: boo
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected: on }}
-      accessibilityLabel={`${p.label} palette${unlocked ? '' : t(', premium, tap to preview')}`}
+      accessibilityLabel={`${t(p.label)} ${t('palette')}${unlocked ? '' : t(', premium, tap to preview')}`}
       style={[styles.tileWrap, { borderColor: on ? ring : 'transparent' }]}>
       <View style={styles.tile}>
         <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>
@@ -130,10 +130,10 @@ function GlowTile({ id, on, unlocked, onPress, ring }: { id: NightColor; on: boo
           )}
         </View>
         <Text numberOfLines={1} color="#FFFFFF" style={{ fontWeight: '700', fontSize: 15 }}>
-          {p.label}
+          {t(p.label)}
         </Text>
         <Text numberOfLines={1} color="rgba(255,255,255,0.75)" style={{ fontSize: 11.5 }}>
-          {p.blurb}
+          {t(p.blurb ?? '')}
         </Text>
       </View>
     </Press>

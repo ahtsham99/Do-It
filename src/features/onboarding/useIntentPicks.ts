@@ -1,12 +1,21 @@
 import { useMemo, useState } from 'react';
 
-import { matchIntents } from './intents';
+import { t } from '@/lib/i18n';
+
+import { INTENT_IDEAS, matchIntents as matchEnglish } from './intents';
 import { suggestionKey, type Suggestion } from './suggestions';
 
 /**
  * Typed intent → matching suggestions. When a new theme shows up while typing,
  * its goal and one habit are ticked for you (once; unticking sticks).
  */
+/** Tapped ideas show in the app's language; match them as their English originals. */
+function matchIntents(text: string) {
+  const lower = text.toLowerCase();
+  const extra = INTENT_IDEAS.filter((i) => t(i) !== i && lower.includes(t(i).toLowerCase())).join(', ');
+  return matchEnglish(extra ? `${text}, ${extra}` : text);
+}
+
 export function useIntentPicks(selected: Set<string>, setSelected: (s: Set<string>) => void) {
   const [text, setTextState] = useState('');
   const [considered, setConsidered] = useState<Set<string>>(new Set());

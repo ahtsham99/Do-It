@@ -1,4 +1,5 @@
 import { todayKey } from '@/lib/dates';
+import { t } from '@/lib/i18n';
 import { uid } from '@/lib/id';
 import { addGoal } from '@/store/actions/goals';
 import { addHabit } from '@/store/actions/habits';
@@ -15,14 +16,14 @@ export function applySuggestions(list: Suggestion[]) {
   const habitNames = new Set(habits.filter((h) => !h.deletedAt).map((h) => h.name.toLowerCase()));
   let added = 0;
   for (const s of list) {
-    if (s.kind === 'task' && !taskTitles.has(s.title.toLowerCase())) {
-      addTask({ title: s.title, date: todayKey(), repeat: s.repeat, time: s.time ?? null, reminder: s.time ? 0 : null });
+    if (s.kind === 'task' && !taskTitles.has(t(s.title).toLowerCase())) {
+      addTask({ title: t(s.title), date: todayKey(), repeat: s.repeat, time: s.time ?? null, reminder: s.time ? 0 : null });
       added++;
-    } else if (s.kind === 'habit' && !habitNames.has(s.name.toLowerCase())) {
-      addHabit({ name: s.name, icon: s.icon, color: s.color, frequency: s.frequency, timesPerWeek: s.timesPerWeek ?? 1 });
+    } else if (s.kind === 'habit' && !habitNames.has(t(s.name).toLowerCase())) {
+      addHabit({ name: t(s.name), icon: s.icon, color: s.color, frequency: s.frequency, timesPerWeek: s.timesPerWeek ?? 1 });
       added++;
-    } else if (s.kind === 'goal' && !goalTitles.has(s.title.toLowerCase())) {
-      addGoal({ title: s.title, icon: s.icon, color: s.color, kind: 'steps', targetDate: null, steps: s.steps.map((title) => ({ id: uid('st_'), title, doneAt: null })) });
+    } else if (s.kind === 'goal' && !goalTitles.has(t(s.title).toLowerCase())) {
+      addGoal({ title: t(s.title), icon: s.icon, color: s.color, kind: 'steps', targetDate: null, steps: s.steps.map((title) => ({ id: uid('st_'), title: t(title), doneAt: null })) });
       added++;
     }
   }

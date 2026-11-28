@@ -10,7 +10,7 @@ import { t } from '@/lib/i18n';
 export function IntentBox({ value, onChange, autoFocus }: { value: string; onChange: (t: string) => void; autoFocus?: boolean }) {
   const { c } = useTheme();
   const lower = value.toLowerCase();
-  const ideas = INTENT_IDEAS.filter((i) => !lower.includes(i.toLowerCase())).slice(0, 6);
+  const ideas = INTENT_IDEAS.filter((i) => !lower.includes(t(i).toLowerCase())).slice(0, 6);
   const addIdea = (idea: string) => {
     const t = value.trim();
     onChange(t ? `${t.replace(/[,.]$/, '')}, ${idea.toLowerCase()}` : idea);
@@ -31,9 +31,9 @@ export function IntentBox({ value, onChange, autoFocus }: { value: string; onCha
       {ideas.length > 0 && (
         <View style={styles.ideas}>
           {ideas.map((i) => (
-            <Press key={i} onPress={() => addIdea(i)} accessibilityLabel={`Add ${i}`} style={[styles.idea, { backgroundColor: c.surfaceAlt }]}>
+            <Press key={i} onPress={() => addIdea(t(i))} accessibilityLabel={t('Add {idea}', { idea: t(i) })} style={[styles.idea, { backgroundColor: c.surfaceAlt }]}>
               <Text variant="small" tone="muted" style={{ fontWeight: '500' }}>
-                + {i}
+                + {t(i)}
               </Text>
             </Press>
           ))}

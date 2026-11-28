@@ -1,5 +1,6 @@
 import { diffDays, todayKey } from '@/lib/dates';
 import type { Goal, GoalKind } from '@/store/types';
+import { t, tn } from '@/lib/i18n';
 
 export const GOAL_ICONS = [
   '🎯', '🏃', '📚', '💰', '🧠', '💪', '🥗', '✈️',
@@ -29,23 +30,22 @@ export function nextStep(g: Goal) {
 
 /** One-line status for cards. */
 export function goalStatus(g: Goal): string {
-  if (g.completedAt) return 'Achieved';
+  if (g.completedAt) return t('Achieved');
   if (g.kind === 'number') {
     const unit = g.unit?.trim() ? ` ${g.unit.trim()}` : '';
-    return `${g.current ?? 0} of ${g.target ?? 0}${unit}`;
+    return t('{current} of {target}{unit}', { current: g.current ?? 0, target: g.target ?? 0, unit });
   }
   const next = nextStep(g);
-  if (next) return `Next: ${next.title}`;
-  return g.steps.length ? 'All steps done' : g.why?.trim() ? `“${g.why.trim()}”` : 'In progress';
+  if (next) return t('Next: {step}', { step: next.title });
+  return g.steps.length ? t('All steps done') : g.why?.trim() ? `“${g.why.trim()}”` : t('In progress');
 }
 
 export function daysLeftLabel(g: Goal, today = todayKey()): string | null {
   if (!g.targetDate || g.completedAt) return null;
   const d = diffDays(today, g.targetDate);
-  if (d === 0) return 'Due today';
-  if (d === 1) return '1 day left';
-  if (d > 0) return `${d} days left`;
-  return `${-d} day${d === -1 ? '' : 's'} past target`;
+  if (d === 0) return t('Due today');
+  if (d > 0) return tn(d, '{n} day left', '{n} days left');
+  return tn(-d, '{n} day past target', '{n} days past target');
 }
 
 export interface GoalTemplate {

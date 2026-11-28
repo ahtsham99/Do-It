@@ -5,6 +5,7 @@ import { radius, space, useTheme } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Press } from './Pressable';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 export function Chip({
   label,
@@ -29,7 +30,7 @@ export function Chip({
       ]}>
       {icon && <Icon name={icon} size={15} color={selected ? c.accentText : c.textMuted} />}
       <Text variant="small" color={selected ? c.accentText : c.text} style={{ fontWeight: '500' }}>
-        {label}
+        {t(label)}
       </Text>
     </Press>
   );

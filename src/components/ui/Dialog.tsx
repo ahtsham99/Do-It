@@ -48,11 +48,11 @@ export function DialogHost() {
           {d && (
             <>
               <Text variant="heading" style={{ textAlign: 'center' }}>
-                {d.title}
+                {t(d.title)}
               </Text>
               {d.message ? (
                 <Text tone="muted" style={{ textAlign: 'center' }}>
-                  {d.message}
+                  {t(d.message)}
                 </Text>
               ) : null}
               <View style={{ gap: space.sm, marginTop: space.sm }}>
@@ -65,7 +65,7 @@ export function DialogHost() {
                     }}
                     style={[styles.btn, { backgroundColor: a.destructive ? c.dangerSoft : c.surfaceAlt }]}>
                     <Text variant="bodyStrong" color={a.destructive ? c.danger : c.text}>
-                      {a.label}
+                      {t(a.label)}
                     </Text>
                   </Press>
                 ))}

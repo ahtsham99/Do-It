@@ -113,7 +113,7 @@ export default function TaskEditor() {
                 </Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
                   {[null, 15, 30, 45, 60, 90, 120, 180].map((m) => (
-                    <Chip key={String(m)} label={m ? formatDuration(m) : 'No end'} selected={duration === m} onPress={() => setDuration(m)} />
+                    <Chip key={String(m)} label={m ? formatDuration(m) : t('No end')} selected={duration === m} onPress={() => setDuration(m)} />
                   ))}
                 </View>
               </View>

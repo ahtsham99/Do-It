@@ -15,7 +15,7 @@ export default function TabLayout() {
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: c.bg }, animation: 'shift' }}>
       {Object.entries(TAB_META).map(([name, meta]) => (
-        <Tabs.Screen key={name} name={name} options={{ title: meta.title }} />
+        <Tabs.Screen key={name} name={name} options={{ title: t(meta.title) }} />
       ))}
       {/* Not in the tab bar; opened from your avatar on Today. */}
       <Tabs.Screen name="settings" options={{ title: t('Settings') }} />

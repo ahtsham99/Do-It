@@ -85,7 +85,7 @@ export default function IconsScreen() {
               style={[styles.chip, { backgroundColor: on ? c.accent : c.surface, borderColor: on ? c.accent : c.border }]}>
               <Icon name={g.icon} size={16} color={on ? c.accentText : c.text} />
               <Text variant="small" color={on ? c.accentText : c.text} style={{ fontWeight: '600' }}>
-                {g.label}
+                {t(g.label)}
               </Text>
             </Press>
           );
@@ -96,7 +96,7 @@ export default function IconsScreen() {
         <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
           {ICON_GROUPS.map((g) => (
             <View key={g.id} onLayout={(e) => (offsets.current[g.id] = e.nativeEvent.layout.y)} style={{ marginBottom: space.xl }}>
-              <Text style={styles.section}>{g.label}</Text>
+              <Text style={styles.section}>{t(g.label)}</Text>
               <View style={styles.grid}>
                 {[...g.free.map((i) => [i, false] as const), ...g.premium.map((i) => [i, true] as const)].map(([i, premium]) => {
                   const sel = i === value;
