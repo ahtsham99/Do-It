@@ -172,7 +172,20 @@ export interface Settings {
   avatar: string;
   /** "Your why", shown on Today when you're behind. */
   why: string;
+  /** How the Today page looks (the Display sheet). */
+  display: PlanDisplay;
 }
+
+export interface PlanDisplay {
+  layout: 'day' | 'week' | 'month';
+  showCompleted: boolean;
+  showFreeTime: boolean;
+  showHabits: boolean;
+  showStats: boolean;
+  showGoals: boolean;
+}
+
+export const DEFAULT_DISPLAY: PlanDisplay = { layout: 'day', showCompleted: true, showFreeTime: true, showHabits: true, showStats: true, showGoals: true };
 
 export interface Stats {
   /** Days the user "showed up": planned their day or finished something. */
@@ -220,6 +233,7 @@ export const DEFAULT_SETTINGS: Settings = {
   nightBackground: 'black',
   avatar: '',
   why: '',
+  display: DEFAULT_DISPLAY,
   focusSound: 'off',
 };
 

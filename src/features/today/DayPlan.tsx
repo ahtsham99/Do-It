@@ -6,6 +6,7 @@ import { Button, Card, Icon, Press, SwipeToDelete, Text } from '@/components/ui'
 import { deleteTaskWithUndo } from '@/features/delete/deleteWithUndo';
 import { completeTask } from '@/features/nudges/celebrate';
 import type { Occurrence } from '@/features/tasks/logic';
+import { setDisplay, useDisplay } from '@/features/today/display';
 import { addMinutesToTime, formatDuration, formatTime, minutesBetween, nowTime, todayKey, type DayKey } from '@/lib/dates';
 import { useSettings } from '@/store/hooks';
 import { radius, space, useTheme } from '@/theme';
@@ -17,8 +18,11 @@ const TIME_W = 54;
  * in order, with a "Now" line on today. Tap the circle to tick, tap the row to
  * edit, swipe left to delete.
  */
-export function DayPlan({ day, items, compact }: { day: DayKey; items: Occurrence[]; compact?: boolean }) {
+export function DayPlan({ day, items: all, compact }: { day: DayKey; items: Occurrence[]; compact?: boolean }) {
   const { c } = useTheme();
+  const display = useDisplay();
+  const items = display.showCompleted ? all : all.filter((o) => !o.done);
+  const hiddenDone = all.length - items.length;
   const { use24h } = useSettings();
   const today = todayKey();
   const now = nowTime();
@@ -27,6 +31,26 @@ export function DayPlan({ day, items, compact }: { day: DayKey; items: Occurrenc
   const nowIndex = day === today ? timed.findIndex((o) => o.task.time! > now) : -1;
   const showNowAtEnd = day === today && timed.length > 0 && nowIndex === -1;
 
+  // Everything's done and completed plans are hidden.
+  if (items.length === 0 && hiddenDone > 0) {
+    return (
+      <Press onPress={() => setDisplay({ showCompleted: true })} accessibilityRole="button" accessibilityLabel="Show completed plans">
+        {compact ? (
+          <Text variant="small" tone="faint" style={{ paddingHorizontal: 4 }}>
+            All {hiddenDone} done ✓
+          </Text>
+        ) : (
+          <Card style={{ alignItems: 'center', paddingVertical: space.lg, gap: 4 }}>
+            <Icon name="checkmark-done-outline" size={22} color={c.accent} />
+            <Text style={{ fontWeight: '500' }}>All {hiddenDone} done</Text>
+            <Text variant="small" tone="muted">
+              Tap to show completed plans
+            </Text>
+          </Card>
+        )}
+      </Press>
+    );
+  }
   if (items.length === 0 && compact) {
     return (
       <Text variant="small" tone="faint" style={{ paddingHorizontal: 4 }}>
@@ -62,7 +86,7 @@ export function DayPlan({ day, items, compact }: { day: DayKey; items: Occurrenc
         const free = prevEnd ? minutesBetween(prevEnd, o.task.time!) : 0;
         return (
           <Fragment key={`${o.task.id}:${o.day}`}>
-            {free >= 30 && !compact && <FreeGap minutes={free} />}
+            {free >= 30 && !compact && display.showFreeTime && <FreeGap minutes={free} />}
             {i === nowIndex && <NowLine now={now} use24h={use24h} />}
             <Row occ={o} label={formatTime(o.task.time!, use24h)} last={i === timed.length - 1 && !showNowAtEnd} />
           </Fragment>

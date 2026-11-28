@@ -18,12 +18,13 @@ import { MonthGrid } from '@/features/tasks/MonthGrid';
 import { QuickAdd } from '@/features/tasks/QuickAdd';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { DayPlan } from '@/features/today/DayPlan';
+import { setDisplay, useDisplay } from '@/features/today/display';
+import { DisplaySheet } from '@/features/today/DisplaySheet';
 import { FromEarlier } from '@/features/today/FromEarlier';
 import { NudgeStrip, type Nudge } from '@/features/today/NudgeStrip';
 import { StatCard } from '@/features/today/StatCard';
 import { addDays, addMonths, diffDays, formatDay, fromKey, monthName, range, startOfWeek, type DayKey } from '@/lib/dates';
 import { useCountdowns, useGoals, useHabits, useSettings, useTasks } from '@/store/hooks';
-import { recall, remember } from '@/lib/uiMemory';
 import { moveToDay, restoreDates } from '@/store/actions/tasks';
 import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
@@ -61,11 +62,12 @@ export function PlannerView() {
 
   const [day, setDay] = useState<DayKey>(n.today);
   const [monthOpen, setMonthOpen] = useState(false);
-  const [span, setSpanState] = useState<'day' | 'week'>(() => recall('plan.span', 'day'));
-  const setSpan = (v: 'day' | 'week') => {
-    remember('plan.span', v);
-    setSpanState(v);
-  };
+  const display = useDisplay();
+  const [sheet, setSheet] = useState(false);
+  const layout = display.layout;
+  const span = layout === 'week' ? 'week' : 'day';
+  const setSpan = (v: 'day' | 'week') => layout !== 'month' && setDisplay({ layout: v });
+  const showMonth = layout === 'month' || monthOpen;
   const isToday = day === n.today;
   const items = occurrencesOn(tasks, day);
   const done = items.filter((o) => o.done).length;
@@ -114,7 +116,7 @@ export function PlannerView() {
     pick(d);
     setSpan('day');
   };
-  const step = (dir: 1 | -1) => setDay(monthOpen ? addMonths(day, dir) : addDays(day, 7 * dir));
+  const step = (dir: 1 | -1) => setDay(showMonth ? addMonths(day, dir) : addDays(day, 7 * dir));
   const [titleW, setTitleW] = useState(220);
   const weekStart = startOfWeek(day, weekStartsOn);
   const weekDays = range(weekStart, 7);
@@ -125,7 +127,7 @@ export function PlannerView() {
   })();
 
   // Shrink the big title so long words (Tomorrow, November, Wednesday) always fit.
-  const titleText = monthOpen ? monthName(day) : span === 'week' ? weekLabel : dayTitle(day, n.today);
+  const titleText = showMonth ? monthName(day) : span === 'week' ? weekLabel : dayTitle(day, n.today);
   const titleSize = Math.round(Math.max(24, Math.min(46, (titleW - 30) / (titleText.length * 0.62))));
 
   return (
@@ -133,11 +135,11 @@ export function PlannerView() {
       {/* Day title + calendar controls */}
       <View style={{ gap: 2 }}>
         <View style={styles.titleRow}>
-          <Press haptic={false} onPress={() => setMonthOpen(!monthOpen)} onLayout={(e) => setTitleW(e.nativeEvent.layout.width)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : 'Show month'} style={styles.titleBtn}>
+          <Press haptic={false} disabled={layout === 'month'} onPress={() => setMonthOpen(!monthOpen)} onLayout={(e) => setTitleW(e.nativeEvent.layout.width)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : 'Show month'} style={styles.titleBtn}>
             <Text style={{ fontFamily: SERIF, fontSize: titleSize, lineHeight: titleSize + 4, letterSpacing: -0.8, flexShrink: 1 }} numberOfLines={1}>
               {titleText}
             </Text>
-            <Icon name={monthOpen ? 'chevron-up' : 'chevron-down'} size={20} color={c.textMuted} />
+            {layout !== 'month' && <Icon name={monthOpen ? 'chevron-up' : 'chevron-down'} size={20} color={c.textMuted} />}
           </Press>
           {!isToday && (
             <Press onPress={() => pick(n.today)} style={[styles.todayPill, { backgroundColor: c.accentSoft }]} accessibilityRole="button">
@@ -146,32 +148,28 @@ export function PlannerView() {
               </Text>
             </Press>
           )}
-          <IconButton icon="chevron-back" label={monthOpen ? 'Previous month' : 'Previous week'} size={16} diameter={34} onPress={() => step(-1)} />
-          <IconButton icon="chevron-forward" label={monthOpen ? 'Next month' : 'Next week'} size={16} diameter={34} onPress={() => step(1)} />
+          <IconButton icon="chevron-back" label={showMonth ? 'Previous month' : 'Previous week'} size={16} diameter={34} onPress={() => step(-1)} />
+          <IconButton icon="chevron-forward" label={showMonth ? 'Next month' : 'Next week'} size={16} diameter={34} onPress={() => step(1)} />
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
           <Text variant="small" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
-            {monthOpen
-              ? `${fromKey(day).getFullYear()} · tap a day`
+            {showMonth
+              ? `${formatDay(day, { relative: false, long: true })}${isToday ? ` · ${greeting(n.now.getHours())}` : ''}`
               : span === 'week'
                 ? `${formatDay(weekStart, { relative: false })} – ${formatDay(addDays(weekStart, 6), { relative: false })}`
                 : `${formatDay(day, { relative: false, long: true })}${isToday ? ` · ${greeting(n.now.getHours())}${name.trim() ? `, ${name.trim()}` : ''}` : ''}`}
           </Text>
-          {!monthOpen && (
-            <View style={[styles.span, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
-              {(['day', 'week'] as const).map((v) => (
-                <Press key={v} onPress={() => setSpan(v)} accessibilityRole="tab" accessibilityState={{ selected: span === v }} style={[styles.spanOpt, span === v && { backgroundColor: c.surface }]}>
-                  <Text variant="small" color={span === v ? c.text : c.textMuted} style={{ fontWeight: '600', fontSize: 12 }}>
-                    {v === 'day' ? 'Day' : 'Week'}
-                  </Text>
-                </Press>
-              ))}
-            </View>
-          )}
+          <Press onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={`Display: ${layout} layout`} style={[styles.displayBtn, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
+            <Icon name="options-outline" size={14} color={c.text} />
+            <Text variant="small" style={{ fontWeight: '600', fontSize: 12 }}>
+              {layout === 'day' ? 'Day' : layout === 'week' ? 'Week' : 'Month'}
+            </Text>
+          </Press>
         </View>
       </View>
 
-      {monthOpen ? (
+      <DisplaySheet visible={sheet} onClose={() => setSheet(false)} />
+      {showMonth ? (
         <MonthGrid month={day} selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
       ) : (
         <WeekStrip selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
@@ -179,7 +177,7 @@ export function PlannerView() {
 
       {isToday && (!timerIdle ? <FocusNowCard compact /> : nudges[0] ? <NudgeStrip nudge={nudges[0]} more={nudges.length - 1} onMore={() => showDialog({ title: 'Also waiting', actions: nudges.slice(1).map((x) => ({ label: x.title, onPress: () => x.onPress?.() })) })} /> : null)}
 
-      {span === 'week' && !monthOpen ? (
+      {span === 'week' && !showMonth ? (
         <>
           {weekDays.map((d) => {
             const its = occurrencesOn(tasks, d);
@@ -262,7 +260,7 @@ export function PlannerView() {
         </Section>
       )}
 
-      {habits.length === 0 ? (
+      {!display.showHabits ? null : habits.length === 0 ? (
         <Empty icon="flame-outline" title="Start one small habit" body="Something you can do in two minutes, every day." action="Add a habit" onAction={() => router.push('/habit')} />
       ) : (
         <Section
@@ -299,12 +297,14 @@ export function PlannerView() {
         </Section>
       )}
 
+      {display.showStats && (
       <View style={{ flexDirection: 'row', gap: space.md - 2 }}>
         <StatCard value={n.streak} unit="day streak" note={`Best ${n.bestStreak}`} href="/streaks" />
         <StatCard value={focusToday} unit="min" note="Focused today" href="/focus" />
       </View>
+      )}
 
-      {activeGoals.length > 0 ? (
+      {!display.showGoals ? null : activeGoals.length > 0 ? (
         <Section
           title="Goals"
           right={
@@ -338,6 +338,5 @@ const styles = StyleSheet.create({
   titleBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
   todayPill: { height: 34, paddingHorizontal: 12, borderRadius: 17, justifyContent: 'center' },
   carry: { flexDirection: 'row', alignItems: 'center', gap: space.sm, height: 46, paddingHorizontal: space.lg, borderRadius: 999, borderWidth: 1 },
-  span: { flexDirection: 'row', borderRadius: 999, borderWidth: 1, padding: 2 },
-  spanOpt: { height: 26, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center' },
+  displayBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 30, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1 },
 });

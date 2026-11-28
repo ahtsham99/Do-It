@@ -6,6 +6,8 @@ export interface ParsedQuickAdd {
   time?: TimeKey;
   /** Minutes, from "7-8am", "9:00-10:30" or "for 1h". */
   duration?: number;
+  /** Where the understood bits are in the input: [start, end) character ranges, in order. */
+  spans: [number, number][];
 }
 
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -19,15 +21,22 @@ const pad = (n: number) => String(n).padStart(2, '0');
  */
 export function parseQuickAdd(input: string, today: DayKey = todayKey()): ParsedQuickAdd {
   let text = ` ${input.trim()} `;
+  // text[i] lines up with input[i - 1 + lead]; matches are blanked to the same length to keep it that way.
+  const lead = input.length - input.trimStart().length;
+  const spans: [number, number][] = [];
   let date: DayKey | undefined;
   let time: TimeKey | undefined;
   let duration: number | undefined;
 
   const take = (re: RegExp, fn: (m: RegExpMatchArray) => void) => {
     const m = text.match(re);
-    if (m) {
+    if (m && m.index !== undefined) {
       fn(m);
-      text = text.replace(m[0], ' ');
+      // Highlight the match without its leading space.
+      const skip = m[0].length - m[0].trimStart().length;
+      const start = m.index + skip - 1 + lead;
+      spans.push([start, start + m[0].trimEnd().length - skip]);
+      text = text.slice(0, m.index) + ' '.repeat(m[0].length) + text.slice(m.index + m[0].length);
     }
   };
 
@@ -98,5 +107,6 @@ export function parseQuickAdd(input: string, today: DayKey = todayKey()): Parsed
     });
 
   const title = text.replace(/\s+/g, ' ').replace(/\s(on|at|by)\s*$/i, '').trim();
-  return { title: title || input.trim(), date, time, ...(duration ? { duration } : {}) };
+  spans.sort((a, b) => a[0] - b[0]);
+  return { title: title || input.trim(), date, time, ...(duration ? { duration } : {}), spans };
 }

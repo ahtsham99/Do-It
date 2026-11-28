@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { HighlightInput } from '@/components/HighlightInput';
 import { Icon, Press, Text, showToast } from '@/components/ui';
 import { addMinutesToTime, formatDay, formatTime, type DayKey } from '@/lib/dates';
 import { to24hText } from '@/lib/to24hText';
@@ -45,8 +46,11 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
           style={[styles.plus, { backgroundColor: c.accentSoft }]}>
           <Icon name="add" size={20} color={c.accent} />
         </Press>
-        <TextInput
+        <HighlightInput
           value={text}
+          spans={parsed.spans}
+          highlight={{ color: c.accent, backgroundColor: c.accentSoft }}
+          accessibilityLabel="Add a plan"
           onChangeText={(t) => setText(use24h ? to24hText(t) : t)}
           placeholder={placeholder}
           placeholderTextColor={c.textFaint}
