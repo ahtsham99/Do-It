@@ -264,7 +264,7 @@ export default function ProfileScreen() {
             <ListRow icon="push-outline" label={t('Restore from a backup')} last onPress={restore} />
           </Card>
           <Text variant="small" tone="muted">
-            Everything lives on this {Platform.OS === 'web' ? 'device' : 'phone'}. A backup keeps it safe if you switch phones or clear your browser.
+            {Platform.OS === 'web' ? t('Everything lives on this device. A backup keeps it safe if you switch phones or clear your browser.') : t('Everything lives on this phone. A backup keeps it safe if you switch phones.')}
           </Text>
         </View>
       </ScrollView>

@@ -37,7 +37,7 @@ export function ConsistencyCard({ habits }: { habits: Habit[] }) {
             <Text tone="muted">%</Text>
           </View>
           <Text variant="small" tone="muted">
-            {data.kept} of {data.expected} check-ins kept · {period.label.toLowerCase()}
+            {t('{kept} of {expected} check-ins kept', { kept: data.kept, expected: data.expected })} · {t(period.label).toLowerCase()}
           </Text>
         </View>
         <Press

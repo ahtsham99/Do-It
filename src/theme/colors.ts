@@ -1,3 +1,5 @@
+import { tk } from '@/lib/i18n';
+
 /** Swatches users can pick for countdowns and habits (muted, to suit the palette). */
 export const SWATCHES = [
   '#2F4F40', '#4A6B8A', '#8A5A44', '#B5873A', '#7A5C8E',
@@ -122,14 +124,14 @@ export const NIGHT_COLORS: Record<NightColor, AppColor> = {
   violet: { label: 'Violet', glow: ['#A35BFF', '#6A22D6', '#24074F'], accent: '#9246F2', accentText: '#FFFFFF', swatch: ['#A35BFF', '#24074F'], day: { accent: '#7A30D9', glow: ['#DCC9F8', '#EEE4FB'] } },
   mono: { label: 'Mono', glow: ['#8A8A8A', '#3A3A3A', '#141414'], accent: '#C8C8C8', accentText: '#0B0B0B', swatch: ['#9A9A9A', '#141414'], day: { accent: '#1E1C19', glow: ['#D9D7D2', '#EBE9E4'] } },
   // Premium palettes
-  ruby: palette('Ruby Red', 'Bold and romantic', ['#4A0010', '#800021', '#B3123B', '#E0436A', '#F59AB0', '#FFE4EA']),
-  ocean: palette('Ocean Teal', 'Fresh and futuristic', ['#03314B', '#05668D', '#028090', '#00A896', '#02C39A', '#D8F8EF']),
-  pine: palette('Forest Green', 'Calm and natural', ['#1B2E1F', '#2D4A32', '#4F7942', '#7FA66A', '#B9D4A3', '#EEF5E6']),
-  plum: palette('Royal Plum', 'Elegant and luxurious', ['#2A0E33', '#4B1D5C', '#6E2C82', '#9B5BB0', '#CFA6DC', '#F4E9F7']),
-  sunset: palette('Sunset Orange', 'Warm and full of energy', ['#3D1308', '#9A2E10', '#E2541F', '#F78B3D', '#FFC27A', '#FFF1DC']),
-  graphite: palette('Monochrome', 'Timeless and minimal', ['#111114', '#2E2E33', '#5A5A63', '#9A9AA3', '#D4D4D9', '#F6F6F4'], { nightText: '#111114' }),
-  slate: palette('Slate Blue', 'Sleek and professional', ['#0F172A', '#1E3A5F', '#2F5D8A', '#5B8DBE', '#A7C4E0', '#EAF2FA']),
-  lavender: palette('Soft Lavender', 'Soft and soothing', ['#2E2A5C', '#4B4A9C', '#7A7FD6', '#A9B0F0', '#D3D8FA', '#F2F4FF'], { nightAccent: 500 }),
+  ruby: palette(tk('Ruby Red'), tk('Bold and romantic'), ['#4A0010', '#800021', '#B3123B', '#E0436A', '#F59AB0', '#FFE4EA']),
+  ocean: palette(tk('Ocean Teal'), tk('Fresh and futuristic'), ['#03314B', '#05668D', '#028090', '#00A896', '#02C39A', '#D8F8EF']),
+  pine: palette(tk('Forest Green'), tk('Calm and natural'), ['#1B2E1F', '#2D4A32', '#4F7942', '#7FA66A', '#B9D4A3', '#EEF5E6']),
+  plum: palette(tk('Royal Plum'), tk('Elegant and luxurious'), ['#2A0E33', '#4B1D5C', '#6E2C82', '#9B5BB0', '#CFA6DC', '#F4E9F7']),
+  sunset: palette(tk('Sunset Orange'), tk('Warm and full of energy'), ['#3D1308', '#9A2E10', '#E2541F', '#F78B3D', '#FFC27A', '#FFF1DC']),
+  graphite: palette(tk('Monochrome'), tk('Timeless and minimal'), ['#111114', '#2E2E33', '#5A5A63', '#9A9AA3', '#D4D4D9', '#F6F6F4'], { nightText: '#111114' }),
+  slate: palette(tk('Slate Blue'), tk('Sleek and professional'), ['#0F172A', '#1E3A5F', '#2F5D8A', '#5B8DBE', '#A7C4E0', '#EAF2FA']),
+  lavender: palette(tk('Soft Lavender'), tk('Soft and soothing'), ['#2E2A5C', '#4B4A9C', '#7A7FD6', '#A9B0F0', '#D3D8FA', '#F2F4FF'], { nightAccent: 500 }),
 };
 
 export const FREE_COLORS = (Object.keys(NIGHT_COLORS) as NightColor[]).filter((k) => !NIGHT_COLORS[k].premium);

@@ -31,7 +31,7 @@ import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
 
 import { dismissed } from './dismissed';
-import { t, locale } from '@/lib/i18n';
+import { t, locale, tn } from '@/lib/i18n';
 
 /** Big day title: Today / Tomorrow / Yesterday, or the weekday. */
 function dayTitle(day: DayKey, today: DayKey) {
@@ -159,7 +159,7 @@ export function PlannerView() {
                 ? `${formatDay(weekStart, { relative: false })} – ${formatDay(addDays(weekStart, 6), { relative: false })}`
                 : `${formatDay(day, { relative: false, long: true })}${isToday ? ` · ${greeting(n.now.getHours())}${name.trim() ? `, ${name.trim()}` : ''}` : ''}`}
           </Text>
-          <Press onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={`Display: ${layout} layout`} style={[styles.displayBtn, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
+          <Press onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={t('Display: {name} layout', { name: t(layout === 'day' ? 'Day' : layout === 'week' ? 'Week' : 'Month') })} style={[styles.displayBtn, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
             <Icon name="options-outline" size={14} color={c.text} />
             <Text variant="small" style={{ fontWeight: '600', fontSize: 12 }}>
               {layout === 'day' ? t('Day') : layout === 'week' ? t('Week') : t('Month')}
@@ -191,7 +191,7 @@ export function PlannerView() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
               {items.length ? (
                 <Text variant="small" tone="muted">
-                  {done} of {items.length} done
+                  {t('{done} of {n} done', { done, n: items.length })}
                 </Text>
               ) : null}
               <Press onPress={() => router.push({ pathname: '/task', params: { date: day } })} hitSlop={10} accessibilityLabel={t('Add a plan')}>
@@ -206,12 +206,12 @@ export function PlannerView() {
             <Press onPress={moveUnfinished} style={[styles.carry, { borderColor: c.border, backgroundColor: c.surface }]} accessibilityRole="button">
               <Icon name="arrow-forward-circle-outline" size={18} color={c.accent} />
               <Text variant="small" style={{ flex: 1, fontWeight: '600' }}>
-                Move {carryOver.length} unfinished to tomorrow
+                {tn(carryOver.length, 'Move {n} unfinished plan to tomorrow', 'Move {n} unfinished plans to tomorrow')}
               </Text>
               <Icon name="chevron-forward" size={16} color={c.textFaint} />
             </Press>
           )}
-          <QuickAdd date={day} placeholder={isToday ? `Add to today… e.g. Gym at ${use24h ? '07:00' : '7am'}` : `Add to ${formatDay(day)}… e.g. Call mum ${use24h ? '18:00' : '6pm'}`} />
+          <QuickAdd date={day} placeholder={isToday ? t('Add to today… e.g. Gym at {time}', { time: use24h ? '07:00' : '7am' }) : t('Add to {day}… e.g. Call mum {time}', { day: formatDay(day), time: use24h ? '18:00' : '6pm' })} />
           {isToday && n.open.length > 0 && timerIdle && (
             <Press onPress={() => router.push('/focus')} style={{ alignSelf: 'center', padding: space.xs }}>
               <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>

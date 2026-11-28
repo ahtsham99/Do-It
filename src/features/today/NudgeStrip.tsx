@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon, Press, Text, type IconName } from '@/components/ui';
 import { radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 export interface Nudge {
   key: string;
@@ -29,7 +30,7 @@ export function NudgeStrip({ nudge, more, onMore }: { nudge: Nudge; more: number
         <Icon name="chevron-forward" size={16} color={c.textMuted} />
       </Press>
       {more > 0 && (
-        <Press onPress={onMore} accessibilityLabel={`${more} more`} style={[styles.more, { backgroundColor: c.surface, borderColor: c.border }]}>
+        <Press onPress={onMore} accessibilityLabel={t('{n} more', { n: more })} style={[styles.more, { backgroundColor: c.surface, borderColor: c.border }]}>
           <Text variant="small" style={{ fontWeight: '600' }}>
             +{more}
           </Text>

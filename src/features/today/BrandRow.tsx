@@ -21,7 +21,7 @@ export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: 
   const n = useNudges();
   return (
     <View style={[styles.top, { paddingTop: space.sm }]}>
-      <Text variant="display" accessibilityRole="header" style={{ fontFamily: LOGO, fontSize: 32, lineHeight: 38, letterSpacing: -0.8 }}>
+      <Text variant="display" accessibilityRole="header" numberOfLines={1} style={{ fontFamily: LOGO, fontSize: 32, lineHeight: 38, letterSpacing: -0.8, flexShrink: 0 }}>
         {t('Do It')}
       </Text>
       <View style={{ flex: 1 }} />
@@ -36,7 +36,7 @@ export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: 
               accessibilityState={{ selected: on }}
               style={[styles.option, on && { backgroundColor: c.accent }]}>
               <Icon name={META[m].icon} size={14} color={on ? c.accentText : c.textMuted} />
-              <Text variant="small" color={on ? c.accentText : c.textMuted} style={{ fontWeight: '600', fontSize: 13 }}>
+              <Text variant="small" numberOfLines={1} color={on ? c.accentText : c.textMuted} style={{ fontWeight: "600", fontSize: 13, flexShrink: 1 }}>
                 {t(META[m].label)}
               </Text>
             </Press>

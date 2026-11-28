@@ -77,7 +77,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
           <Text variant="small" tone="muted">
             {(habit.perDay ?? 1) > 1 ? t('{count}/{perDay} today · ', { count: countFor(habit, today), perDay: habit.perDay }) : ''}
             {streak > 0 ? t('{length} streak', { length: streakLabel(habit, streak) }) : t('No streak yet')} · {t('best {n}', { n: best })}
-            {habit.frequency === 'weekly' ? ` · ${weekCount(habit, today, weekStartsOn)}/${habit.timesPerWeek} this week` : ''}
+            {habit.frequency === 'weekly' ? ` · ${t('{count}/{target} this week', { count: weekCount(habit, today, weekStartsOn), target: habit.timesPerWeek })}` : ''}
           </Text>
         </Press>
         <Press onPress={open} hitSlop={12} accessibilityLabel={t('Edit {name}', { name: habit.name })} style={{ padding: 4 }}>

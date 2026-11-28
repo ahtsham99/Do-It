@@ -135,7 +135,7 @@ export default function StreaksScreen() {
                     <View style={{ alignItems: 'flex-end' }}>
                       <Text style={{ fontSize: 17 }}>{streakLabel(h, s)}</Text>
                       <Text variant="small" tone="muted" style={{ fontSize: 12 }}>
-                        best {Math.max(s, bestHabitStreak(h, weekStartsOn))}
+                        {t('best {n}', { n: Math.max(s, bestHabitStreak(h, weekStartsOn)) })}
                       </Text>
                     </View>
                   </View>

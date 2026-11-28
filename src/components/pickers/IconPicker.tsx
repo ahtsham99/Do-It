@@ -87,7 +87,7 @@ export function ColorPicker({ colors, value, onChange, children }: { colors: str
         <Press
           key={col}
           onPress={() => onChange(col)}
-          accessibilityLabel={`Colour ${col}`}
+          accessibilityLabel={t('Colour {color}', { color: col })}
           style={[styles.swatch, { borderColor: col === value ? c.text : 'transparent' }]}>
           <View style={[styles.swatchInner, { backgroundColor: paint(col) }]} />
         </Press>

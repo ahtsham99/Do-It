@@ -85,7 +85,7 @@ export function CountdownStack({ items }: { items: Countdown[] }) {
           </ScrollView>
         )}
       </View>
-      <View style={styles.dots} accessibilityLabel={`Countdown ${index + 1} of ${items.length}`}>
+      <View style={styles.dots} accessibilityLabel={t('Countdown {n} of {total}', { n: index + 1, total: items.length })}>
         {items.map((it, k) => (
           <View key={it.id} style={[styles.dot, { backgroundColor: k === index ? c.text : c.border, width: k === index ? 16 : 6 }]} />
         ))}
@@ -95,8 +95,8 @@ export function CountdownStack({ items }: { items: Countdown[] }) {
 }
 
 const styles = StyleSheet.create({
-  snapX: { scrollSnapType: t('x mandatory'), overscrollBehaviorX: 'contain' } as object,
-  card: { scrollSnapAlign: 'start', scrollSnapStop: 'always', willChange: t('transform, opacity'), transformOrigin: 'center center' } as object,
+  snapX: { scrollSnapType: 'x mandatory', overscrollBehaviorX: 'contain' } as object,
+  card: { scrollSnapAlign: 'start', scrollSnapStop: 'always', willChange: 'transform, opacity', transformOrigin: 'center center' } as object,
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 5 },
   dot: { height: 6, borderRadius: 3 },
 });

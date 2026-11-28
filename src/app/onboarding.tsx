@@ -78,7 +78,7 @@ export default function Onboarding() {
             <Icon name="checkmark" size={44} color="#fff" />
           </View>
           <Text style={{ fontFamily: SERIF, fontSize: 56, letterSpacing: -1, lineHeight: 58 }}>
-            Remember it.{'\n'}Start it.
+            {t('Remember it.')}{'\n'}{t('Start it.')}
           </Text>
           <Text variant="body" tone="muted" style={{ fontSize: 18, lineHeight: 26 }}>
             {t('A calm habit planner for people who forget things and put things off. Small daily habits, gentle reminders, and a focus timer for when starting is the hard part.')}

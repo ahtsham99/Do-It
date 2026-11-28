@@ -85,7 +85,7 @@ export function CountdownStack({ items }: { items: Countdown[] }) {
           </Animated.ScrollView>
         )}
       </View>
-      <View style={styles.dots} accessibilityLabel={`Countdown ${index + 1} of ${items.length}`}>
+      <View style={styles.dots} accessibilityLabel={t('Countdown {n} of {total}', { n: index + 1, total: items.length })}>
         {items.map((it, k) => (
           <View key={it.id} style={[styles.dot, { backgroundColor: k === index ? c.text : c.border, width: k === index ? 16 : 6 }]} />
         ))}
@@ -97,7 +97,7 @@ export function CountdownStack({ items }: { items: Countdown[] }) {
 const styles = StyleSheet.create({
   // Web: give each card its own GPU layer so moving it doesn't repaint the page.
   layer: { willChange: 'transform' } as object,
-  snapX: { scrollSnapType: t('x mandatory'), overscrollBehaviorX: 'contain' } as object,
+  snapX: { scrollSnapType: 'x mandatory', overscrollBehaviorX: 'contain' } as object,
   snapStart: { scrollSnapAlign: 'start', scrollSnapStop: 'always' } as object,
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 5 },
   dot: { height: 6, borderRadius: 3 },

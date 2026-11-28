@@ -9,14 +9,14 @@ import {
   type DayKey,
 } from '@/lib/dates';
 import type { Repeat, Task } from '@/store/types';
-import { t } from '@/lib/i18n';
+import { t, tk } from '@/lib/i18n';
 
 export const REPEAT_LABELS: Record<Repeat, string> = {
-  none: 'Never',
-  daily: 'Every day',
-  weekdays: 'Weekdays',
-  weekly: 'Every week',
-  monthly: 'Every month',
+  none: tk('Never'),
+  daily: tk('Every day'),
+  weekdays: tk('Weekdays'),
+  weekly: tk('Every week'),
+  monthly: tk('Every month'),
 };
 
 export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [

@@ -18,7 +18,7 @@ import { addMinutes, pauseTimer, remainingSec, resumeTimer, startTimer, stopTime
 import { useHabits, useSettings, useTasks } from '@/store/hooks';
 import { getState, useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
-import { t } from '@/lib/i18n';
+import { t, tn } from '@/lib/i18n';
 
 const PRESETS = [5, 15, 25, 45];
 const ROUNDS = [1, 2, 3, 4];
@@ -152,7 +152,7 @@ export default function FocusScreen() {
     <Screen title={t('Focus')} subtitle={t('Can’t get started? Just do five minutes.')}>
       {idle && (
         <View style={{ gap: space.md }}>
-          <Label>What will you work on?</Label>
+          <Label>{t('What will you work on?')}</Label>
           {options.length > 0 && (
             <View style={[styles.row, { justifyContent: 'flex-start' }]}>
               {options.map((o) => {
@@ -302,7 +302,7 @@ export default function FocusScreen() {
       </Card>
 
       <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
-        Today: {stats.todayCount} session{stats.todayCount === 1 ? '' : 's'} · {stats.todayMin} min · Last 7 days: {stats.weekMin} min
+        {tn(stats.todayCount, 'Today: {n} session · {min} min', 'Today: {n} sessions · {min} min', { min: stats.todayMin })} · {t('Last 7 days: {min} min', { min: stats.weekMin })}
       </Text>
     </Screen>
     </>

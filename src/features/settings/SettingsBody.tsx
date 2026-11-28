@@ -8,7 +8,7 @@ import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { Avatar } from '@/features/profile/Avatar';
 import { APP_VERSION } from '@/lib/appInfo';
-import { LANGUAGES, deviceLanguage, t, tk } from '@/lib/i18n';
+import { t, LANGUAGES, deviceLanguage, tk } from '@/lib/i18n';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { PREMIUM_AVAILABLE, useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
@@ -52,7 +52,7 @@ export function SettingsBody() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.label}>{s.name.trim() || t('Your profile')}</Text>
             <Text variant="small" tone="muted">
-              {(s.persona === 'other' && s.personaLabel.trim()) || PERSONAS.find((p) => p.value === s.persona)?.label || t('Tell us who you are')}
+              {(s.persona === 'other' && s.personaLabel.trim()) || t(PERSONAS.find((p) => p.value === s.persona)?.label ?? '') || t('Tell us who you are')}
             </Text>
           </View>
           <Icon name="chevron-forward" size={18} color={c.textFaint} />
@@ -311,7 +311,7 @@ function BgChoice({ label, color, card, on, onPress }: { label: string; color: s
     <Press onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected: on }} style={[styles.bg, { backgroundColor: color, borderColor: on ? c.accent : c.border }]}>
       <View style={{ width: '70%', height: 10, borderRadius: 5, backgroundColor: card }} />
       <Text variant="small" color={darkBg ? '#F4F3EE' : '#1E1C19'} style={{ fontWeight: on ? '700' : '500', fontSize: 12 }}>
-        {label}
+        {t(label)}
       </Text>
     </Press>
   );
