@@ -89,7 +89,7 @@ export default function Onboarding() {
       body = (
         <View style={{ gap: space.lg }}>
           <Heading title="What should we call you?" sub="So the app can greet you properly." />
-          <Field placeholder="First name (optional)" value={name} onChangeText={setName} autoFocus returnKeyType="next" onSubmitEditing={next} />
+          <Field placeholder="First name (optional)" value={name} onChangeText={setName} returnKeyType="next" onSubmitEditing={next} />
         </View>
       );
       break;

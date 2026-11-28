@@ -1,10 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
-import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, DateTimeField, PremiumColorDots } from '@/components/pickers';
-import { Button, Card, Chip, Field, Glyph, Icon, Label, Press, SheetHeader, Text, showDialog } from '@/components/ui';
+import { Button, Card, Chip, Field, Glyph, Icon, Label, Press, SheetHeader, Text, showDialog, SheetScreen } from '@/components/ui';
 import { openIconPicker } from '@/features/countdowns/iconPick';
 import { CATEGORY_DEFAULTS, DEFAULT_CATEGORIES, countdownLabel, daysUntil } from '@/features/countdowns/logic';
 import { addDays, todayKey } from '@/lib/dates';
@@ -15,7 +14,6 @@ import { SWATCHES, radius, space, useTheme } from '@/theme';
 
 export default function CountdownEditor() {
   const { c, paint } = useTheme();
-  const sheetTop = useSheetTopInset();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const existing = useStore((s) => s.countdowns.find((x) => x.id === id));
   const all = useCountdowns();
@@ -56,8 +54,8 @@ export default function CountdownEditor() {
   const preview = countdownLabel(daysUntil({ date } as never));
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: sheetTop }}>
+    <SheetScreen>
+      <View>
         <SheetHeader title={existing ? 'Edit countdown' : 'New countdown'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView
@@ -75,7 +73,7 @@ export default function CountdownEditor() {
             </View>
           </Press>
           <View style={{ flex: 1 }}>
-            <Field placeholder="What are you counting down to?" value={title} onChangeText={setTitle} autoFocus={!existing} />
+            <Field placeholder="What are you counting down to?" value={title} onChangeText={setTitle} />
           </View>
         </View>
 
@@ -129,6 +127,6 @@ export default function CountdownEditor() {
           />
         )}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SheetScreen>
   );
 }

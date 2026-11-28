@@ -12,6 +12,7 @@ export { Screen, MAX_WIDTH } from './Screen';
 export { Section } from './Section';
 export { Segmented } from './Segmented';
 export { SheetHeader } from './SheetHeader';
+export { SheetScreen, useSheetClose } from './SheetScreen';
 export { Text } from './Text';
 export { DialogHost, showDialog, type DialogAction } from './Dialog';
 export { Toggle } from './Toggle';

@@ -1,10 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
-import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, IconPicker } from '@/components/pickers';
-import { Button, Card, Chip, Field, Glyph, IconButton, Label, Segmented, SheetHeader, Text, showDialog } from '@/components/ui';
+import { Button, Card, Chip, Field, Glyph, IconButton, Label, Segmented, SheetHeader, Text, showDialog, SheetScreen } from '@/components/ui';
 import { HistoryGrid } from '@/features/habits/HistoryGrid';
 import { HABIT_ICONS, habitStreak, streakLabel } from '@/features/habits/logic';
 import { addHabit, deleteHabit, updateHabit } from '@/store/actions/habits';
@@ -15,7 +14,6 @@ import { SWATCHES, space, useTheme } from '@/theme';
 
 export default function HabitEditor() {
   const { c, paint } = useTheme();
-  const sheetTop = useSheetTopInset();
   const params = useLocalSearchParams<{ id?: string; name?: string; icon?: string }>();
   const existing = useStore((s) => s.habits.find((h) => h.id === params.id));
   const { weekStartsOn } = useSettings();
@@ -42,8 +40,8 @@ export default function HabitEditor() {
   const streak = existing ? habitStreak(existing, undefined, weekStartsOn) : 0;
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: sheetTop }}>
+    <SheetScreen>
+      <View>
         <SheetHeader title={existing ? 'Habit' : 'New habit'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView
@@ -54,7 +52,7 @@ export default function HabitEditor() {
             <Glyph value={icon} size={26} color={paint(color)} />
           </View>
           <View style={{ flex: 1 }}>
-            <Field placeholder="e.g. Read 20 pages" value={name} onChangeText={setName} autoFocus={!existing} />
+            <Field placeholder="e.g. Read 20 pages" value={name} onChangeText={setName} />
           </View>
         </View>
 
@@ -157,7 +155,7 @@ export default function HabitEditor() {
           />
         )}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SheetScreen>
   );
 }
 

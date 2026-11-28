@@ -1,10 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 
-import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, DateTimeField, PremiumColorDots } from '@/components/pickers';
-import { Button, Card, Chip, Field, Icon, Label, Press, SheetHeader, Text, Toggle, showDialog } from '@/components/ui';
+import { Button, Card, Chip, Field, Icon, Label, Press, SheetHeader, Text, Toggle, showDialog, SheetScreen } from '@/components/ui';
 import { REMINDER_OPTIONS, REPEAT_LABELS } from '@/features/tasks/logic';
 import { addDays, addMinutesToTime, formatDay, formatDuration, formatTime, todayKey, type DayKey } from '@/lib/dates';
 import { addTask, deleteTask, skipOccurrence, updateTask } from '@/store/actions/tasks';
@@ -17,7 +16,6 @@ const REPEATS = Object.keys(REPEAT_LABELS) as Repeat[];
 
 export default function TaskEditor() {
   const { c } = useTheme();
-  const sheetTop = useSheetTopInset();
   const params = useLocalSearchParams<{ id?: string; date?: string; day?: string; title?: string; time?: string; duration?: string }>();
   const existing = useStore((s) => s.tasks.find((t) => t.id === params.id));
   const { use24h, notificationsEnabled } = useSettings();
@@ -67,8 +65,8 @@ export default function TaskEditor() {
   ];
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: sheetTop }}>
+    <SheetScreen>
+      <View>
         <SheetHeader title={existing ? 'Edit plan' : 'Add to plan'} onSave={save} canSave={canSave} />
       </View>
       <ScrollView
@@ -78,7 +76,6 @@ export default function TaskEditor() {
           placeholder="What’s the plan?"
           value={title}
           onChangeText={setTitle}
-          autoFocus={!existing}
           returnKeyType="done"
           onSubmitEditing={save}
           style={{ fontSize: 20, fontWeight: '600', minHeight: 58 }}
@@ -189,7 +186,7 @@ export default function TaskEditor() {
         )}
         {existing && <Button kind="danger" icon="trash-outline" label="Delete" onPress={remove} />}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SheetScreen>
   );
 }
 

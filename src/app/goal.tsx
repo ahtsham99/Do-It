@@ -1,10 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { useSheetTopInset } from '@/hooks/useTopInset';
 import { ColorPicker, DateTimeField, IconPicker } from '@/components/pickers';
-import { Button, Card, Checkbox, Chip, Field, Glyph, Icon, IconButton, Label, Press, Segmented, SheetHeader, Text, Toggle, showDialog, showToast } from '@/components/ui';
+import { Button, Card, Checkbox, Chip, Field, Glyph, Icon, IconButton, Label, Press, Segmented, SheetHeader, Text, Toggle, showDialog, showToast, SheetScreen } from '@/components/ui';
 import { GOAL_ICONS, GOAL_TEMPLATES, daysLeftLabel, goalProgress, isSimple } from '@/features/goals/logic';
 import { addDays, todayKey } from '@/lib/dates';
 import { addGoal, deleteGoal, linkHabit, logProgress, newStep, setAchieved, toggleStep, updateGoal, type GoalInput } from '@/store/actions/goals';
@@ -28,7 +27,6 @@ function celebrate(title: string) {
  */
 export default function GoalScreen() {
   const { c, fonts, paint } = useTheme();
-  const sheetTop = useSheetTopInset();
   const params = useLocalSearchParams<{ id?: string; template?: string }>();
   const existing = useStore((s) => s.goals.find((g) => g.id === params.id && !g.deletedAt));
   const habits = useHabits();
@@ -98,8 +96,8 @@ export default function GoalScreen() {
   const unlinked = habits.filter((h) => !h.goalId);
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: sheetTop }}>
+    <SheetScreen>
+      <View>
         <SheetHeader title={existing ? 'Goal' : 'New goal'} onSave={save} saveLabel={existing ? 'Done' : 'Save'} canSave={canSave} cancelLabel={existing ? 'Close' : 'Cancel'} />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
@@ -108,7 +106,7 @@ export default function GoalScreen() {
             <Glyph value={g.icon} size={28} color={col} />
           </View>
           <View style={{ flex: 1 }}>
-            <Field placeholder="What do you want to achieve?" value={g.title} onChangeText={(title) => apply({ title })} autoFocus={!existing && !template} />
+            <Field placeholder="What do you want to achieve?" value={g.title} onChangeText={(title) => apply({ title })}  />
           </View>
         </View>
 
@@ -347,7 +345,7 @@ export default function GoalScreen() {
           />
         )}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SheetScreen>
   );
 }
 

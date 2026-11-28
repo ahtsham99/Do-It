@@ -96,7 +96,6 @@ export function ReminderForm({
         placeholder={shopping ? 'Add an item' : 'Add a reminder'}
         value={title}
         onChangeText={(t) => setTitle(use24h ? to24hText(t) : t)}
-        autoFocus={!existing}
         returnKeyType={shopping && !existing ? 'next' : 'done'}
         submitBehavior={shopping && !existing ? 'submit' : 'blurAndSubmit'}
         blurOnSubmit={!(shopping && !existing)}

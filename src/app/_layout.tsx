@@ -47,6 +47,9 @@ function Blank() {
   return <View style={{ flex: 1, backgroundColor: c.bg }} />;
 }
 
+/** Editors slide up as sheets over the page behind (SheetScreen animates them). */
+const SHEET = { presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } } as const;
+
 function Navigator() {
   const { dark, c } = useTheme();
   const navTheme = dark ? DarkTheme : DefaultTheme;
@@ -59,11 +62,11 @@ function Navigator() {
       <StatusBar style={dark ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="task" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="reminder" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="countdown" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="habit" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="goal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="task" options={SHEET} />
+        <Stack.Screen name="reminder" options={SHEET} />
+        <Stack.Screen name="countdown" options={SHEET} />
+        <Stack.Screen name="habit" options={SHEET} />
+        <Stack.Screen name="goal" options={SHEET} />
         <Stack.Screen name="suggestions" options={{ presentation: 'modal' }} />
         <Stack.Screen name="streaks" options={{ presentation: 'modal' }} />
         <Stack.Screen name="history" options={{ presentation: 'modal' }} />

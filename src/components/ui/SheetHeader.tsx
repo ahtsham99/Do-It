@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { space, useTheme } from '@/theme';
 
 import { Press } from './Pressable';
+import { useSheetClose } from './SheetScreen';
 import { Text } from './Text';
 
 /** Header for modal editor screens: Cancel · Title · Save. */
@@ -21,9 +22,10 @@ export function SheetHeader({
   cancelLabel?: string;
 }) {
   const { c } = useTheme();
+  const sheetClose = useSheetClose();
   return (
     <View style={[styles.wrap, { borderBottomColor: c.border }]}>
-      <Press onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={10} style={styles.side}>
+      <Press onPress={() => (sheetClose ? sheetClose() : router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={10} style={styles.side}>
         <Text tone="muted">{cancelLabel}</Text>
       </Press>
       <Text variant="bodyStrong">{title}</Text>
