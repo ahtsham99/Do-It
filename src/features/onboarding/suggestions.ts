@@ -18,7 +18,15 @@ export interface HabitSuggestion {
   frequency: HabitFrequency;
   timesPerWeek?: number;
 }
-export type Suggestion = TaskSuggestion | HabitSuggestion;
+export interface GoalSuggestion {
+  kind: 'goal';
+  title: string;
+  icon: string;
+  color: string;
+  /** Small first steps. */
+  steps: string[];
+}
+export type Suggestion = TaskSuggestion | HabitSuggestion | GoalSuggestion;
 
 /** In display order. The first four show in your profile; the rest under "More". */
 export const PERSONAS: { value: Persona; label: string; icon: IconName; blurb: string }[] = [
@@ -160,5 +168,5 @@ export const SUGGESTIONS: Record<Persona, Suggestion[]> = {
 };
 
 export function suggestionKey(s: Suggestion) {
-  return s.kind === 'task' ? `t:${s.title}` : `h:${s.name}`;
+  return s.kind === 'task' ? `t:${s.title}` : s.kind === 'goal' ? `g:${s.title}` : `h:${s.name}`;
 }

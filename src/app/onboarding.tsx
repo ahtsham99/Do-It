@@ -6,8 +6,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTopInset } from '@/hooks/useTopInset';
 import { Button, Card, Field, Icon, Press, Segmented, Text } from '@/components/ui';
 import { applySuggestions } from '@/features/onboarding/applySuggestions';
+import { IntentBox } from '@/features/onboarding/IntentBox';
 import { SuggestionPicker } from '@/features/onboarding/SuggestionPicker';
-import { ONBOARDING_PERSONAS, SUGGESTIONS, suggestionKey } from '@/features/onboarding/suggestions';
+import { useIntentPicks } from '@/features/onboarding/useIntentPicks';
+import { ONBOARDING_PERSONAS, PERSONAS, SUGGESTIONS, suggestionKey } from '@/features/onboarding/suggestions';
 import { pick } from '@/features/nudges/messages';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { updateSettings } from '@/store/actions/settings';
@@ -33,6 +35,7 @@ export default function Onboarding() {
   const [persona, setPersona] = useState<Persona | null>(settings.persona);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [tone, setTone] = useState<Tone>(settings.tone);
+  const intent = useIntentPicks(selected, setSelected);
 
   const idx = STEPS.indexOf(step);
   const next = () => setStep(STEPS[Math.min(idx + 1, STEPS.length - 1)]);
@@ -46,8 +49,14 @@ export default function Onboarding() {
     setSelected(new Set(pre.map(suggestionKey)));
   };
 
+  const toggle = (k: string) => {
+    const n = new Set(selected);
+    if (!n.delete(k)) n.add(k);
+    setSelected(n);
+  };
+
   const finish = async () => {
-    if (persona) applySuggestions(SUGGESTIONS[persona].filter((s) => selected.has(suggestionKey(s))));
+    applySuggestions(intent.chosen(persona ? SUGGESTIONS[persona] : []));
     let notificationsEnabled = settings.notificationsEnabled;
     if (supportsLocalNotifications) notificationsEnabled = await requestNotificationPermission().catch(() => false);
     updateSettings({ onboarded: true, name: name.trim(), persona, tone, notificationsEnabled });
@@ -118,18 +127,26 @@ export default function Onboarding() {
       break;
     case 'suggest':
       cta = selected.size ? `Add ${selected.size} & continue` : 'Skip for now';
-      body = persona && (
+      body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="A starter kit" sub="Pick one or two habits. Start small; you can add more any time." />
-          <SuggestionPicker
-            items={SUGGESTIONS[persona]}
-            selected={selected}
-            onToggle={(k) => {
-              const n = new Set(selected);
-              if (!n.delete(k)) n.add(k);
-              setSelected(n);
-            }}
-          />
+          <Heading title="What do you want to work on?" sub="A few words is enough. We’ll suggest a goal, habits and reminders to match. Or skip it." />
+          <IntentBox value={intent.text} onChange={intent.setText} />
+          {intent.matches.length > 0 && (
+            <>
+              <Text variant="caption" tone="muted" style={styles.group}>
+                Based on what you wrote
+              </Text>
+              <SuggestionPicker items={intent.matches} selected={selected} onToggle={toggle} />
+            </>
+          )}
+          {persona && (
+            <>
+              <Text variant="caption" tone="muted" style={styles.group}>
+                {`Starter kit · ${PERSONAS.find((p) => p.value === persona)?.label ?? ''}`}
+              </Text>
+              <SuggestionPicker items={SUGGESTIONS[persona]} selected={selected} onToggle={toggle} />
+            </>
+          )}
         </View>
       );
       break;
@@ -241,6 +258,7 @@ function Tip({ icon, text }: { icon: React.ComponentProps<typeof Icon>['name']; 
 }
 
 const styles = StyleSheet.create({
+  group: { textTransform: 'uppercase', fontSize: 11, marginBottom: -space.sm, marginTop: space.sm },
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 32 },
   dots: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   dot: { height: 6, borderRadius: 3 },

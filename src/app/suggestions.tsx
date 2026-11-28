@@ -5,8 +5,10 @@ import { ScrollView, View } from 'react-native';
 import { useSheetTopInset } from '@/hooks/useTopInset';
 import { Button, Chip, SheetHeader, Text, showToast } from '@/components/ui';
 import { applySuggestions } from '@/features/onboarding/applySuggestions';
+import { IntentBox } from '@/features/onboarding/IntentBox';
 import { SuggestionPicker } from '@/features/onboarding/SuggestionPicker';
-import { PERSONAS, SUGGESTIONS, suggestionKey } from '@/features/onboarding/suggestions';
+import { useIntentPicks } from '@/features/onboarding/useIntentPicks';
+import { PERSONAS, SUGGESTIONS } from '@/features/onboarding/suggestions';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import type { Persona } from '@/store/types';
@@ -19,9 +21,15 @@ export default function SuggestionsScreen() {
   const settings = useSettings();
   const [persona, setPersona] = useState<Persona>(settings.persona ?? 'other');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const intent = useIntentPicks(selected, setSelected);
+  const toggle = (k: string) => {
+    const n = new Set(selected);
+    if (!n.delete(k)) n.add(k);
+    setSelected(n);
+  };
 
   const add = () => {
-    const n = applySuggestions(SUGGESTIONS[persona].filter((s) => selected.has(suggestionKey(s))));
+    const n = applySuggestions(intent.chosen(SUGGESTIONS[persona]));
     showToast(n ? `Added ${n}.` : 'You already have those.');
     if (router.canGoBack()) router.back();
     else router.replace('/settings');
@@ -35,7 +43,14 @@ export default function SuggestionsScreen() {
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <View style={{ gap: space.sm }}>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-            I am a…
+            What do you want to work on?
+          </Text>
+          <IntentBox value={intent.text} onChange={intent.setText} />
+        </View>
+        {intent.matches.length > 0 && <SuggestionPicker items={intent.matches} selected={selected} onToggle={toggle} />}
+        <View style={{ gap: space.sm }}>
+          <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
+            Or browse by who you are
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {PERSONAS.map((p) => (
@@ -46,22 +61,13 @@ export default function SuggestionsScreen() {
                 selected={persona === p.value}
                 onPress={() => {
                   setPersona(p.value);
-                  setSelected(new Set());
                   updateSettings({ persona: p.value });
                 }}
               />
             ))}
           </View>
         </View>
-        <SuggestionPicker
-          items={SUGGESTIONS[persona]}
-          selected={selected}
-          onToggle={(k) => {
-            const n = new Set(selected);
-            if (!n.delete(k)) n.add(k);
-            setSelected(n);
-          }}
-        />
+        <SuggestionPicker items={SUGGESTIONS[persona]} selected={selected} onToggle={toggle} />
         <Button label={selected.size ? `Add ${selected.size}` : 'Pick some to add'} disabled={!selected.size} onPress={add} />
       </ScrollView>
     </View>
