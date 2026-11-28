@@ -8,6 +8,7 @@ import { pick } from '@/features/nudges/messages';
 import { PERSONAS } from '@/features/onboarding/suggestions';
 import { Avatar } from '@/features/profile/Avatar';
 import { APP_VERSION } from '@/lib/appInfo';
+import { LANGUAGES, deviceLanguage, t } from '@/lib/i18n';
 import { requestNotificationPermission, supportsLocalNotifications } from '@/lib/notifications';
 import { PREMIUM_AVAILABLE, useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
@@ -204,7 +205,25 @@ export function SettingsBody() {
           label="Week starts on Monday"
           right={<Toggle value={s.weekStartsOn === 1} onValueChange={(v) => updateSettings({ weekStartsOn: v ? 1 : 0 })} />}
         />
-        <ListRow label="24-hour time" last right={<Toggle value={s.use24h} onValueChange={(use24h) => updateSettings({ use24h })} />} />
+        <ListRow label="24-hour time" right={<Toggle value={s.use24h} onValueChange={(use24h) => updateSettings({ use24h })} />} />
+        <ListRow
+          label={t('Language')}
+          last
+          right={
+            <Text tone="muted">
+              {s.language === 'system' ? `${t('Automatic')} · ${LANGUAGES.find((l) => l.code === deviceLanguage())?.name}` : LANGUAGES.find((l) => l.code === s.language)?.name}
+            </Text>
+          }
+          onPress={() =>
+            showDialog({
+              title: t('Language'),
+              actions: [
+                { label: `${t('Automatic')} (${LANGUAGES.find((l) => l.code === deviceLanguage())?.name})`, onPress: () => updateSettings({ language: 'system' }) },
+                ...LANGUAGES.map((l) => ({ label: l.name, onPress: () => updateSettings({ language: l.code }) })),
+              ],
+            })
+          }
+        />
       </Card>
 
       {/* Plan and upgrade: hidden until Premium can be bought. */}

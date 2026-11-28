@@ -176,6 +176,8 @@ export interface Settings {
   why: string;
   /** How the Today page looks (the Display sheet). */
   display: PlanDisplay;
+  /** 'system' follows the phone, or a code from src/lib/i18n LANGUAGES. */
+  language: string;
 }
 
 export interface PlanDisplay {
@@ -236,6 +238,7 @@ export const DEFAULT_SETTINGS: Settings = {
   avatar: '',
   why: '',
   display: DEFAULT_DISPLAY,
+  language: 'system',
   focusSound: 'off',
 };
 

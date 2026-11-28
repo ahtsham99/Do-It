@@ -1,14 +1,15 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { DialogHost, ToastHost } from '@/components/ui';
+import { DialogHost, ToastHost, showDialog } from '@/components/ui';
 import { FocusMode } from '@/features/focus/FocusMode';
 import { TimerWatcher } from '@/features/focus/TimerWatcher';
 import { NotificationSync } from '@/features/nudges/NotificationSync';
+import { applyLanguage, resolveLanguage, t } from '@/lib/i18n';
 import { start as fitViewport } from '@/lib/viewport';
 import { hydrate, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme';
@@ -36,10 +37,20 @@ export default function RootLayout() {
 function Gate({ hydrated }: { hydrated: boolean }) {
   const { fontsReady } = useTheme();
   const ready = hydrated && fontsReady;
+  // Language: applied before anything renders; the app redraws when it changes.
+  const setting = useStore((s) => s.settings.language);
+  const lang = useMemo(() => {
+    const code = resolveLanguage(setting);
+    return { code, restart: applyLanguage(code) };
+  }, [setting]);
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
-  return ready ? <Navigator /> : <Blank />;
+  useEffect(() => {
+    // The native app flips to right-to-left (or back) after a restart.
+    if (lang.restart) showDialog({ title: t('Restart Do It'), message: t('Close and reopen the app to finish switching the layout direction.'), actions: [{ label: t('OK'), onPress: () => {} }] });
+  }, [lang]);
+  return ready ? <Navigator key={lang.code} /> : <Blank />;
 }
 
 function Blank() {

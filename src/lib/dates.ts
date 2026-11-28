@@ -1,3 +1,4 @@
+import { currentLanguage, locale, t } from '@/lib/i18n';
 /**
  * Date helpers. All "day" values in the app are local calendar days stored as
  * ISO-like keys `YYYY-MM-DD` so they are timezone-safe and easy to sync later.
@@ -87,27 +88,27 @@ export function timeFromDate(d: Date): TimeKey {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-const WEEKDAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
+// Names come from Intl in the app's language (see src/lib/i18n).
+const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(locale(), o).format(d);
 
 export function weekdayShort(key: DayKey) {
-  return WEEKDAYS_SHORT[weekday(key)];
+  return fmt(fromKey(key), { weekday: 'short' }).replace(/\.$/, '');
 }
+/** One-letter weekday headers, starting on the first day of the week. */
 export function weekdayLetters(weekStartsOn: 0 | 1 = 1) {
-  const l = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-  return weekStartsOn === 1 ? [...l.slice(1), l[0]] : l;
+  // 2024-01-07 was a Sunday.
+  const letters = Array.from({ length: 7 }, (_, i) => fmt(new Date(2024, 0, 7 + i), { weekday: 'narrow' }));
+  return weekStartsOn === 1 ? [...letters.slice(1), letters[0]] : letters;
 }
 export function monthName(key: DayKey) {
-  return MONTHS[fromKey(key).getMonth()];
+  return fmt(fromKey(key), { month: 'long' });
 }
 
 export function formatTime(t?: TimeKey | null, use24h = false): string {
   if (!t) return '';
   if (use24h) return t;
   const [h, m] = t.split(':').map(Number);
+  if (currentLanguage() !== 'en') return fmt(new Date(2024, 0, 1, h, m), { hour: 'numeric', minute: '2-digit', hour12: true });
   const suffix = h >= 12 ? 'pm' : 'am';
   const hh = h % 12 === 0 ? 12 : h % 12;
   return m === 0 ? `${hh}${suffix}` : `${hh}:${pad(m)}${suffix}`;
@@ -116,19 +117,21 @@ export function formatTime(t?: TimeKey | null, use24h = false): string {
 /** "Today", "Tomorrow", "Yesterday", "Mon 12 Mar", or with year if not this year. */
 export function formatDay(key: DayKey, opts: { relative?: boolean; long?: boolean } = {}): string {
   const { relative = true, long = false } = opts;
-  const t = todayKey();
+  const today = todayKey();
   if (relative) {
-    const diff = diffDays(t, key);
-    if (diff === 0) return 'Today';
-    if (diff === 1) return 'Tomorrow';
-    if (diff === -1) return 'Yesterday';
+    const diff = diffDays(today, key);
+    if (diff === 0) return t('Today');
+    if (diff === 1) return t('Tomorrow');
+    if (diff === -1) return t('Yesterday');
   }
   const d = fromKey(key);
-  const month = MONTHS[d.getMonth()];
-  const base = long
-    ? `${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][d.getDay()]}, ${d.getDate()} ${month}`
-    : `${WEEKDAYS_SHORT[d.getDay()]} ${d.getDate()} ${month.slice(0, 3)}`;
-  return d.getFullYear() === fromKey(t).getFullYear() ? base : `${base} ${d.getFullYear()}`;
+  const year = d.getFullYear() === fromKey(today).getFullYear() ? {} : { year: 'numeric' as const };
+  if (currentLanguage() === 'en') {
+    const month = fmt(d, { month: 'long' });
+    const base = long ? `${fmt(d, { weekday: 'long' })}, ${d.getDate()} ${month}` : `${fmt(d, { weekday: 'short' })} ${d.getDate()} ${month.slice(0, 3)}`;
+    return year.year ? `${base} ${d.getFullYear()}` : base;
+  }
+  return fmt(d, long ? { weekday: 'long', day: 'numeric', month: 'long', ...year } : { weekday: 'short', day: 'numeric', month: 'short', ...year });
 }
 
 export function isoWeekId(key: DayKey, weekStartsOn: 0 | 1 = 1): DayKey {
@@ -153,5 +156,5 @@ export function minutesBetween(a: TimeKey, b: TimeKey) {
 export function formatDuration(min: number) {
   const h = Math.floor(min / 60);
   const m = Math.round(min % 60);
-  return h ? (m ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
+  return h ? (m ? t('{h}h {m}m', { h, m }) : t('{h}h', { h })) : t('{m}m', { m });
 }
