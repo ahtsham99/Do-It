@@ -42,7 +42,7 @@ export function ReminderCard({ occ, onDismiss }: { occ: Occurrence; onDismiss: (
         <Press haptic={false} style={{ flex: 1, gap: 3 }} onPress={() => router.push({ pathname: '/task', params: { id: task.id, day } })}>
           <Text variant="heading">{task.title}</Text>
           <Text variant="small" tone="muted">
-            {pick('reminder', tone, task.id)} {task.time ? `planned for ${formatTime(task.time, use24h)}` : 'planned for today'}.
+            {tone === 'savage' ? `${task.time ? `Planned for ${formatTime(task.time, use24h)}` : 'Planned for today'}. ${pick('remindCard', tone, task.id)}` : `${pick('remindCard', tone, task.id)} ${task.time ? `planned for ${formatTime(task.time, use24h)}` : 'planned for today'}.`}
           </Text>
         </Press>
         <Press onPress={onDismiss} hitSlop={14} accessibilityLabel="Dismiss" style={{ padding: 4 }}>

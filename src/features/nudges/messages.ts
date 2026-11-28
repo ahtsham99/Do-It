@@ -19,9 +19,9 @@ export const MESSAGES = {
       'A clear plan now makes the rest of the day easier.',
     ],
     savage: [
-      'Before anything else, decide what today is for.',
-      'Name the one thing you’ll finish today, then build around it.',
-      'A day with a plan is a day you can finish. Set yours now.',
+      'Up! Decide what today is for before anything else.',
+      'No plan, no progress. Set your day now!',
+      'Pick the one thing you’ll finish today. Go!',
     ],
   },
   overdue: {
@@ -34,19 +34,19 @@ export const MESSAGES = {
       'Give each of these a new day, or cross it off for good.',
     ],
     savage: [
-      'These have waited long enough. Finish one before anything new.',
-      'Start with the oldest one. Ten minutes is enough to begin.',
+      'These have waited long enough. Finish one now!',
+      'Stop scrolling. Start with the oldest one. Go!',
     ],
   },
   unfinished: {
     gentle: ['There’s still time for one more, if you’d like.', 'Almost there. One more?'],
     balanced: ['A little left for today. Finish what you can.', 'Close the day well. One more tick.'],
-    savage: ['You planned these for today. Finish one before you rest.', 'One more before the day ends. You’ll be glad you did.'],
+    savage: ['You planned these. Finish one before you rest!', 'The day’s not over. Get one more done!'],
   },
   streakRisk: {
     gentle: ['One small thing today keeps your streak going.'],
     balanced: ['Your streak is waiting. One habit or one reminder keeps it going.'],
-    savage: ['Your streak ends at midnight. One small thing saves it.'],
+    savage: ['Your streak dies at midnight! Do one thing now!'],
   },
   done: {
     gentle: ['Nicely done.', 'One less thing.', 'Lovely.', 'Well done.'],
@@ -58,10 +58,36 @@ export const MESSAGES = {
     balanced: ['All done for today. Enjoy the quiet.'],
     savage: ['Every task finished. That’s a full day.'],
   },
-  reminder: {
-    gentle: ['A gentle reminder:'],
+  // Reminders: plain for Gentle and Firm, pushy for Relentless.
+  /** A timed plan, at its time. */
+  remindNow: {
+    gentle: ['It’s time for this.'],
+    balanced: ['It’s time for this.'],
+    savage: ['Still not done? Do it now!', 'No more waiting. Go!', 'Now. Not later. Go!'],
+  },
+  /** An untimed plan for today. */
+  remindToday: {
+    gentle: ['On your list for today.'],
+    balanced: ['On your list for today.'],
+    savage: ['Still on your list. Get it done today!', 'Today. No excuses!', 'This won’t do itself. Go!'],
+  },
+  /** Something you asked to remember (Reminders tab). */
+  remindAsked: {
+    gentle: ['You asked to be reminded.'],
+    balanced: ['You asked to be reminded.'],
+    savage: ['You said you’d do this. Do it now!', 'Reminder! Get it done now!', 'Don’t ignore this one. Do it!'],
+  },
+  /** A snoozed plan coming back. */
+  remindAgain: {
+    gentle: ['Here it is again, as you asked.'],
+    balanced: ['Reminding you again, as you asked.'],
+    savage: ['You snoozed this. Not again. Do it now!', 'Back again! Stop putting it off!'],
+  },
+  /** The reminder card on Today. */
+  remindCard: {
+    gentle: ['A reminder:'],
     balanced: ['A reminder:'],
-    savage: ['It’s time:'],
+    savage: ['Do it now!'],
   },
 } satisfies Record<string, Bank>;
 

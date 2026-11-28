@@ -103,7 +103,7 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
     if (r.deletedAt || r.done) continue;
     const at = r.snoozedUntil && r.snoozedUntil > now.getTime() ? r.snoozedUntil : r.remindAt;
     if (!at || at <= now.getTime()) continue;
-    out.push({ id: `rem-${r.id}`, date: new Date(at), title: r.title, body: `${pick('reminder', settings.tone, r.id)} you asked to remember this.`, url: `/reminder?id=${r.id}` });
+    out.push({ id: `rem-${r.id}`, date: new Date(at), title: r.title, body: pick('remindAsked', settings.tone, r.id), url: `/reminder?id=${r.id}` });
   }
 
   // Snoozed plan items.
@@ -113,7 +113,7 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
         id: `snooze-${task.id}`,
         date: new Date(task.snoozedUntil),
         title: task.title,
-        body: `${pick('reminder', settings.tone, task.id)} you asked to be reminded again.`,
+        body: pick('remindAgain', settings.tone, task.id),
         url: `/task?id=${task.id}`,
       });
     }
@@ -132,8 +132,10 @@ export function planNotifications(state: AppState, now = new Date()): PlannedNot
         date: at,
         title: task.title,
         body: task.time
-          ? `${task.reminder === 0 ? 'Now' : `At ${formatTime(task.time, settings.use24h)}`} · ${pick('reminder', settings.tone, task.id)} worth doing now.`
-          : `${pick('reminder', settings.tone, task.id)} this is on today’s list.`,
+          ? task.reminder === 0
+            ? pick('remindNow', settings.tone, task.id)
+            : `At ${formatTime(task.time, settings.use24h)} · ${pick('remindToday', settings.tone, task.id)}`
+          : pick('remindToday', settings.tone, task.id),
         url: `/task?id=${task.id}&day=${day}`,
       });
       if (out.length >= MAX) break;
