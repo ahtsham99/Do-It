@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Text } from '@/components/ui';
 import { radius, space, useTheme } from '@/theme';
+import { formatDuration } from '@/lib/dates';
+import { t } from '@/lib/i18n';
 
 /** True where we can show the iPhone's own hours-and-minutes timer wheel. */
 export const nativeDurationWheel = Platform.OS === 'ios';
@@ -26,7 +28,7 @@ export function DurationSheet({ visible, minutes, onClose, onSet }: { visible: b
       <Pressable style={[styles.backdrop, { backgroundColor: c.overlay }]} onPress={onClose}>
         <Pressable style={[styles.sheet, { backgroundColor: c.surface, paddingBottom: space.lg + insets.bottom }]}>
           <Text variant="heading" style={{ textAlign: 'center' }}>
-            Focus length
+            {t('Focus length')}
           </Text>
           <DateTimePicker
             value={value}
@@ -36,7 +38,7 @@ export function DurationSheet({ visible, minutes, onClose, onSet }: { visible: b
             onValueChange={(_, d) => setValue(d)}
           />
           <Button
-            label={total ? `Set ${Math.floor(total / 60) ? `${Math.floor(total / 60)}h ` : ''}${total % 60 ? `${total % 60}m` : ''}`.trim() : 'Pick a length'}
+            label={total ? t('Set {length}', { length: formatDuration(total) }) : t('Pick a length')}
             disabled={!total}
             onPress={() => {
               onSet(total);

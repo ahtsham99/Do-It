@@ -12,6 +12,7 @@ import type { Habit } from '@/store/types';
 import { space, useTheme } from '@/theme';
 
 import { bestHabitStreak, habitStreak, streakLabel, weekCount } from './logic';
+import { t } from '@/lib/i18n';
 
 /** Tick a habit for a day, with a cheer when it's today. */
 export function tickHabit(habit: Habit, day: string, tone: Parameters<typeof randomLine>[1], weekStartsOn: 0 | 1) {
@@ -38,7 +39,7 @@ export function HabitRing({ habit, size = 64, onPress }: { habit: Habit; size?: 
       disabled={!onPress}
       accessibilityRole="button"
       accessibilityState={{ checked: done }}
-      accessibilityLabel={target > 1 ? `${habit.name}: ${count} of ${target}. Tap to add one` : `Tick ${habit.name}`}
+      accessibilityLabel={target > 1 ? t('{name}: {count} of {target}. Tap to add one', { name: habit.name, count, target }) : t('Tick {name}', { name: habit.name })}
       style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <TimerRing size={size} stroke={3} progress={target > 1 ? count / target : done ? 1 : 0} color={color}>
         <View style={{ width: size - 6, height: size - 6, borderRadius: size, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.accentSoft : c.surface }}>
@@ -74,12 +75,12 @@ export function HabitCard({ habit }: { habit: Habit }) {
             {habit.name}
           </Text>
           <Text variant="small" tone="muted">
-            {(habit.perDay ?? 1) > 1 ? `${countFor(habit, today)}/${habit.perDay} today · ` : ''}
-            {streak > 0 ? `${streakLabel(habit, streak)} streak` : 'No streak yet'} · best {best}
+            {(habit.perDay ?? 1) > 1 ? t('{count}/{perDay} today · ', { count: countFor(habit, today), perDay: habit.perDay }) : ''}
+            {streak > 0 ? `${streakLabel(habit, streak)} streak` : t('No streak yet')} · best {best}
             {habit.frequency === 'weekly' ? ` · ${weekCount(habit, today, weekStartsOn)}/${habit.timesPerWeek} this week` : ''}
           </Text>
         </Press>
-        <Press onPress={open} hitSlop={12} accessibilityLabel={`Edit ${habit.name}`} style={{ padding: 4 }}>
+        <Press onPress={open} hitSlop={12} accessibilityLabel={t('Edit {name}', { name: habit.name })} style={{ padding: 4 }}>
           <Icon name="ellipsis-horizontal" size={22} color={c.textMuted} />
         </Press>
       </View>
@@ -93,7 +94,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
               haptic={false}
               disabled={future}
               onPress={() => (d === today ? tickHabit(habit, d, tone, weekStartsOn) : setHabitDay(habit, d, !hit))}
-              accessibilityLabel={`${weekdayShort(d)} ${hit ? 'done' : 'not done'}`}
+              accessibilityLabel={`${weekdayShort(d)} ${hit ? 'done' : t('not done')}`}
               style={[
                 styles.day,
                 {

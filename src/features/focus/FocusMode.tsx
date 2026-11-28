@@ -13,6 +13,7 @@ import { darkFor, type NightBackground } from '@/theme/colors';
 import { setFocusExpanded, useFocusExpanded } from './focusMode';
 import { playSound, stopSound, type SoundId } from './sounds';
 import { formatClock, useTick } from './useTick';
+import { t } from '@/lib/i18n';
 
 const INK = '#F2EFE8';
 const DIM = 'rgba(242,239,232,0.55)';
@@ -60,8 +61,8 @@ function FocusModeView() {
   const size = Math.round(Math.min(320, width - 64, height * 0.42));
   const clock = formatClock(left);
   const clockSize = Math.round(Math.min(84, (size * 0.72) / (clock.length * 0.62)));
-  const state = paused ? 'Paused' : isBreak ? 'Break · breathe' : 'Focusing';
-  const roundText = rounds > 1 ? `Round ${timer.round ?? 1} of ${rounds}` : '';
+  const state = paused ? t('Paused') : isBreak ? t('Break · breathe') : t('Focusing');
+  const roundText = rounds > 1 ? t('Round {round} of {rounds}', { round: timer.round ?? 1, rounds }) : '';
 
   const poke = () => {
     setTouchedAt(Date.now());
@@ -80,17 +81,17 @@ function FocusModeView() {
   };
   const end = () =>
     showDialog({
-      title: isBreak ? 'End the break?' : 'End this session?',
-      message: isBreak ? 'You can start the next round from the Focus tab.' : 'The minutes you’ve already done still count.',
-      actions: [{ label: isBreak ? 'End break' : 'End session', destructive: true, onPress: () => (stopSound(), stopTimer()) }],
+      title: isBreak ? t('End the break?') : t('End this session?'),
+      message: isBreak ? t('You can start the next round from the Focus tab.') : t('The minutes you’ve already done still count.'),
+      actions: [{ label: isBreak ? t('End break') : t('End session'), destructive: true, onPress: () => (stopSound(), stopTimer()) }],
     });
 
   return (
     <View style={[StyleSheet.absoluteFill, { backgroundColor: BG }]}>
       <StatusBar style="light" />
-      <Press haptic={false} onPress={toggle} accessibilityLabel={controls ? 'Hide controls' : 'Show controls'} style={[styles.fill, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }]}>
+      <Press haptic={false} onPress={toggle} accessibilityLabel={controls ? t('Hide controls') : t('Show controls')} style={[styles.fill, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }]}>
         <View style={[styles.top, { opacity: controls ? 1 : 0 }]} pointerEvents={controls ? 'auto' : 'none'}>
-          <Press onPress={() => setFocusExpanded(false)} accessibilityLabel="Minimise" hitSlop={12} style={styles.close}>
+          <Press onPress={() => setFocusExpanded(false)} accessibilityLabel={t('Minimise')} hitSlop={12} style={styles.close}>
             <Icon name="chevron-down" size={26} color={DIM} />
           </Press>
         </View>
@@ -104,7 +105,7 @@ function FocusModeView() {
             {roundText ? <Text style={{ color: DIM, fontSize: 15, marginTop: 4 }}>{roundText}</Text> : null}
           </GlowRing>
           <Text numberOfLines={2} style={{ color: INK, fontFamily: SERIF, fontStyle: 'italic', fontSize: 26, lineHeight: 32, textAlign: 'center', maxWidth: size + 20, paddingHorizontal: 8, opacity: timer.label ? 0.95 : 0.8 }}>
-            {timer.label || (isBreak ? 'Stand up, stretch, drink water' : 'One thing at a time')}
+            {timer.label || (isBreak ? t('Stand up, stretch, drink water') : t('One thing at a time'))}
           </Text>
           {rounds > 1 ? (
             <View style={styles.pips} accessibilityLabel={roundText}>
@@ -118,13 +119,13 @@ function FocusModeView() {
         <View style={[styles.controls, { opacity: controls ? 1 : 0 }]} pointerEvents={controls ? 'box-none' : 'none'}>
           {controls ? (
             <>
-              <Round icon="add" label="+5 min" onPress={() => (poke(), addMinutes(5))} />
+              <Round icon="add" label={t('+5 min')} onPress={() => (poke(), addMinutes(5))} />
               <Round icon={paused ? 'play' : 'pause'} label={paused ? 'Resume' : 'Pause'} onPress={pause} big color={ringColor} />
-              <Round icon="stop" label="End" onPress={end} />
+              <Round icon="stop" label={t('End')} onPress={end} />
             </>
           ) : null}
         </View>
-        <Text style={{ color: FAINT, fontSize: 12, textAlign: 'center', opacity: controls ? 0 : 1 }}>Tap for controls</Text>
+        <Text style={{ color: FAINT, fontSize: 12, textAlign: 'center', opacity: controls ? 0 : 1 }}>{t('Tap for controls')}</Text>
       </Press>
     </View>
   );

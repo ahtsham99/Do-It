@@ -11,6 +11,7 @@ import { useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import type { Repeat } from '@/store/types';
 import { SWATCHES, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const REPEATS = Object.keys(REPEAT_LABELS) as Repeat[];
 
@@ -44,36 +45,36 @@ export default function TaskEditor() {
     if (!existing) return;
     const day = params.day ?? existing.date;
     if (existing.repeat !== 'none') {
-      showDialog({ title: 'Delete repeating task', actions: [
-        { label: `Delete only ${formatDay(day)}`, onPress: () => (skipOccurrence(existing, day), close()) },
-        { label: 'Delete all occurrences', destructive: true, onPress: () => (deleteTask(existing.id), close()) },
+      showDialog({ title: t('Delete repeating task'), actions: [
+        { label: t('Delete only {day}', { day: formatDay(day) }), onPress: () => (skipOccurrence(existing, day), close()) },
+        { label: t('Delete all occurrences'), destructive: true, onPress: () => (deleteTask(existing.id), close()) },
       ] });
     } else {
       showDialog({
-        title: 'Delete task?',
-        message: `“${existing.title}” will be removed.`,
-        actions: [{ label: 'Delete', destructive: true, onPress: () => (deleteTask(existing.id), close()) }],
+        title: t('Delete task?'),
+        message: t('“{title}” will be removed.', { title: existing.title }),
+        actions: [{ label: t('Delete'), destructive: true, onPress: () => (deleteTask(existing.id), close()) }],
       });
     }
   };
 
-  const t = todayKey();
+  const today = todayKey();
   const quickDates: { label: string; value: DayKey }[] = [
-    { label: 'Today', value: t },
-    { label: 'Tomorrow', value: addDays(t, 1) },
-    { label: 'Next week', value: addDays(t, 7) },
+    { label: t('Today'), value: today },
+    { label: t('Tomorrow'), value: addDays(today, 1) },
+    { label: t('Next week'), value: addDays(today, 7) },
   ];
 
   return (
     <SheetScreen>
       <View>
-        <SheetHeader title={existing ? 'Edit plan' : 'Add to plan'} onSave={save} canSave={canSave} />
+        <SheetHeader title={existing ? t('Edit plan') : t('Add to plan')} onSave={save} canSave={canSave} />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <Field
-          placeholder="What’s the plan?"
+          placeholder={t('What’s the plan?')}
           value={title}
           onChangeText={setTitle}
           returnKeyType="done"
@@ -82,17 +83,17 @@ export default function TaskEditor() {
         />
 
         <View style={{ gap: space.sm }}>
-          <Label>When</Label>
+          <Label>{t('When')}</Label>
           <Card style={{ gap: space.md }}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
               {quickDates.map((q) => (
                 <Chip key={q.label} label={q.label} selected={date === q.value} onPress={() => setDate(q.value)} />
               ))}
             </View>
-            <Row label="Date">
+            <Row label={t('Date')}>
               <DateTimeField mode="date" value={date} onChange={setDate} />
             </Row>
-            <Row label="Time">
+            <Row label={t('Time')}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
                 {time && <DateTimeField mode="time" value={time} onChange={setTime} use24h={use24h} />}
                 <Toggle
@@ -108,7 +109,7 @@ export default function TaskEditor() {
             {time && (
               <View style={{ gap: space.sm }}>
                 <Text variant="small" tone="muted">
-                  How long?{duration ? ` · until ${formatTime(addMinutesToTime(time, duration), use24h)}` : ''}
+                  How long?{duration ? t(' · until {time}', { time: formatTime(addMinutesToTime(time, duration), use24h) }) : ''}
                 </Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
                   {[null, 15, 30, 45, 60, 90, 120, 180].map((m) => (
@@ -121,7 +122,7 @@ export default function TaskEditor() {
         </View>
 
         <View style={{ gap: space.sm }}>
-          <Label>Remind me</Label>
+          <Label>{t('Remind me')}</Label>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {REMINDER_OPTIONS.map((o) => (
               <Chip
@@ -135,18 +136,18 @@ export default function TaskEditor() {
           </View>
           {reminder != null && (
             <Text variant="small" tone="muted">
-              {!time ? 'No time set — you’ll be reminded at 9am. ' : ''}
+              {!time ? t('No time set — you’ll be reminded at 9am. ') : ''}
               {Platform.OS === 'web'
-                ? 'In the web app, this shows on your main page when it’s time.'
+                ? t('In the web app, this shows on your main page when it’s time.')
                 : !notificationsEnabled
-                  ? 'Turn on notifications in Settings to get this reminder.'
+                  ? t('Turn on notifications in Settings to get this reminder.')
                   : ''}
             </Text>
           )}
         </View>
 
         <View style={{ gap: space.sm }}>
-          <Label>Repeat</Label>
+          <Label>{t('Repeat')}</Label>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {REPEATS.map((r) => (
               <Chip key={r} label={REPEAT_LABELS[r]} selected={repeat === r} onPress={() => setRepeat(r)} />
@@ -155,12 +156,12 @@ export default function TaskEditor() {
         </View>
 
         <View style={{ gap: space.sm }}>
-          <Label>Colour</Label>
+          <Label>{t('Colour')}</Label>
           <ColorPicker colors={SWATCHES} value={color ?? ''} onChange={setColor}>
             <PremiumColorDots value={color} onChange={setColor} />
             <Press
               onPress={() => setColor(null)}
-              accessibilityLabel="No colour"
+              accessibilityLabel={t('No colour')}
               accessibilityState={{ selected: !color }}
               style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2.5, padding: 3, borderColor: !color ? c.text : 'transparent' }}>
               <View style={{ flex: 1, borderRadius: 20, borderWidth: 1.5, borderColor: c.border, alignItems: 'center', justifyContent: 'center' }}>
@@ -170,21 +171,21 @@ export default function TaskEditor() {
           </ColorPicker>
         </View>
 
-        <Field label="Notes" placeholder="Details, links, sub-steps…" value={notes} onChangeText={setNotes} multiline />
+        <Field label={t('Notes')} placeholder={t('Details, links, sub-steps…')} value={notes} onChangeText={setNotes} multiline />
 
-        <Button label={existing ? 'Save changes' : 'Add to plan'} onPress={save} disabled={!canSave} />
+        <Button label={existing ? t('Save changes') : t('Add to plan')} onPress={save} disabled={!canSave} />
         {existing && (
           <Button
             kind="secondary"
             icon="timer-outline"
-            label="Focus on this for 5 minutes"
+            label={t('Focus on this for 5 minutes')}
             onPress={() => {
               close();
               router.push({ pathname: '/focus', params: { taskId: existing.id } });
             }}
           />
         )}
-        {existing && <Button kind="danger" icon="trash-outline" label="Delete" onPress={remove} />}
+        {existing && <Button kind="danger" icon="trash-outline" label={t('Delete')} onPress={remove} />}
       </ScrollView>
     </SheetScreen>
   );

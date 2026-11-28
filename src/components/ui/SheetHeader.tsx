@@ -6,14 +6,15 @@ import { space, useTheme } from '@/theme';
 import { Press } from './Pressable';
 import { useSheetClose } from './SheetScreen';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 /** Header for modal editor screens: Cancel · Title · Save. */
 export function SheetHeader({
   title,
   onSave,
-  saveLabel = 'Save',
+  saveLabel = t('Save'),
   canSave = true,
-  cancelLabel = 'Cancel',
+  cancelLabel = t('Cancel'),
 }: {
   title: string;
   onSave?: () => void;

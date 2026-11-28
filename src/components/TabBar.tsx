@@ -7,12 +7,13 @@ import { Icon, Press, Text, type IconName } from '@/components/ui';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import { useTabBarBottom } from '@/hooks/useTopInset';
 import { radius, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 export const TAB_META: Record<string, { title: string; icon: IconName }> = {
-  index: { title: 'Today', icon: 'sunny-outline' },
-  habits: { title: 'Habits', icon: 'flame-outline' },
-  reminders: { title: 'Reminders', icon: 'alarm-outline' },
-  focus: { title: 'Focus', icon: 'timer-outline' },
+  index: { title: t('Today'), icon: 'sunny-outline' },
+  habits: { title: t('Habits'), icon: 'flame-outline' },
+  reminders: { title: t('Reminders'), icon: 'alarm-outline' },
+  focus: { title: t('Focus'), icon: 'timer-outline' },
 };
 
 /** Floating, pill-shaped tab bar. */

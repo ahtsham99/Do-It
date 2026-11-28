@@ -7,6 +7,7 @@ import { useSettings } from '@/store/hooks';
 import { space, useTheme } from '@/theme';
 
 import { suggestionKey, type Suggestion } from './suggestions';
+import { t } from '@/lib/i18n';
 
 export function SuggestionPicker({
   items,
@@ -23,7 +24,7 @@ export function SuggestionPicker({
   return (
     <>
       {goals.length > 0 && (
-        <Section title={goals.length > 1 ? 'Goals' : 'A goal'}>
+        <Section title={goals.length > 1 ? t('Goals') : t('A goal')}>
           <Card padded={false} style={{ paddingHorizontal: space.lg }}>
             {goals.map((s, i) => (
               <Row key={suggestionKey(s)} s={s} on={selected.has(suggestionKey(s))} onToggle={onToggle} last={i === goals.length - 1} />
@@ -32,7 +33,7 @@ export function SuggestionPicker({
         </Section>
       )}
       {habits.length > 0 && (
-      <Section title="Habits">
+      <Section title={t('Habits')}>
         <Card padded={false} style={{ paddingHorizontal: space.lg }}>
           {habits.map((s, i) => (
             <Row key={suggestionKey(s)} s={s} on={selected.has(suggestionKey(s))} onToggle={onToggle} last={i === habits.length - 1} />
@@ -41,7 +42,7 @@ export function SuggestionPicker({
       </Section>
       )}
       {tasks.length > 0 && (
-      <Section title="Repeating plans">
+      <Section title={t('Repeating plans')}>
         <Card padded={false} style={{ paddingHorizontal: space.lg }}>
           {tasks.map((s, i) => (
             <Row key={suggestionKey(s)} s={s} on={selected.has(suggestionKey(s))} onToggle={onToggle} last={i === tasks.length - 1} />
@@ -78,9 +79,9 @@ function Row({ s, on, onToggle, last }: { s: Suggestion; on: boolean; onToggle: 
             ? `First steps: ${s.steps.join(' · ')}`
             : s.kind === 'habit'
               ? s.frequency === 'daily'
-                ? 'Every day'
-                : `${s.timesPerWeek}× a week`
-              : `${REPEAT_LABELS[s.repeat]}${s.time ? ` · ${formatTime(s.time, use24h)}` : ''}`}
+                ? t('Every day')
+                : t('{timesPerWeek}× a week', { timesPerWeek: s.timesPerWeek })
+              : `${t(REPEAT_LABELS[s.repeat])}${s.time ? ` · ${formatTime(s.time, use24h)}` : ''}`}
         </Text>
       </View>
       <Checkbox checked={on} onToggle={() => onToggle(key)} />

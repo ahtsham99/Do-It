@@ -9,6 +9,7 @@ import { useLists, useReminders } from '@/store/hooks';
 import { recall, remember } from '@/lib/uiMemory';
 import { INBOX_LIST, type ReminderItem } from '@/store/types';
 import { font, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 
 /** Things to remember — not your schedule. Lists like Reminders and Groceries. */
@@ -50,13 +51,13 @@ export default function RemindersScreen() {
       title: current.name,
       actions: [
         {
-          label: 'Delete this list',
+          label: t('Delete this list'),
           destructive: true,
           onPress: () =>
             showDialog({
-              title: `Delete “${current.name}”?`,
-              message: 'The list and everything in it will be removed.',
-              actions: [{ label: 'Delete list', destructive: true, onPress: () => (deleteList(current.id), setList(INBOX_LIST)) }],
+              title: t('Delete “{name}”?', { name: current.name }),
+              message: t('The list and everything in it will be removed.'),
+              actions: [{ label: t('Delete list'), destructive: true, onPress: () => (deleteList(current.id), setList(INBOX_LIST)) }],
             }),
         },
       ],
@@ -65,7 +66,7 @@ export default function RemindersScreen() {
 
   const clear = () => {
     const ids = clearDone(activeId);
-    showToast(`Cleared ${ids.length} done`, 'checkmark-done-outline', { label: 'Undo', onPress: () => restoreReminders(ids) });
+    showToast(t('Cleared {n} done', { n: ids.length }), 'checkmark-done-outline', { label: t('Undo'), onPress: () => restoreReminders(ids) });
   };
 
   const addTo = activeId;
@@ -75,8 +76,8 @@ export default function RemindersScreen() {
     <>
     <ReminderSheet visible={sheet.open} existing={sheet.item} defaultListId={addTo} onClose={() => setSheet({ open: false })} />
     <Screen
-      title="Reminders"
-      subtitle={open.length ? `${open.length} to remember` : 'Nothing to remember'}
+      title={t('Reminders')}
+      subtitle={open.length ? t('{n} to remember', { n: open.length }) : t('Nothing to remember')}
 >
       {/* Lists */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm, paddingRight: space.lg }} style={{ marginHorizontal: -2 }}>
@@ -103,10 +104,10 @@ export default function RemindersScreen() {
           );
         })}
         {newList === null ? (
-          <Press onPress={() => setNewList('')} accessibilityLabel="New list" style={[styles.list, { borderColor: c.border, borderStyle: 'dashed' }]}>
+          <Press onPress={() => setNewList('')} accessibilityLabel={t('New list')} style={[styles.list, { borderColor: c.border, borderStyle: 'dashed' }]}>
             <Icon name="add" size={15} color={c.textMuted} />
             <Text variant="small" tone="muted" style={{ fontWeight: '600' }}>
-              New list
+              {t('New list')}
             </Text>
           </Press>
         ) : (
@@ -117,7 +118,7 @@ export default function RemindersScreen() {
               onChangeText={setNewList}
               onSubmitEditing={createList}
               onBlur={createList}
-              placeholder="List name"
+              placeholder={t('List name')}
               placeholderTextColor={c.textFaint}
               style={[font.small, { width: 120, color: c.text, fontFamily: fonts.text(500), outlineStyle: 'none' } as object]}
             />
@@ -126,18 +127,18 @@ export default function RemindersScreen() {
       </ScrollView>
 
       {/* Tap to open the add sheet: type and set everything in one go. */}
-      <Press onPress={() => setSheet({ open: true })} accessibilityRole="button" accessibilityLabel={isShopping ? 'Add an item' : 'Add a reminder'} style={[styles.addField, { backgroundColor: c.surface, borderColor: c.border }]}>
+      <Press onPress={() => setSheet({ open: true })} accessibilityRole="button" accessibilityLabel={isShopping ? 'Add an item' : t('Add a reminder')} style={[styles.addField, { backgroundColor: c.surface, borderColor: c.border }]}>
         <Icon name="add" size={22} color={c.textFaint} />
         <Text tone="faint" style={{ fontSize: 16 }}>
-          {isShopping ? 'Add an item' : 'Add a reminder'}
+          {isShopping ? t('Add an item') : t('Add a reminder')}
         </Text>
       </Press>
 
       {open.length === 0 && done.length === 0 ? (
         <Empty
           icon={isShopping ? 'cart-outline' : 'notifications-outline'}
-          title={isShopping ? 'The list is empty' : 'Nothing to remember'}
-          body={isShopping ? 'Add items as you think of them. Tick them off in the shop.' : 'Add anything you don’t want to forget. Add a day or time to get an alert.'}
+          title={isShopping ? t('The list is empty') : t('Nothing to remember')}
+          body={isShopping ? t('Add items as you think of them. Tick them off in the shop.') : t('Add anything you don’t want to forget. Add a day or time to get an alert.')}
         />
       ) : (
         open.length > 0 && (
@@ -151,17 +152,17 @@ export default function RemindersScreen() {
 
       {done.length > 0 && (
         <Section
-          title={`Done · ${done.length}`}
+          title={t('Done · {n}', { n: done.length })}
           right={
             <View style={{ flexDirection: 'row', gap: space.lg }}>
               <Press onPress={() => setShowDone(!showDone)} hitSlop={8}>
                 <Text variant="small" tone="muted">
-                  {showDone ? 'Hide' : 'Show'}
+                  {showDone ? t('Hide') : t('Show')}
                 </Text>
               </Press>
               <Press onPress={clear} hitSlop={8}>
                 <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
-                  Clear
+                  {t('Clear')}
                 </Text>
               </Press>
             </View>
@@ -177,7 +178,7 @@ export default function RemindersScreen() {
       )}
     </Screen>
     {/* Within thumb reach, just above the tab bar. */}
-    <Fab label={isShopping ? 'Add an item' : 'Add a reminder'} onPress={() => setSheet({ open: true })} />
+    <Fab label={isShopping ? t('Add an item') : t('Add a reminder')} onPress={() => setSheet({ open: true })} />
     </>
   );
 }

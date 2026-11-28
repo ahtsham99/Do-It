@@ -31,8 +31,9 @@ import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
 
 import { dismissed } from './dismissed';
+import { t } from '@/lib/i18n';
 
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const WEEKDAYS = ['Sunday', t('Monday'), t('Tuesday'), t('Wednesday'), t('Thursday'), t('Friday'), t('Saturday')];
 
 /** Big day title: Today / Tomorrow / Yesterday, or the weekday. */
 function dayTitle(day: DayKey, today: DayKey) {
@@ -85,7 +86,7 @@ export function PlannerView() {
   // In the evening, the most useful thing is to set up tomorrow.
   const planTomorrow: Nudge | null =
     n.now.getHours() >= 17
-      ? { key: 'tomorrow', kind: 'accent', icon: 'moon-outline', title: tomorrowCount ? `Plan tomorrow · ${tomorrowCount} planned so far` : 'Plan tomorrow while it’s fresh', onPress: () => (setSpan('day'), pick(tomorrow)) }
+      ? { key: 'tomorrow', kind: 'accent', icon: 'moon-outline', title: tomorrowCount ? `Plan tomorrow · ${tomorrowCount} planned so far` : t('Plan tomorrow while it’s fresh'), onPress: () => (setSpan('day'), pick(tomorrow)) }
       : null;
   for (const r of dueItems) {
     nudges.push({ key: `ri:${r.id}`, kind: 'warning', icon: 'notifications-outline', title: `Remember: ${r.title}`, onPress: () => router.push({ pathname: '/reminder', params: { id: r.id } }) });
@@ -106,7 +107,7 @@ export function PlannerView() {
       carryOver.map((o) => o.task.id),
       addDays(n.today, 1),
     );
-    showToast(`Moved ${moved.length} to tomorrow`, 'arrow-forward-circle-outline', { label: 'Undo', onPress: () => restoreDates(moved) });
+    showToast(t('Moved {n} to tomorrow', { n: moved.length }), 'arrow-forward-circle-outline', { label: t('Undo'), onPress: () => restoreDates(moved) });
   };
 
   const pick = (d: DayKey) => {
@@ -136,7 +137,7 @@ export function PlannerView() {
       {/* Day title + calendar controls */}
       <View style={{ gap: 2 }}>
         <View style={styles.titleRow}>
-          <Press haptic={false} disabled={layout === 'month'} onPress={() => setMonthOpen(!monthOpen)} onLayout={(e) => setTitleW(e.nativeEvent.layout.width)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : 'Show month'} style={styles.titleBtn}>
+          <Press haptic={false} disabled={layout === 'month'} onPress={() => setMonthOpen(!monthOpen)} onLayout={(e) => setTitleW(e.nativeEvent.layout.width)} accessibilityRole="button" accessibilityLabel={monthOpen ? 'Hide month' : t('Show month')} style={styles.titleBtn}>
             <Text style={{ fontFamily: SERIF, fontSize: titleSize, lineHeight: titleSize + 4, letterSpacing: -0.8, flexShrink: 1 }} numberOfLines={1}>
               {titleText}
             </Text>
@@ -145,7 +146,7 @@ export function PlannerView() {
           {!isToday && (
             <Press onPress={() => pick(n.today)} style={[styles.todayPill, { backgroundColor: c.accentSoft }]} accessibilityRole="button">
               <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
-                Today
+                {t('Today')}
               </Text>
             </Press>
           )}
@@ -176,18 +177,18 @@ export function PlannerView() {
         <WeekStrip selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
       )}
 
-      {isToday && (!timerIdle ? <FocusNowCard compact /> : nudges[0] ? <NudgeStrip nudge={nudges[0]} more={nudges.length - 1} onMore={() => showDialog({ title: 'Also waiting', actions: nudges.slice(1).map((x) => ({ label: x.title, onPress: () => x.onPress?.() })) })} /> : null)}
+      {isToday && (!timerIdle ? <FocusNowCard compact /> : nudges[0] ? <NudgeStrip nudge={nudges[0]} more={nudges.length - 1} onMore={() => showDialog({ title: t('Also waiting'), actions: nudges.slice(1).map((x) => ({ label: x.title, onPress: () => x.onPress?.() })) })} /> : null)}
 
       {span === 'week' && !showMonth ? (
         <>
           <WeekView days={weekDays} tasks={tasks} onOpenDay={pickFromStrip} />
-          <QuickAdd date={day < weekStart || day > addDays(weekStart, 6) ? weekStart : day} placeholder="Add to this week… e.g. Gym friday 7am" />
+          <QuickAdd date={day < weekStart || day > addDays(weekStart, 6) ? weekStart : day} placeholder={t('Add to this week… e.g. Gym friday 7am')} />
         </>
       ) : (
         <>
         {isToday && <FromEarlier items={n.overdue.filter((o) => o.day < n.today)} />}
         <Section
-          title={isToday ? 'Your day' : `Plan for ${formatDay(day)}`}
+          title={isToday ? t('Your day') : t('Plan for {day}', { day: formatDay(day) })}
           right={
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
               {items.length ? (
@@ -195,9 +196,9 @@ export function PlannerView() {
                   {done} of {items.length} done
                 </Text>
               ) : null}
-              <Press onPress={() => router.push({ pathname: '/task', params: { date: day } })} hitSlop={10} accessibilityLabel="Add a plan">
+              <Press onPress={() => router.push({ pathname: '/task', params: { date: day } })} hitSlop={10} accessibilityLabel={t('Add a plan')}>
                 <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
-                  + Add
+                  {t('+ Add')}
                 </Text>
               </Press>
             </View>
@@ -216,7 +217,7 @@ export function PlannerView() {
           {isToday && n.open.length > 0 && timerIdle && (
             <Press onPress={() => router.push('/focus')} style={{ alignSelf: 'center', padding: space.xs }}>
               <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
-                Putting something off? Focus on it for 5 minutes
+                {t('Putting something off? Focus on it for 5 minutes')}
               </Text>
             </Press>
           )}
@@ -226,7 +227,7 @@ export function PlannerView() {
 
       {/* Everything else */}
       {(reminders.length > 0 || dueItems.length > 0) && (
-        <Section title="Due now">
+        <Section title={t('Due now')}>
           <View style={{ gap: space.sm }}>
             {dueItems.map((r) => (
               <DueReminderCard key={r.id} item={r} />
@@ -246,14 +247,14 @@ export function PlannerView() {
       )}
 
       {!display.showHabits ? null : habits.length === 0 ? (
-        <Empty icon="flame-outline" title="Start one small habit" body="Something you can do in two minutes, every day." action="Add a habit" onAction={() => router.push('/habit')} />
+        <Empty icon="flame-outline" title={t('Start one small habit')} body={t('Something you can do in two minutes, every day.')} action={t('Add a habit')} onAction={() => router.push('/habit')} />
       ) : (
         <Section
-          title="Habits"
+          title={t('Habits')}
           right={
             <Press onPress={() => router.push('/habits')} hitSlop={10}>
               <Text variant="small" tone="muted">
-                All
+                {t('All')}
               </Text>
             </Press>
           }>
@@ -284,18 +285,18 @@ export function PlannerView() {
 
       {display.showStats && (
       <View style={{ flexDirection: 'row', gap: space.md - 2 }}>
-        <StatCard value={n.streak} unit="day streak" note={`Best ${n.bestStreak}`} href="/streaks" />
-        <StatCard value={focusToday} unit="min" note="Focused today" href="/focus" />
+        <StatCard value={n.streak} unit={t('day streak')} note={t('Best {bestStreak}', { bestStreak: n.bestStreak })} href="/streaks" />
+        <StatCard value={focusToday} unit={t('min')} note={t('Focused today')} href="/focus" />
       </View>
       )}
 
       {!display.showGoals ? null : activeGoals.length > 0 ? (
         <Section
-          title="Goals"
+          title={t('Goals')}
           right={
             <Press onPress={() => router.push({ pathname: '/habits', params: { view: 'goals' } })} hitSlop={10}>
               <Text variant="small" tone="muted">
-                All
+                {t('All')}
               </Text>
             </Press>
           }>
@@ -308,7 +309,7 @@ export function PlannerView() {
       ) : (
         <Press onPress={() => router.push('/goal')} style={{ alignSelf: 'center', padding: space.sm }}>
           <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
-            Set a goal to work towards
+            {t('Set a goal to work towards')}
           </Text>
         </Press>
       )}

@@ -10,6 +10,7 @@ import { getState, useStore } from '@/store/store';
 
 import { chime } from './chime';
 import { playSound, stopSound, type SoundId } from './sounds';
+import { t } from '@/lib/i18n';
 
 /**
  * Finishes the timer when its end time passes, including when the app was in
@@ -22,8 +23,8 @@ export function TimerWatcher() {
 
   useEffect(() => {
     const check = () => {
-      const t = getState().timer;
-      if (t.status !== 'running' || !t.endsAt || Date.now() < t.endsAt) return;
+      const timer = getState().timer;
+      if (timer.status !== 'running' || !timer.endsAt || Date.now() < timer.endsAt) return;
       const done = completeTimer();
       if (!done) return;
       stopSound();
@@ -36,10 +37,10 @@ export function TimerWatcher() {
       // Focus rounds run on their own: focus → break → focus, until the last one.
       if (round < rounds) {
         if (done.mode === 'focus') {
-          showToast(`Round ${round} done · ${settings.breakMinutes}-minute break`, 'cafe-outline');
+          showToast(t('Round {round} done · {breakMinutes}-minute break', { round, breakMinutes: settings.breakMinutes }), 'cafe-outline');
           startTimer({ ...same, minutes: settings.breakMinutes, mode: 'break', round });
         } else {
-          showToast(`Round ${round + 1} of ${rounds} · let’s go`, 'timer-outline');
+          showToast(t('Round {round} of {rounds} · let’s go', { round: round + 1, rounds }), 'timer-outline');
           playSound(settings.focusSound as SoundId);
           startTimer({ ...same, minutes: roundMinutes, round: round + 1 });
         }
@@ -47,9 +48,9 @@ export function TimerWatcher() {
       }
       if (done.mode === 'break') {
         showDialog({
-          title: 'Break’s over',
-          message: 'Ready for another round?',
-          actions: [{ label: `Focus ${settings.focusMinutes} min`, onPress: () => (playSound(settings.focusSound as SoundId), startTimer({ minutes: settings.focusMinutes, label: done.label, taskId: done.taskId, habitId: done.habitId })) }],
+          title: t('Break’s over'),
+          message: t('Ready for another round?'),
+          actions: [{ label: t('Focus {focusMinutes} min', { focusMinutes: settings.focusMinutes }), onPress: () => (playSound(settings.focusSound as SoundId), startTimer({ minutes: settings.focusMinutes, label: done.label, taskId: done.taskId, habitId: done.habitId })) }],
         });
         return;
       }
@@ -57,14 +58,14 @@ export function TimerWatcher() {
       const minutes = Math.round(done.durationSec / 60);
       const all = rounds > 1 ? rounds * roundMinutes : minutes;
       showDialog({
-        title: rounds > 1 ? `All ${rounds} rounds done` : 'Session complete',
+        title: rounds > 1 ? t('All {rounds} rounds done', { rounds }) : t('Session complete'),
         message: `${all} focused minute${all === 1 ? '' : 's'}${done.label ? ` on ${done.label}` : ''}. That’s real progress.`,
         actions: [
           ...(task
-            ? [{ label: 'Mark task as done', onPress: () => completeTask(task, task.repeat === 'none' ? task.date : todayKey()) }]
+            ? [{ label: t('Mark task as done'), onPress: () => completeTask(task, task.repeat === 'none' ? task.date : todayKey()) }]
             : []),
-          { label: `Take a ${settings.breakMinutes}-minute break`, onPress: () => startTimer({ minutes: settings.breakMinutes, mode: 'break', label: done.label, taskId: done.taskId, habitId: done.habitId }) },
-          { label: 'Keep going', onPress: () => (playSound(settings.focusSound as SoundId), startTimer({ minutes, label: done.label, taskId: done.taskId, habitId: done.habitId })) },
+          { label: t('Take a {breakMinutes}-minute break', { breakMinutes: settings.breakMinutes }), onPress: () => startTimer({ minutes: settings.breakMinutes, mode: 'break', label: done.label, taskId: done.taskId, habitId: done.habitId }) },
+          { label: t('Keep going'), onPress: () => (playSound(settings.focusSound as SoundId), startTimer({ minutes, label: done.label, taskId: done.taskId, habitId: done.habitId })) },
         ],
       });
     };

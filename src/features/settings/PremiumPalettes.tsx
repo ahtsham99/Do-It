@@ -8,6 +8,7 @@ import { useEntitlements } from '@/lib/premium';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { NIGHT_COLORS, PREMIUM_COLORS, radius, setColorPreview, space, useColorPreview, useTheme, type NightColor } from '@/theme';
+import { t } from '@/lib/i18n';
 
 /**
  * Premium palettes, tucked under "More colours". With Premium, tap to use one.
@@ -47,13 +48,13 @@ export function PremiumPalettes() {
           ))}
         </View>
         <Text numberOfLines={1} style={{ flex: 1, fontWeight: '600' }}>
-          More colours
+          {t('More colours')}
         </Text>
         {!unlocked && (
           <View style={[styles.badge, { backgroundColor: c.accentSoft }]}>
             <Icon name="sparkles" size={11} color={c.accent} />
             <Text variant="small" color={c.accent} style={{ fontSize: 11, fontWeight: '600' }}>
-              Premium
+              {t('Premium')}
             </Text>
           </View>
         )}
@@ -65,11 +66,11 @@ export function PremiumPalettes() {
           {preview && !unlocked ? (
             <View style={[styles.previewBar, { backgroundColor: c.accentSoft }]}>
               <Text variant="small" style={{ flex: 1 }}>
-                Previewing <Text variant="small" style={{ fontWeight: '700' }}>{NIGHT_COLORS[preview].label}</Text>. Premium palettes are coming soon.
+                {t('Previewing')} <Text variant="small" style={{ fontWeight: '700' }}>{NIGHT_COLORS[preview].label}</Text>. Premium palettes are coming soon.
               </Text>
-              <Press onPress={() => setColorPreview(null)} hitSlop={8} accessibilityLabel="Stop preview">
+              <Press onPress={() => setColorPreview(null)} hitSlop={8} accessibilityLabel={t('Stop preview')}>
                 <Text variant="small" color={c.accent} style={{ fontWeight: '700' }}>
-                  Stop
+                  {t('Stop')}
                 </Text>
               </Press>
             </View>
@@ -94,7 +95,7 @@ function GlowTile({ id, on, unlocked, onPress, ring }: { id: NightColor; on: boo
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected: on }}
-      accessibilityLabel={`${p.label} palette${unlocked ? '' : ', premium, tap to preview'}`}
+      accessibilityLabel={`${p.label} palette${unlocked ? '' : t(', premium, tap to preview')}`}
       style={[styles.tileWrap, { borderColor: on ? ring : 'transparent' }]}>
       <View style={styles.tile}>
         <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>

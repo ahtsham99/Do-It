@@ -10,6 +10,7 @@ import { space, useTheme } from '@/theme';
 import { useNow } from '@/features/nudges/useNow';
 
 import { whenLabel } from './logic';
+import { t } from '@/lib/i18n';
 
 export function ReminderRow({ item, listName, last, onOpen }: { item: ReminderItem; listName?: string; last?: boolean; onOpen?: (item: ReminderItem) => void }) {
   const { c } = useTheme();
@@ -22,13 +23,13 @@ export function ReminderRow({ item, listName, last, onOpen }: { item: ReminderIt
       borderRadius={0}
       onDelete={() => {
         deleteReminder(item.id);
-        showToast(`Deleted “${item.title.length > 28 ? `${item.title.slice(0, 27)}…` : item.title}”`, 'trash-outline', {
-          label: 'Undo',
+        showToast(t('Deleted “{title}”', { title: item.title.length > 28 ? `${item.title.slice(0, 27)}…` : item.title }), 'trash-outline', {
+          label: t('Undo'),
           onPress: () => updateReminder(item.id, { deletedAt: null }),
         });
       }}>
       <View style={[styles.row, { backgroundColor: c.surface }, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.border }]}>
-        <Checkbox checked={item.done} onToggle={() => toggleReminder(item)} label={`Done: ${item.title}`} />
+        <Checkbox checked={item.done} onToggle={() => toggleReminder(item)} label={t('Done: {title}', { title: item.title })} />
         <Press haptic={false} style={{ flex: 1, gap: 2 }} onPress={() => (onOpen ? onOpen(item) : router.push({ pathname: '/reminder', params: { id: item.id } }))}>
           <Text numberOfLines={2} tone={item.done ? 'faint' : 'default'} style={[{ fontWeight: '500' }, item.done && { textDecorationLine: 'line-through' }]}>
             {item.title}

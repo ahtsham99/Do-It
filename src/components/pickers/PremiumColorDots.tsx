@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Icon, Press, showDialog } from '@/components/ui';
 import { useEntitlements } from '@/lib/premium';
 import { NIGHT_COLORS, PREMIUM_COLORS, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 /** One rich shade from each premium palette, locked on the free plan. Sits inside a ColorPicker. */
 export function PremiumColorDots({ value, onChange }: { value?: string | null; onChange: (col: string) => void }) {
@@ -20,12 +21,12 @@ export function PremiumColorDots({ value, onChange }: { value?: string | null; o
                 unlocked
                   ? onChange(col)
                   : showDialog({
-                      title: 'Premium colours',
-                      message: `${NIGHT_COLORS[k].label} and the other palette colours come with Do It Premium. Everything you use today stays free.`,
-                      actions: [{ label: 'Sounds good', onPress: () => {} }],
+                      title: t('Premium colours'),
+                      message: t('{name} and the other palette colours come with Do It Premium. Everything you use today stays free.', { name: NIGHT_COLORS[k].label }),
+                      actions: [{ label: t('Sounds good'), onPress: () => {} }],
                     })
               }
-              accessibilityLabel={`${NIGHT_COLORS[k].label}${unlocked ? '' : ', premium'}`}
+              accessibilityLabel={`${NIGHT_COLORS[k].label}${unlocked ? '' : t(', premium')}`}
               accessibilityState={{ selected: on }}
               style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2.5, padding: 3, borderColor: on ? c.text : 'transparent' }}>
               <View style={{ flex: 1, borderRadius: 20, backgroundColor: col, alignItems: 'center', justifyContent: 'center' }}>

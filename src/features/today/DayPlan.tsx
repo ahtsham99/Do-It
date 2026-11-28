@@ -10,6 +10,7 @@ import { setDisplay, useDisplay } from '@/features/today/display';
 import { addMinutesToTime, formatDuration, formatTime, minutesBetween, nowTime, todayKey, type DayKey } from '@/lib/dates';
 import { useSettings } from '@/store/hooks';
 import { hexAlpha, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const TIME_W = 54;
 
@@ -34,7 +35,7 @@ export function DayPlan({ day, items: all, compact }: { day: DayKey; items: Occu
   // Everything's done and completed plans are hidden.
   if (items.length === 0 && hiddenDone > 0) {
     return (
-      <Press onPress={() => setDisplay({ showCompleted: true })} accessibilityRole="button" accessibilityLabel="Show completed plans">
+      <Press onPress={() => setDisplay({ showCompleted: true })} accessibilityRole="button" accessibilityLabel={t('Show completed plans')}>
         {compact ? (
           <Text variant="small" tone="faint" style={{ paddingHorizontal: 4 }}>
             All {hiddenDone} done ✓
@@ -44,7 +45,7 @@ export function DayPlan({ day, items: all, compact }: { day: DayKey; items: Occu
             <Icon name="checkmark-done-outline" size={22} color={c.accent} />
             <Text style={{ fontWeight: '500' }}>All {hiddenDone} done</Text>
             <Text variant="small" tone="muted">
-              Tap to show completed plans
+              {t('Tap to show completed plans')}
             </Text>
           </Card>
         )}
@@ -54,7 +55,7 @@ export function DayPlan({ day, items: all, compact }: { day: DayKey; items: Occu
   if (items.length === 0 && compact) {
     return (
       <Text variant="small" tone="faint" style={{ paddingHorizontal: 4 }}>
-        Nothing planned
+        {t('Nothing planned')}
       </Text>
     );
   }
@@ -64,11 +65,11 @@ export function DayPlan({ day, items: all, compact }: { day: DayKey; items: Occu
         <Icon name="calendar-clear-outline" size={22} color={c.textFaint} />
         <Text style={{ fontWeight: '500', marginTop: 4 }}>{day === today ? 'Nothing planned yet' : 'A free day'}</Text>
         <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
-          {day === today ? 'Add the first thing below. Try “Gym at 7am”.' : 'Tap below to plan it, or type “Gym at 7am”.'}
+          {day === today ? 'Add the first thing below. Try “Gym at 7am”.' : t('Tap below to plan it, or type “Gym at 7am”.')}
         </Text>
         {/* Today already has the add field right underneath; other days get a clear button. */}
         {day !== today && (
-          <Button small label="Plan this day" icon="add" onPress={() => router.push({ pathname: '/task', params: { date: day } })} style={{ marginTop: space.sm }} />
+          <Button small label={t('Plan this day')} icon="add" onPress={() => router.push({ pathname: '/task', params: { date: day } })} style={{ marginTop: space.sm }} />
         )}
       </Card>
     );
@@ -117,7 +118,7 @@ function NowLine({ now, use24h }: { now: string; use24h: boolean }) {
   return (
     <View style={styles.nowRow} accessibilityLabel={`Now, ${formatTime(now, use24h)}`}>
       <Text variant="small" color={c.accent} style={{ width: TIME_W, fontSize: 11, fontWeight: '700' }}>
-        NOW
+        {t('NOW')}
       </Text>
       <View style={[styles.nowDot, { backgroundColor: c.accent }]} />
       <View style={[styles.nowLine, { backgroundColor: c.accent }]} />
@@ -155,7 +156,7 @@ function Row({ occ, label, last }: { occ: Occurrence; label: string; last: boole
             hitSlop={10}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: done }}
-            accessibilityLabel={`Complete ${task.title}`}
+            accessibilityLabel={t('Complete {title}', { title: task.title })}
             style={[styles.dot, { borderColor: done ? c.accent : late ? c.danger : c.border, backgroundColor: done ? c.accent : c.surface }]}>
             {done && <Icon name="checkmark" size={14} color={c.accentText} />}
           </Press>

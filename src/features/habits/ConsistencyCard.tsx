@@ -7,10 +7,11 @@ import type { Habit } from '@/store/types';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
 import { consistency } from './logic';
+import { t } from '@/lib/i18n';
 
 const PERIODS = [
-  { key: 'week', label: 'Week', days: 7 },
-  { key: 'month', label: 'Month', days: 30 },
+  { key: 'week', label: t('Week'), days: 7 },
+  { key: 'month', label: t('Month'), days: 30 },
 ] as const;
 
 /** "Habits / Consistency": share of check-ins kept, with a daily bar chart. */
@@ -26,7 +27,7 @@ export function ConsistencyCard({ habits }: { habits: Habit[] }) {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
         <Icon name="flame-outline" size={16} color={c.textMuted} />
         <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-          Habits / Consistency
+          {t('Habits / Consistency')}
         </Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -41,7 +42,7 @@ export function ConsistencyCard({ habits }: { habits: Habit[] }) {
         </View>
         <Press
           onPress={() => setIdx((idx + 1) % PERIODS.length)}
-          accessibilityLabel="Change period"
+          accessibilityLabel={t('Change period')}
           style={[styles.period, { backgroundColor: c.surfaceAlt }]}>
           <Text variant="small" style={{ fontWeight: '500' }}>
             {period.label}
@@ -70,7 +71,7 @@ export function ConsistencyCard({ habits }: { habits: Habit[] }) {
           {formatDay(data.start, { relative: false }).split(' ').slice(1).join(' ')}
         </Text>
         <Text variant="small" tone="muted" style={{ fontSize: 12 }}>
-          Today
+          {t('Today')}
         </Text>
       </View>
     </Card>

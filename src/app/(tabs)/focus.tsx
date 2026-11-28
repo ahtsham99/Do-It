@@ -18,6 +18,7 @@ import { addMinutes, pauseTimer, remainingSec, resumeTimer, startTimer, stopTime
 import { useHabits, useSettings, useTasks } from '@/store/hooks';
 import { getState, useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const PRESETS = [5, 15, 25, 45];
 const ROUNDS = [1, 2, 3, 4];
@@ -130,25 +131,25 @@ export default function FocusScreen() {
 
   const stop = () =>
     showDialog({
-      title: 'End this session?',
-      message: 'The minutes you’ve already done still count.',
-      actions: [{ label: 'End session', destructive: true, onPress: () => (stopSound(), stopTimer()) }],
+      title: t('End this session?'),
+      message: t('The minutes you’ve already done still count.'),
+      actions: [{ label: t('End session'), destructive: true, onPress: () => (stopSound(), stopTimer()) }],
     });
 
   // Fit the clock inside the ring whatever its length (25:00 … 10:00:00) and font.
   const clockText = formatClock(left);
   const clockSize = Math.round(Math.min(58, 158 / (clockText.length * 0.64)));
 
-  const status = idle ? 'Ready' : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
-  const roundOf = !idle && (timer.rounds ?? 1) > 1 ? `Round ${timer.round ?? 1} of ${timer.rounds}` : '';
+  const status = idle ? t('Ready') : timer.status === 'paused' ? 'Paused' : isBreak ? 'Break' : 'Focusing';
+  const roundOf = !idle && (timer.rounds ?? 1) > 1 ? t('Round {round} of {rounds}', { round: timer.round ?? 1, rounds: timer.rounds }) : '';
   const fmt = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ''}` : `${m} min`);
-  const plan = rounds > 1 ? `${rounds} × ${fmt(minutes)} with ${settings.breakMinutes}-min breaks` : minutes === 5 ? 'Just five minutes. You can keep going after.' : `${fmt(minutes)} of focus`;
+  const plan = rounds > 1 ? t('{rounds} × {length} with {breakMinutes}-min breaks', { rounds, length: fmt(minutes), breakMinutes: settings.breakMinutes }) : minutes === 5 ? 'Just five minutes. You can keep going after.' : `${fmt(minutes)} of focus`;
   const totalMin = rounds * minutes + (rounds - 1) * settings.breakMinutes;
 
   return (
     <>
     {editing && <DurationSheet visible minutes={minutes} onClose={() => setEditing(false)} onSet={setMinutes} />}
-    <Screen title="Focus" subtitle="Can’t get started? Just do five minutes.">
+    <Screen title={t('Focus')} subtitle={t('Can’t get started? Just do five minutes.')}>
       {idle && (
         <View style={{ gap: space.md }}>
           <Label>What will you work on?</Label>
@@ -171,10 +172,10 @@ export default function FocusScreen() {
               })}
             </View>
           )}
-          {target.kind === 'none' && <Field placeholder={options.length ? 'Or type something else (optional)' : 'Type it here (optional)'} value={custom} onChangeText={setCustom} returnKeyType="go" onSubmitEditing={start} />}
+          {target.kind === 'none' && <Field placeholder={options.length ? 'Or type something else (optional)' : t('Type it here (optional)')} value={custom} onChangeText={setCustom} returnKeyType="go" onSubmitEditing={start} />}
           {target.kind === 'habit' && (
             <Text variant="small" tone="muted">
-              Finishing the session ticks this habit for today.
+              {t('Finishing the session ticks this habit for today.')}
             </Text>
           )}
         </View>
@@ -192,15 +193,15 @@ export default function FocusScreen() {
               onChangeText={setTyped}
               onSubmitEditing={applyTyped}
               onBlur={applyTyped}
-              placeholder="e.g. 90 or 1:30"
+              placeholder={t('e.g. 90 or 1:30')}
               placeholderTextColor={c.textFaint}
               keyboardType="numbers-and-punctuation"
               returnKeyType="done"
-              accessibilityLabel="Type a length"
+              accessibilityLabel={t('Type a length')}
               style={{ fontFamily: fonts.display, fontSize: 32, textAlign: 'center', color: c.text, width: 170, paddingVertical: 6, borderBottomWidth: 2, borderBottomColor: c.accent, outlineStyle: 'none' } as object}
             />
           ) : (
-            <Press haptic={false} disabled={!idle} onPress={openLength} accessibilityRole="button" accessibilityLabel="Tap to change the length">
+            <Press haptic={false} disabled={!idle} onPress={openLength} accessibilityRole="button" accessibilityLabel={t('Tap to change the length')}>
               <Text accessibilityRole="timer" numberOfLines={1} style={{ fontFamily: SERIF, fontSize: clockSize, lineHeight: clockSize + 8, fontVariant: ['tabular-nums'] }}>
                 {formatClock(left)}
               </Text>
@@ -208,7 +209,7 @@ export default function FocusScreen() {
           )}
           {idle && !typing && (
             <Text variant="small" tone="faint" style={{ fontSize: 11 }}>
-              {nativeDurationWheel ? 'Tap to change' : 'Tap to type'}
+              {nativeDurationWheel ? t('Tap to change') : t('Tap to type')}
             </Text>
           )}
           {roundOf ? (
@@ -225,15 +226,15 @@ export default function FocusScreen() {
 
         {idle ? (
           <>
-            <Button label="Start focus" icon="play" onPress={start} style={styles.start} />
+            <Button label={t('Start focus')} icon="play" onPress={start} style={styles.start} />
             <Text variant="small" tone="muted" style={{ textAlign: 'center', marginTop: -4 }}>
               {plan}
-              {rounds > 1 ? ` · ${fmt(totalMin)} total` : ''}
+              {rounds > 1 ? t(' · {total} total', { total: fmt(totalMin) }) : ''}
             </Text>
             <View style={[styles.divider, { backgroundColor: c.border }]} />
             <View style={styles.setting}>
               <Text variant="caption" tone="muted" style={styles.settingLabel}>
-                Length
+                {t('Length')}
               </Text>
               <View style={[styles.row, { flexWrap: 'nowrap', justifyContent: 'space-between' }]}>
                 {PRESETS.map((m) => (
@@ -243,7 +244,7 @@ export default function FocusScreen() {
             </View>
             <View style={styles.setting}>
               <Text variant="caption" tone="muted" style={styles.settingLabel}>
-                Rounds
+                {t('Rounds')}
               </Text>
               <View style={[styles.row, { flexWrap: 'nowrap', justifyContent: 'space-between' }]}>
                 {ROUNDS.map((n) => (
@@ -263,20 +264,20 @@ export default function FocusScreen() {
           <View style={{ alignSelf: 'stretch', gap: space.sm }}>
           <View style={[styles.row, { flexWrap: 'nowrap' }]}>
             {timer.status === 'running' ? (
-              <Button label="Pause" icon="pause" onPress={() => (stopSound(), pauseTimer())} />
+              <Button label={t('Pause')} icon="pause" onPress={() => (stopSound(), pauseTimer())} />
             ) : (
-              <Button label="Resume" icon="play" onPress={() => (playSound(sound), resumeTimer())} />
+              <Button label={t('Resume')} icon="play" onPress={() => (playSound(sound), resumeTimer())} />
             )}
-            <Button kind="secondary" label="+5 min" onPress={() => addMinutes(5)} />
-            <Button kind="ghost" label="End" onPress={stop} />
+            <Button kind="secondary" label={t('+5 min')} onPress={() => addMinutes(5)} />
+            <Button kind="ghost" label={t('End')} onPress={stop} />
           </View>
-            <Button kind="ghost" label="Full screen" icon="expand" onPress={() => setFocusExpanded(true)} />
+            <Button kind="ghost" label={t('Full screen')} icon="expand" onPress={() => setFocusExpanded(true)} />
           </View>
         )}
         {soundsSupported && (
           <View style={{ alignSelf: 'stretch', gap: space.sm }}>
             <Text variant="caption" tone="muted" style={styles.settingLabel}>
-              Sound
+              {t('Sound')}
             </Text>
             <View style={styles.sounds}>
               {SOUNDS.map((x) => {

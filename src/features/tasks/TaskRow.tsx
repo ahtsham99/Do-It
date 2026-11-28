@@ -9,6 +9,7 @@ import { useSettings } from '@/store/hooks';
 import { space, useTheme } from '@/theme';
 
 import { daysOverdue, type Occurrence } from './logic';
+import { t } from '@/lib/i18n';
 
 export function TaskRow({
   occ,
@@ -28,13 +29,13 @@ export function TaskRow({
   const meta = [
     showDate ? formatDay(day) : null,
     task.time ? formatTime(task.time, use24h) : null,
-    late > 0 ? `${late}d overdue` : null,
+    late > 0 ? t('{late}d overdue', { late }) : null,
   ].filter(Boolean);
 
   return (
     <SwipeToDelete onDelete={() => deleteTaskWithUndo(task, day)} borderRadius={0}>
     <View style={[styles.row, { borderBottomColor: c.border, backgroundColor: c.surface }]}>
-      <Checkbox checked={done} onToggle={() => completeTask(task, day)} label={`Complete ${task.title}`} />
+      <Checkbox checked={done} onToggle={() => completeTask(task, day)} label={t('Complete {title}', { title: task.title })} />
       <Press
         haptic={false}
         style={styles.body}

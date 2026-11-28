@@ -10,6 +10,7 @@ import type { Task } from '@/store/types';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
 import { useDisplay } from './display';
+import { t } from '@/lib/i18n';
 
 /**
  * The week on one card: a row per day, the date on the left and that day's
@@ -67,7 +68,7 @@ export function WeekView({ days, tasks, onOpenDay }: { days: DayKey[]; tasks: Ta
               {items.length === 0 ? (
                 <Press onPress={() => onOpenDay(d)} style={styles.empty}>
                   <Text variant="small" tone="faint">
-                    {all.length ? `All ${all.length} done ✓` : past ? 'Nothing planned' : 'Free'}
+                    {all.length ? t('All {n} done ✓', { n: all.length }) : past ? t('Nothing planned') : t('Free')}
                   </Text>
                 </Press>
               ) : (
@@ -106,7 +107,7 @@ function Line({ occ }: { occ: Occurrence }) {
         hitSlop={8}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: done }}
-        accessibilityLabel={`Complete ${task.title}`}
+        accessibilityLabel={t('Complete {title}', { title: task.title })}
         style={[styles.tick, { borderColor: done ? c.accent : late ? c.danger : c.border, backgroundColor: done ? c.accent : 'transparent' }]}>
         {done && <Icon name="checkmark" size={11} color={c.accentText} />}
       </Press>

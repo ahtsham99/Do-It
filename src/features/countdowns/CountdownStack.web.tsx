@@ -5,6 +5,7 @@ import type { Countdown } from '@/store/types';
 import { space, useTheme } from '@/theme';
 
 import { CountdownCard } from './CountdownCard';
+import { t } from '@/lib/i18n';
 
 const PEEK = 12;
 const SCALE = 0.05;
@@ -94,8 +95,8 @@ export function CountdownStack({ items }: { items: Countdown[] }) {
 }
 
 const styles = StyleSheet.create({
-  snapX: { scrollSnapType: 'x mandatory', overscrollBehaviorX: 'contain' } as object,
-  card: { scrollSnapAlign: 'start', scrollSnapStop: 'always', willChange: 'transform, opacity', transformOrigin: 'center center' } as object,
+  snapX: { scrollSnapType: t('x mandatory'), overscrollBehaviorX: 'contain' } as object,
+  card: { scrollSnapAlign: 'start', scrollSnapStop: 'always', willChange: t('transform, opacity'), transformOrigin: 'center center' } as object,
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 5 },
   dot: { height: 6, borderRadius: 3 },
 });

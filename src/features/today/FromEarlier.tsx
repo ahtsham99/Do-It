@@ -7,6 +7,7 @@ import { formatDay } from '@/lib/dates';
 import { deleteTask, moveToToday, skipOccurrence } from '@/store/actions/tasks';
 import { useSettings } from '@/store/hooks';
 import { SERIF, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 /**
  * Plans from earlier days that never got done: do them, move them to today,
@@ -19,8 +20,8 @@ export function FromEarlier({ items }: { items: Occurrence[] }) {
   const movable = items.filter((o) => o.task.repeat === 'none');
   return (
     <Section
-      title={`From earlier · ${items.length}`}
-      right={movable.length > 1 ? <Button small kind="secondary" label="All to today" onPress={() => moveToToday(movable.map((o) => o.task.id))} style={{ height: 32 }} /> : undefined}>
+      title={t('From earlier · {n}', { n: items.length })}
+      right={movable.length > 1 ? <Button small kind="secondary" label={t('All to today')} onPress={() => moveToToday(movable.map((o) => o.task.id))} style={{ height: 32 }} /> : undefined}>
       {/* Your why, from your profile: a reminder of what this is all for. */}
       {why.trim() ? (
         <Text style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 19, lineHeight: 25, color: c.textMuted, marginBottom: space.sm }}>
@@ -41,7 +42,7 @@ function Leftover({ occ, last }: { occ: Occurrence; last: boolean }) {
   const { task, day } = occ;
   return (
     <View style={[styles.row, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.border }]}>
-      <Checkbox checked={false} onToggle={() => completeTask(task, day)} label={`Complete ${task.title}`} />
+      <Checkbox checked={false} onToggle={() => completeTask(task, day)} label={t('Complete {title}', { title: task.title })} />
       <View style={{ flex: 1 }}>
         <Text numberOfLines={2} style={{ fontWeight: '500' }}>
           {task.title}
@@ -51,16 +52,16 @@ function Leftover({ occ, last }: { occ: Occurrence; last: boolean }) {
         </Text>
       </View>
       {task.repeat === 'none' && (
-        <Press onPress={() => moveToToday([task.id])} style={[styles.act, { backgroundColor: c.accentSoft }]} accessibilityLabel={`Move ${task.title} to today`}>
+        <Press onPress={() => moveToToday([task.id])} style={[styles.act, { backgroundColor: c.accentSoft }]} accessibilityLabel={t('Move {title} to today', { title: task.title })}>
           <Text variant="small" tone="accent" style={{ fontWeight: '700' }}>
-            Today
+            {t('Today')}
           </Text>
         </Press>
       )}
       <Press
         onPress={() => (task.repeat === 'none' ? deleteTask(task.id) : skipOccurrence(task, day))}
         style={[styles.act, { backgroundColor: c.surfaceAlt }]}
-        accessibilityLabel={`Let ${task.title} go`}>
+        accessibilityLabel={t('Let {title} go', { title: task.title })}>
         <Icon name="close" size={16} color={c.textMuted} />
       </Press>
     </View>

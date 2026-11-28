@@ -3,6 +3,7 @@ import { Image, View } from 'react-native';
 import { Text } from '@/components/ui';
 import { useSettings } from '@/store/hooks';
 import { SERIF, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 export const isPhoto = (a: string) => a.startsWith('data:') || a.startsWith('file:') || a.startsWith('http') || a.startsWith('blob:');
 
@@ -26,7 +27,7 @@ export function Avatar({ size, ring, small }: { size: number; ring?: boolean; sm
         borderColor: c.border,
       }}>
       {isPhoto(avatar) ? (
-        <Image source={{ uri: avatar }} style={{ width: inner, height: inner }} resizeMode="cover" accessibilityLabel="Profile picture" />
+        <Image source={{ uri: avatar }} style={{ width: inner, height: inner }} resizeMode="cover" accessibilityLabel={t('Profile picture')} />
       ) : avatar ? (
         <Text style={{ fontSize: inner * 0.5, lineHeight: inner * 0.62 }}>{avatar}</Text>
       ) : (

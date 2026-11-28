@@ -12,12 +12,13 @@ import { useHabits } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import type { Goal, GoalKind, GoalStep } from '@/store/types';
 import { SERIF, SWATCHES, font, hexAlpha, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 function celebrate(title: string) {
   showDialog({
     title: 'Goal achieved 🎉',
-    message: `“${title}” is done. You started, you kept going, and you finished.`,
-    actions: [{ label: 'Lovely', onPress: () => {} }],
+    message: t('“{title}” is done. You started, you kept going, and you finished.', { title }),
+    actions: [{ label: t('Lovely'), onPress: () => {} }],
   });
 }
 
@@ -63,7 +64,7 @@ export default function GoalScreen() {
     if (!canSave) return;
     if (!existing) {
       const created = addGoal({ ...draft, title: draft.title.trim(), why: draft.why?.trim() || undefined });
-      showToast('Goal set. Start with the first small step.', 'flag-outline');
+      showToast(t('Goal set. Start with the first small step.'), 'flag-outline');
       router.replace({ pathname: '/goal', params: { id: created.id } });
       return;
     }
@@ -98,7 +99,7 @@ export default function GoalScreen() {
   return (
     <SheetScreen>
       <View>
-        <SheetHeader title={existing ? 'Goal' : 'New goal'} onSave={save} saveLabel={existing ? 'Done' : 'Save'} canSave={canSave} cancelLabel={existing ? 'Close' : 'Cancel'} />
+        <SheetHeader title={existing ? t('Goal') : t('New goal')} onSave={save} saveLabel={existing ? t('Done') : t('Save')} canSave={canSave} cancelLabel={existing ? t('Close') : t('Cancel')} />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
@@ -106,13 +107,13 @@ export default function GoalScreen() {
             <Glyph value={g.icon} size={28} color={col} />
           </View>
           <View style={{ flex: 1 }}>
-            <Field placeholder="What do you want to achieve?" value={g.title} onChangeText={(title) => apply({ title })}  />
+            <Field placeholder={t('What do you want to achieve?')} value={g.title} onChangeText={(title) => apply({ title })}  />
           </View>
         </View>
 
         {!existing && !template && !draft.title && (
           <View style={{ gap: space.sm }}>
-            <Label>Or start from an idea</Label>
+            <Label>{t('Or start from an idea')}</Label>
             <View style={styles.wrap}>
               {GOAL_TEMPLATES.map((t) => (
                 <Chip
@@ -130,7 +131,7 @@ export default function GoalScreen() {
           {simple && (
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-                Small steps · optional
+                {t('Small steps · optional')}
               </Text>
               {left && (
                 <Text variant="small" tone={left.includes('past') ? 'danger' : 'muted'} style={{ fontWeight: '500' }}>
@@ -144,7 +145,7 @@ export default function GoalScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <View>
               <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-                Progress
+                {t('Progress')}
               </Text>
               <Text style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 60 }}>
                 {Math.round(p * 100)}
@@ -167,12 +168,12 @@ export default function GoalScreen() {
             <View>
               {g.steps.length === 0 && (
                 <Text variant="small" tone="muted" style={{ marginBottom: space.xs }}>
-                  If it helps, break it into steps you could start in 10 minutes. Progress shows once you add one.
+                  {t('If it helps, break it into steps you could start in 10 minutes. Progress shows once you add one.')}
                 </Text>
               )}
               {g.steps.map((s, i) => (
                 <View key={s.id} style={[styles.step, i < g.steps.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.border }]}>
-                  <Checkbox checked={!!s.doneAt} onToggle={() => tick(s)} color={col} label={`Complete ${s.title}`} />
+                  <Checkbox checked={!!s.doneAt} onToggle={() => tick(s)} color={col} label={t('Complete {title}', { title: s.title })} />
                   <Text style={[{ flex: 1 }, !!s.doneAt && { textDecorationLine: 'line-through' }]} tone={s.doneAt ? 'faint' : 'default'}>
                     {s.title}
                   </Text>
@@ -180,12 +181,12 @@ export default function GoalScreen() {
                     <Press
                       onPress={() => {
                         addTask({ title: s.title, date: todayKey(), repeat: 'none', reminder: null, time: null });
-                        showToast('Added to today’s plan.', 'calendar-outline');
+                        showToast(t('Added to today’s plan.'), 'calendar-outline');
                       }}
-                      accessibilityLabel={`Add ${s.title} to today`}
+                      accessibilityLabel={t('Add {title} to today', { title: s.title })}
                       style={[styles.mini, { backgroundColor: c.surfaceAlt }]}>
                       <Text variant="small" style={{ fontWeight: '600' }}>
-                        Today
+                        {t('Today')}
                       </Text>
                     </Press>
                   )}
@@ -202,17 +203,17 @@ export default function GoalScreen() {
                   onSubmitEditing={addOne}
                   submitBehavior="submit"
                   returnKeyType="done"
-                  placeholder="Add a small step…"
+                  placeholder={t('Add a small step…')}
                   placeholderTextColor={c.textFaint}
                   style={[font.body, { flex: 1, height: 48, color: c.text, fontFamily: fonts.text(400), outlineStyle: 'none' } as object]}
                 />
-                {stepText.trim().length > 0 && <IconButton icon="arrow-up" label="Add step" size={16} diameter={34} bg={c.accent} color={c.accentText} onPress={addOne} />}
+                {stepText.trim().length > 0 && <IconButton icon="arrow-up" label={t('Add step')} size={16} diameter={34} bg={c.accent} color={c.accentText} onPress={addOne} />}
               </View>
             </View>
           ) : (
             <View style={{ gap: space.md }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.lg }}>
-                <IconButton icon="remove" label="Less" onPress={() => log(-1)} />
+                <IconButton icon="remove" label={t('Less')} onPress={() => log(-1)} />
                 <Text style={{ fontFamily: SERIF, fontSize: 40, lineHeight: 44, minWidth: 120, textAlign: 'center' }}>
                   {g.current ?? 0}
                   <Text tone="muted" style={{ fontSize: 20 }}>
@@ -220,7 +221,7 @@ export default function GoalScreen() {
                     / {g.target ?? 0}
                   </Text>
                 </Text>
-                <IconButton icon="add" label="More" onPress={() => log(1)} bg={c.accent} color={c.accentText} />
+                <IconButton icon="add" label={t('More')} onPress={() => log(1)} bg={c.accent} color={c.accentText} />
               </View>
               {g.unit ? (
                 <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
@@ -231,11 +232,11 @@ export default function GoalScreen() {
           )}
         </Card>
 
-        <Field label="Why does this matter to you?" placeholder="e.g. So I feel proud of myself" value={g.why ?? ''} onChangeText={(why) => apply({ why })} multiline />
+        <Field label={t('Why does this matter to you?')} placeholder={t('e.g. So I feel proud of myself')} value={g.why ?? ''} onChangeText={(why) => apply({ why })} multiline />
 
         <Card style={{ gap: space.md }}>
           <View style={styles.row}>
-            <Text>Target date</Text>
+            <Text>{t('Target date')}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
               {g.targetDate && <DateTimeField mode="date" value={g.targetDate} onChange={(targetDate) => apply({ targetDate })} />}
               <Toggle value={!!g.targetDate} onValueChange={(v) => apply({ targetDate: v ? addDays(todayKey(), 30) : null })} />
@@ -244,11 +245,11 @@ export default function GoalScreen() {
         </Card>
 
         <View style={{ gap: space.sm }}>
-          <Label>Track progress by</Label>
+          <Label>{t('Track progress by')}</Label>
           <Segmented<GoalKind>
             options={[
-              { value: 'steps', label: 'Small steps', icon: 'list-outline' },
-              { value: 'number', label: 'A number', icon: 'stats-chart-outline' },
+              { value: 'steps', label: t('Small steps'), icon: 'list-outline' },
+              { value: 'number', label: t('A number'), icon: 'stats-chart-outline' },
             ]}
             value={g.kind}
             onChange={(kind) => apply({ kind })}
@@ -257,14 +258,14 @@ export default function GoalScreen() {
             <View style={{ flexDirection: 'row', gap: space.sm }}>
               <View style={{ flex: 1 }}>
                 <Field
-                  label="Target"
+                  label={t('Target')}
                   keyboardType="numeric"
                   value={String(g.target ?? '')}
                   onChangeText={(v) => apply({ target: Math.max(0, Number(v.replace(/[^0-9.]/g, '')) || 0) })}
                 />
               </View>
               <View style={{ flex: 1.4 }}>
-                <Field label="Unit" placeholder="books, km, £…" value={g.unit ?? ''} onChangeText={(unit) => apply({ unit })} />
+                <Field label={t('Unit')} placeholder={t('books, km, £…')} value={g.unit ?? ''} onChangeText={(unit) => apply({ unit })} />
               </View>
             </View>
           )}
@@ -272,7 +273,7 @@ export default function GoalScreen() {
 
         {existing && habits.length > 0 && (
           <View style={{ gap: space.sm }}>
-            <Label>Habits that help</Label>
+            <Label>{t('Habits that help')}</Label>
             {linked.length > 0 && (
               <View style={styles.wrap}>
                 {linked.map((h) => (
@@ -283,7 +284,7 @@ export default function GoalScreen() {
             {unlinked.length > 0 && (
               <>
                 <Text variant="small" tone="muted">
-                  Tap a habit to link it to this goal.
+                  {t('Tap a habit to link it to this goal.')}
                 </Text>
                 <View style={styles.wrap}>
                   {unlinked.map((h) => (
@@ -296,22 +297,22 @@ export default function GoalScreen() {
         )}
 
         <View style={{ gap: space.sm }}>
-          <Label>Colour</Label>
+          <Label>{t('Colour')}</Label>
           <ColorPicker colors={SWATCHES} value={g.color} onChange={(color) => apply({ color })} />
         </View>
         <View style={{ gap: space.sm }}>
-          <Label>Icon</Label>
+          <Label>{t('Icon')}</Label>
           <IconPicker icons={GOAL_ICONS} value={g.icon} color={col} onChange={(icon) => apply({ icon })} />
         </View>
 
-        {!existing && <Button label="Set this goal" icon="flag-outline" onPress={save} disabled={!canSave} />}
+        {!existing && <Button label={t('Set this goal')} icon="flag-outline" onPress={save} disabled={!canSave} />}
         {existing && simple && (
           existing.completedAt ? (
-            <Button kind="secondary" icon="refresh" label="Reopen this goal" onPress={() => setAchieved(existing.id, false)} />
+            <Button kind="secondary" icon="refresh" label={t('Reopen this goal')} onPress={() => setAchieved(existing.id, false)} />
           ) : (
             <Button
               icon="trophy-outline"
-              label="Mark as achieved"
+              label={t('Mark as achieved')}
               onPress={() => {
                 setAchieved(existing.id, true);
                 celebrate(existing.title);
@@ -323,7 +324,7 @@ export default function GoalScreen() {
           <Button
             kind="secondary"
             icon="timer-outline"
-            label="Focus on this goal for 5 minutes"
+            label={t('Focus on this goal for 5 minutes')}
             onPress={() => {
               close();
               router.push('/focus');
@@ -334,12 +335,12 @@ export default function GoalScreen() {
           <Button
             kind="danger"
             icon="trash-outline"
-            label="Delete goal"
+            label={t('Delete goal')}
             onPress={() =>
               showDialog({
-                title: 'Delete goal?',
-                message: `“${existing.title}” and its steps will be removed. Linked habits stay.`,
-                actions: [{ label: 'Delete', destructive: true, onPress: () => (deleteGoal(existing.id), close()) }],
+                title: t('Delete goal?'),
+                message: t('“{title}” and its steps will be removed. Linked habits stay.', { title: existing.title }),
+                actions: [{ label: t('Delete'), destructive: true, onPress: () => (deleteGoal(existing.id), close()) }],
               })
             }
           />

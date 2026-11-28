@@ -8,6 +8,7 @@ import type { Habit } from '@/store/types';
 import { SERIF, hexAlpha, space, useTheme } from '@/theme';
 
 import { bestHabitStreak } from './logic';
+import { t } from '@/lib/i18n';
 
 /** Every habit × the 7 days of a week, with the week's numbers underneath. */
 export function WeekGrid({ habits, weekStartsOn }: { habits: Habit[]; weekStartsOn: 0 | 1 }) {
@@ -42,11 +43,11 @@ export function WeekGrid({ habits, weekStartsOn }: { habits: Habit[]; weekStarts
   return (
     <Card style={{ gap: space.md }}>
       <View style={styles.head}>
-        <IconButton icon="chevron-back" label="Previous week" size={14} diameter={30} onPress={() => setStart(addDays(start, -7))} />
+        <IconButton icon="chevron-back" label={t('Previous week')} size={14} diameter={30} onPress={() => setStart(addDays(start, -7))} />
         <Text variant="small" style={{ flex: 1, textAlign: 'center', fontWeight: '600' }}>
-          {isThisWeek ? 'This week' : diffDays(start, startOfWeek(today, weekStartsOn)) === 7 ? 'Last week' : `${formatDay(start, { relative: false })} – ${formatDay(addDays(start, 6), { relative: false })}`}
+          {isThisWeek ? t('This week') : diffDays(start, startOfWeek(today, weekStartsOn)) === 7 ? 'Last week' : `${formatDay(start, { relative: false })} – ${formatDay(addDays(start, 6), { relative: false })}`}
         </Text>
-        <IconButton icon="chevron-forward" label="Next week" size={14} diameter={30} onPress={() => !isThisWeek && setStart(addDays(start, 7))} />
+        <IconButton icon="chevron-forward" label={t('Next week')} size={14} diameter={30} onPress={() => !isThisWeek && setStart(addDays(start, 7))} />
       </View>
 
       <View style={styles.row}>
@@ -95,10 +96,10 @@ export function WeekGrid({ habits, weekStartsOn }: { habits: Habit[]; weekStarts
       })}
 
       <View style={[styles.totals, { borderTopColor: c.border }]}>
-        <Total value={`${pct}%`} label="Kept" />
-        <Total value={total ? weekdayShort(days[bestIdx]) : '—'} label="Best day" />
-        <Total value={String(total)} label="Done" />
-        <Total value={`${bestStreak}`} label="Best streak" />
+        <Total value={`${pct}%`} label={t('Kept')} />
+        <Total value={total ? weekdayShort(days[bestIdx]) : '—'} label={t('Best day')} />
+        <Total value={String(total)} label={t('Done')} />
+        <Total value={`${bestStreak}`} label={t('Best streak')} />
       </View>
     </Card>
   );

@@ -9,6 +9,7 @@ import { SERIF, radius, space, useTheme } from '@/theme';
 import { setFocusExpanded } from './focusMode';
 import { TimerRing } from './TimerRing';
 import { formatClock, useTick } from './useTick';
+import { t } from '@/lib/i18n';
 
 /** Compact live timer shown on Today while a session is running or paused. */
 export function FocusNowCard({ compact }: { compact?: boolean }) {
@@ -27,7 +28,7 @@ export function FocusNowCard({ compact }: { compact?: boolean }) {
         <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
           {timer.status === 'paused' ? 'Paused' : isBreak ? 'On a break' : 'Focusing'}
         </Text>
-        <Text numberOfLines={1}>{timer.label || 'Focus session'}{(timer.rounds ?? 1) > 1 ? ` · ${timer.round ?? 1}/${timer.rounds}` : ''}</Text>
+        <Text numberOfLines={1}>{timer.label || t('Focus session')}{(timer.rounds ?? 1) > 1 ? ` · ${timer.round ?? 1}/${timer.rounds}` : ''}</Text>
       </View>
       <Text style={{ fontFamily: SERIF, fontSize: compact ? 26 : 34, lineHeight: compact ? 30 : 38, fontVariant: ['tabular-nums'] }}>{formatClock(left)}</Text>
     </Press>

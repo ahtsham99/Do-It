@@ -8,6 +8,7 @@ import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { LOGO, radius, space, useTheme } from '@/theme';
 import { DISPLAY_FONTS, FONT_STYLES, TEXT_FONTS, displayFont, faceForWeight, previewFaces, styleFor, textFont } from '@/theme/fonts';
+import { t } from '@/lib/i18n';
 
 /** Pick the logo, heading and text fonts, with a live preview. */
 export default function FontsScreen() {
@@ -33,24 +34,24 @@ export default function FontsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ paddingTop: sheetTop }}>
-        <SheetHeader title="Fonts" cancelLabel="Done" />
+        <SheetHeader title={t('Fonts')} cancelLabel={t('Done')} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <Card style={{ gap: space.sm }}>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-            Preview
+            {t('Preview')}
           </Text>
           <Text variant="display" style={{ fontFamily: LOGO, letterSpacing: -0.8 }}>
-            Do It
+            {t('Do It')}
           </Text>
-          <Text variant="title">Good evening</Text>
+          <Text variant="title">{t('Good evening')}</Text>
           <Text tone="muted" style={{ lineHeight: 23 }}>
-            Three small habits today. A reminder at 6pm, and a 25-minute focus session when you’re ready.
+            {t('Three small habits today. A reminder at 6pm, and a 25-minute focus session when you’re ready.')}
           </Text>
-          <Text variant="bodyStrong">Read 20 pages · 4 day streak</Text>
+          <Text variant="bodyStrong">{t('Read 20 pages · 4 day streak')}</Text>
         </Card>
 
-        <Section title="Style">
+        <Section title={t('Style')}>
           <View style={styles.grid}>
             {FONT_STYLES.map((st) => {
               const d = displayFont(st.choice.display).face?.family;
@@ -70,18 +71,18 @@ export default function FontsScreen() {
 
         <Press onPress={() => setCustom(!custom)} style={styles.customRow} accessibilityRole="button">
           <Text variant="small" tone="muted" style={{ fontWeight: '600' }}>
-            Customise each font
+            {t('Customise each font')}
           </Text>
           <Icon name={custom ? 'chevron-up' : 'chevron-down'} size={16} color={c.textMuted} />
         </Press>
 
         {custom && (
         <>
-        <Section title="Logo">
+        <Section title={t('Logo')}>
           <View style={styles.grid}>
             {DISPLAY_FONTS.map((f) => (
               <Option key={f.id} selected={s.logoFont === f.id} onPress={() => updateSettings({ logoFont: f.id })}>
-                <Text style={[{ fontSize: 30, lineHeight: 38 }, own(f.face?.family), !f.face && { fontWeight: '600' }]}>Do It</Text>
+                <Text style={[{ fontSize: 30, lineHeight: 38 }, own(f.face?.family), !f.face && { fontWeight: '600' }]}>{t('Do It')}</Text>
                 <Text variant="small" tone="muted">
                   {f.label}
                 </Text>
@@ -90,11 +91,11 @@ export default function FontsScreen() {
           </View>
         </Section>
 
-        <Section title="Headings">
+        <Section title={t('Headings')}>
           <View style={styles.grid}>
             {DISPLAY_FONTS.map((f) => (
               <Option key={f.id} selected={s.displayFont === f.id} onPress={() => updateSettings({ displayFont: f.id })}>
-                <Text style={[{ fontSize: 26, lineHeight: 34 }, own(f.face?.family), !f.face && { fontWeight: '600' }]}>Habits</Text>
+                <Text style={[{ fontSize: 26, lineHeight: 34 }, own(f.face?.family), !f.face && { fontWeight: '600' }]}>{t('Habits')}</Text>
                 <Text variant="small" tone="muted">
                   {f.label} · {f.blurb}
                 </Text>
@@ -103,7 +104,7 @@ export default function FontsScreen() {
           </View>
         </Section>
 
-        <Section title="Text">
+        <Section title={t('Text')}>
           <Card padded={false} style={{ paddingHorizontal: space.lg }}>
             {TEXT_FONTS.map((f, i) => {
               const on = s.textFont === f.id;
@@ -134,7 +135,7 @@ export default function FontsScreen() {
           onPress={() => updateSettings({ logoFont: 'newsreader', displayFont: 'instrument', textFont: 'system' })}
           style={{ alignSelf: 'center', padding: space.sm }}>
           <Text variant="small" tone="muted" style={{ textDecorationLine: 'underline' }}>
-            Back to the original fonts
+            {t('Back to the original fonts')}
           </Text>
         </Press>
       </ScrollView>

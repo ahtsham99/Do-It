@@ -4,6 +4,7 @@ import { Press, Text } from '@/components/ui';
 import { radius, space, useTheme } from '@/theme';
 
 import { INTENT_IDEAS } from './intents';
+import { t } from '@/lib/i18n';
 
 /** "What do you want to work on?": free text plus ideas to tap. */
 export function IntentBox({ value, onChange, autoFocus }: { value: string; onChange: (t: string) => void; autoFocus?: boolean }) {
@@ -22,9 +23,9 @@ export function IntentBox({ value, onChange, autoFocus }: { value: string; onCha
         autoFocus={autoFocus}
         multiline
         maxLength={240}
-        placeholder="e.g. Go to the gym 3 times a week, eat clean and stop scrolling at night"
+        placeholder={t('e.g. Go to the gym 3 times a week, eat clean and stop scrolling at night')}
         placeholderTextColor={c.textFaint}
-        accessibilityLabel="What do you want to work on?"
+        accessibilityLabel={t('What do you want to work on?')}
         style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text }, { outlineStyle: 'none' } as object]}
       />
       {ideas.length > 0 && (

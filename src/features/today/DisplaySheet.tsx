@@ -7,6 +7,7 @@ import type { PlanDisplay } from '@/store/types';
 import { radius, space, useTheme } from '@/theme';
 
 import { setDisplay, useDisplay } from './display';
+import { t } from '@/lib/i18n';
 
 /** Layout and what shows on Today. Changes apply straight away. */
 export function DisplaySheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
@@ -36,39 +37,39 @@ export function DisplaySheet({ visible, onClose }: { visible: boolean; onClose: 
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: c.overlay }]} onPress={onClose} accessibilityLabel="Close" />
+      <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: c.overlay }]} onPress={onClose} accessibilityLabel={t('Close')} />
       <View style={{ flex: 1, justifyContent: 'flex-end' }} pointerEvents="box-none">
         <Animated.View style={[styles.sheet, { backgroundColor: c.bg, maxHeight: height * 0.9, paddingBottom: insets.bottom + space.md, transform: [{ translateY: y }] }]}>
           <View {...drag.panHandlers} style={{ paddingTop: space.sm }}>
             <View style={[styles.grabber, { backgroundColor: c.border }]} />
             <View style={styles.header}>
-              <Press onPress={onClose} accessibilityLabel="Close" style={[styles.round, { backgroundColor: c.surface, borderColor: c.border }]}>
+              <Press onPress={onClose} accessibilityLabel={t('Close')} style={[styles.round, { backgroundColor: c.surface, borderColor: c.border }]}>
                 <Icon name="close" size={20} color={c.text} />
               </Press>
-              <Text variant="bodyStrong">Display</Text>
-              <Press onPress={onClose} accessibilityLabel="Done" style={[styles.round, { backgroundColor: c.accent, borderColor: c.accent }]}>
+              <Text variant="bodyStrong">{t('Display')}</Text>
+              <Press onPress={onClose} accessibilityLabel={t('Done')} style={[styles.round, { backgroundColor: c.accent, borderColor: c.accent }]}>
                 <Icon name="checkmark" size={20} color={c.accentText} />
               </Press>
             </View>
           </View>
           <ScrollView contentContainerStyle={{ padding: space.lg, paddingTop: space.sm, gap: space.sm }}>
-            <Group label="Layout">
+            <Group label={t('Layout')}>
               <View style={styles.layouts}>
                 {(['day', 'week', 'month'] as const).map((k) => (
                   <LayoutOption key={k} kind={k} on={d.layout === k} onPress={() => setDisplay({ layout: k })} />
                 ))}
               </View>
               <Divider />
-              <Row icon="checkmark-circle-outline" label="Completed plans" value={d.showCompleted} onChange={(v) => setDisplay({ showCompleted: v })} />
+              <Row icon="checkmark-circle-outline" label={t('Completed plans')} value={d.showCompleted} onChange={(v) => setDisplay({ showCompleted: v })} />
               <Divider />
-              <Row icon="hourglass-outline" label="Free time between plans" value={d.showFreeTime} onChange={(v) => setDisplay({ showFreeTime: v })} last />
+              <Row icon="hourglass-outline" label={t('Free time between plans')} value={d.showFreeTime} onChange={(v) => setDisplay({ showFreeTime: v })} last />
             </Group>
-            <Group label="Also on Today">
-              <Row icon="flame-outline" label="Habits" value={d.showHabits} onChange={(v) => setDisplay({ showHabits: v })} />
+            <Group label={t('Also on Today')}>
+              <Row icon="flame-outline" label={t('Habits')} value={d.showHabits} onChange={(v) => setDisplay({ showHabits: v })} />
               <Divider />
-              <Row icon="stats-chart-outline" label="Streak and focus" value={d.showStats} onChange={(v) => setDisplay({ showStats: v })} />
+              <Row icon="stats-chart-outline" label={t('Streak and focus')} value={d.showStats} onChange={(v) => setDisplay({ showStats: v })} />
               <Divider />
-              <Row icon="flag-outline" label="Goals" value={d.showGoals} onChange={(v) => setDisplay({ showGoals: v })} last />
+              <Row icon="flag-outline" label={t('Goals')} value={d.showGoals} onChange={(v) => setDisplay({ showGoals: v })} last />
             </Group>
           </ScrollView>
         </Animated.View>
@@ -105,7 +106,7 @@ function Row({ icon, label, value, onChange }: { icon: IconName; label: string; 
   );
 }
 
-const LABELS: Record<PlanDisplay['layout'], string> = { day: 'Day', week: 'Week', month: 'Month' };
+const LABELS: Record<PlanDisplay['layout'], string> = { day: t('Day'), week: t('Week'), month: t('Month') };
 
 /** A little phone drawing of each layout. */
 function LayoutOption({ kind, on, onPress }: { kind: PlanDisplay['layout']; on: boolean; onPress: () => void }) {

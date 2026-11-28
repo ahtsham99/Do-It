@@ -4,6 +4,7 @@ import { Animated, KeyboardAvoidingView, PanResponder, Platform, Pressable, Styl
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const SheetClose = createContext<(() => void) | null>(null);
 
@@ -100,7 +101,7 @@ export function SheetScreen({ children }: { children: ReactNode }) {
     <SheetClose.Provider value={close}>
       <View style={styles.root} onLayout={(e) => setAvail(e.nativeEvent.layout.height)}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: c.overlay, opacity: dim }]}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel="Close" />
+          <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel={t('Close')} />
         </Animated.View>
         <KeyboardAvoidingView style={styles.place} behavior={Platform.OS === 'ios' ? 'padding' : undefined} pointerEvents="box-none">
           <Animated.View {...drag.panHandlers} style={[styles.slide, { transform: [{ translateY: y }] }]}>

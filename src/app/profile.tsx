@@ -16,6 +16,7 @@ import { updateSettings } from '@/store/actions/settings';
 import { useGoals, useHabits, useReminders, useSettings, useTasks } from '@/store/hooks';
 import { restoreAll, useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const EMOJIS = ['🦊', '🐼', '🐨', '🦁', '🐯', '🐸', '🐧', '🦉', '🐙', '🦋', '🌻', '🌙', '⭐', '🔥', '🌊', '🍀', '🎧', '📚', '☕', '🚀', '🎨', '⚽', '🧠', '😊'];
 
@@ -67,16 +68,16 @@ export default function ProfileScreen() {
         setEmojiOpen(false);
       }
     } catch {
-      showToast('Couldn’t open that photo', 'alert-circle-outline');
+      showToast(t('Couldn’t open that photo'), 'alert-circle-outline');
     }
   };
   const editAvatar = () =>
     showDialog({
-      title: 'Profile picture',
+      title: t('Profile picture'),
       actions: [
-        { label: 'Choose a photo', onPress: choosePhoto },
-        { label: 'Pick an emoji', onPress: () => setEmojiOpen(true) },
-        ...(s.avatar ? [{ label: isPhoto(s.avatar) ? 'Remove photo' : 'Use my initials', onPress: () => updateSettings({ avatar: '' }) }] : []),
+        { label: t('Choose a photo'), onPress: choosePhoto },
+        { label: t('Pick an emoji'), onPress: () => setEmojiOpen(true) },
+        ...(s.avatar ? [{ label: isPhoto(s.avatar) ? t('Remove photo') : t('Use my initials'), onPress: () => updateSettings({ avatar: '' }) }] : []),
       ],
     });
 
@@ -84,23 +85,23 @@ export default function ProfileScreen() {
     try {
       await saveBackup();
     } catch {
-      showToast('Couldn’t save the backup', 'alert-circle-outline');
+      showToast(t('Couldn’t save the backup'), 'alert-circle-outline');
     }
   };
   const restore = async () => {
     const text = await pickBackup().catch(() => null);
     if (!text) return;
     showDialog({
-      title: 'Restore this backup?',
-      message: 'Everything on this phone will be replaced with what’s in the backup.',
+      title: t('Restore this backup?'),
+      message: t('Everything on this phone will be replaced with what’s in the backup.'),
       actions: [
         {
-          label: 'Restore',
+          label: t('Restore'),
           destructive: true,
           onPress: async () => {
             try {
               const r = await restoreAll(text);
-              showToast(`Restored ${r.tasks} plans and ${r.habits} habits`);
+              showToast(t('Restored {tasks} plans and {habits} habits', { tasks: r.tasks, habits: r.habits }));
             } catch (e) {
               showToast((e as Error).message, 'alert-circle-outline');
             }
@@ -114,12 +115,12 @@ export default function ProfileScreen() {
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Glow height={420} />
       <View style={{ paddingTop: sheetTop }}>
-        <SheetHeader title="Profile" cancelLabel="Close" />
+        <SheetHeader title={t('Profile')} cancelLabel={t('Close')} />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
         {/* Who you are */}
         <View style={{ alignItems: 'center', gap: space.sm }}>
-          <Press onPress={editAvatar} accessibilityRole="button" accessibilityLabel="Change profile picture">
+          <Press onPress={editAvatar} accessibilityRole="button" accessibilityLabel={t('Change profile picture')}>
             <Avatar size={108} ring />
             <View style={[styles.edit, { backgroundColor: c.accent, borderColor: c.bg }]}>
               <Icon name="camera" size={14} color={c.accentText} />
@@ -141,19 +142,19 @@ export default function ProfileScreen() {
           <TextInput
             value={s.name}
             onChangeText={(name) => updateSettings({ name })}
-            placeholder="Your name"
+            placeholder={t('Your name')}
             placeholderTextColor={c.textFaint}
-            accessibilityLabel="Your name"
+            accessibilityLabel={t('Your name')}
             returnKeyType="done"
             style={[styles.name, { color: c.text, fontFamily: fonts.display }, { outlineStyle: 'none' } as object]}
           />
           <Text tone="muted" style={{ textAlign: 'center' }}>
-            {[s.persona === 'other' && s.personaLabel.trim() ? s.personaLabel.trim() : persona && persona.value !== 'other' ? persona.label : null, since ? `with Do It since ${since}` : null].filter(Boolean).join(' · ') || 'Tap your name to change it'}
+            {[s.persona === 'other' && s.personaLabel.trim() ? s.personaLabel.trim() : persona && persona.value !== 'other' ? persona.label : null, since ? `with Do It since ${since}` : null].filter(Boolean).join(' · ') || t('Tap your name to change it')}
           </Text>
           {n.bestStreak > 0 && (
             <View style={[styles.pill, { backgroundColor: c.accentSoft }]}>
               <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
-                🔥 {n.streak}-day streak{n.bestStreak > n.streak ? ` · best ${n.bestStreak}` : ''}
+                🔥 {n.streak}-day streak{n.bestStreak > n.streak ? t(' · best {bestStreak}', { bestStreak: n.bestStreak }) : ''}
               </Text>
             </View>
           )}
@@ -161,42 +162,42 @@ export default function ProfileScreen() {
 
         {/* Your why */}
         <View style={{ gap: space.sm }}>
-          <Label>Your why</Label>
+          <Label>{t('Your why')}</Label>
           <Card style={{ gap: space.xs }}>
             <TextInput
               value={s.why}
               onChangeText={(why) => updateSettings({ why })}
-              placeholder="Why are you using Do It? e.g. Finish uni without the last-minute panic."
+              placeholder={t('Why are you using Do It? e.g. Finish uni without the last-minute panic.')}
               placeholderTextColor={c.textFaint}
               multiline
               maxLength={140}
-              accessibilityLabel="Your why"
+              accessibilityLabel={t('Your why')}
               style={[styles.why, { color: c.text, fontFamily: fonts.display }, { outlineStyle: 'none' } as object]}
             />
             <Text variant="small" tone="muted">
-              We’ll show this on Today when things pile up.
+              {t('We’ll show this on Today when things pile up.')}
             </Text>
           </Card>
         </View>
 
         {/* All time */}
         <View style={{ gap: space.sm }}>
-          <Label>All time</Label>
+          <Label>{t('All time')}</Label>
           <View style={styles.grid}>
-            <Stat value={String(totals.plansDone)} label="Plans done" />
-            <Stat value={String(totals.checkIns)} label="Habit check-ins" />
-            <Stat value={focus} label="Focused" />
-            <Stat value={String(totals.remindersDone)} label="Reminders done" />
+            <Stat value={String(totals.plansDone)} label={t('Plans done')} />
+            <Stat value={String(totals.checkIns)} label={t('Habit check-ins')} />
+            <Stat value={focus} label={t('Focused')} />
+            <Stat value={String(totals.remindersDone)} label={t('Reminders done')} />
           </View>
         </View>
 
         {/* Milestones */}
         <View style={{ gap: space.sm }}>
-          <Label>{`Milestones · ${earned} of ${badges.length}`}</Label>
+          <Label>{t('Milestones · {earned} of {n}', { earned, n: badges.length })}</Label>
           <Card padded={false}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badges}>
               {badges.map((b) => (
-                <View key={b.id} style={styles.badge} accessibilityLabel={`${b.label}${b.done ? ', earned' : ', not yet'}`}>
+                <View key={b.id} style={styles.badge} accessibilityLabel={`${b.label}${b.done ? t(', earned') : t(', not yet')}`}>
                   <View style={[styles.badgeIcon, { backgroundColor: b.done ? b.tint : c.surfaceAlt, opacity: b.done ? 1 : 0.55 }]}>
                     <Text style={{ fontSize: 26, opacity: b.done ? 1 : 0.35 }}>{b.icon}</Text>
                   </View>
@@ -219,28 +220,28 @@ export default function ProfileScreen() {
         {/* Plan: hidden until Premium can be bought. */}
         {PREMIUM_AVAILABLE && (
           <View style={{ gap: space.sm }}>
-            <Label>Plan</Label>
+            <Label>{t('Plan')}</Label>
             <View style={[styles.plan, { backgroundColor: c.accent }]}>
               <View style={{ flex: 1, gap: 2 }}>
                 <Text color={c.accentText} style={{ fontWeight: '700', fontSize: 16 }}>
-                  {isPremium ? 'Premium' : 'Free plan'}
+                  {isPremium ? t('Premium') : t('Free plan')}
                 </Text>
                 <Text variant="small" color={c.accentText} style={{ opacity: 0.8 }}>
-                  {isPremium ? 'Thanks for supporting Do It.' : 'Premium palettes, icons and sync are coming.'}
+                  {isPremium ? t('Thanks for supporting Do It.') : t('Premium palettes, icons and sync are coming.')}
                 </Text>
               </View>
               {!isPremium && (
                 <Press
                   onPress={() =>
                     showDialog({
-                      title: 'Premium is coming',
-                      message: 'Sync across devices, more themes and icons, and deeper stats. Everything you use today stays free.',
-                      actions: [{ label: 'Sounds good', onPress: () => {} }],
+                      title: t('Premium is coming'),
+                      message: t('Sync across devices, more themes and icons, and deeper stats. Everything you use today stays free.'),
+                      actions: [{ label: t('Sounds good'), onPress: () => {} }],
                     })
                   }
                   style={[styles.planBtn, { backgroundColor: c.accentText }]}>
                   <Text variant="small" color={c.accent} style={{ fontWeight: '700' }}>
-                    See Premium
+                    {t('See Premium')}
                   </Text>
                 </Press>
               )}
@@ -250,17 +251,17 @@ export default function ProfileScreen() {
 
         {/* Shortcuts */}
         <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
-          <ListRow icon="bulb-outline" label="Suggested habits and reminders" onPress={() => router.push('/suggestions')} />
-          <ListRow icon="flame-outline" label="Your streak" onPress={() => router.push('/streaks')} />
-          <ListRow icon="stats-chart-outline" label="Your history" last onPress={() => router.push('/history')} />
+          <ListRow icon="bulb-outline" label={t('Suggested habits and reminders')} onPress={() => router.push('/suggestions')} />
+          <ListRow icon="flame-outline" label={t('Your streak')} onPress={() => router.push('/streaks')} />
+          <ListRow icon="stats-chart-outline" label={t('Your history')} last onPress={() => router.push('/history')} />
         </Card>
 
         {/* Your data */}
         <View style={{ gap: space.sm }}>
-          <Label>Your data</Label>
+          <Label>{t('Your data')}</Label>
           <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
-            <ListRow icon="download-outline" label="Back up to a file" onPress={backup} />
-            <ListRow icon="push-outline" label="Restore from a backup" last onPress={restore} />
+            <ListRow icon="download-outline" label={t('Back up to a file')} onPress={backup} />
+            <ListRow icon="push-outline" label={t('Restore from a backup')} last onPress={restore} />
           </Card>
           <Text variant="small" tone="muted">
             Everything lives on this {Platform.OS === 'web' ? 'device' : 'phone'}. A backup keeps it safe if you switch phones or clear your browser.

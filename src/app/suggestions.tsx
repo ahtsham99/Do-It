@@ -13,6 +13,7 @@ import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import type { Persona } from '@/store/types';
 import { space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 /** Change persona and browse its suggestions at any time. */
 export default function SuggestionsScreen() {
@@ -30,7 +31,7 @@ export default function SuggestionsScreen() {
 
   const add = () => {
     const n = applySuggestions(intent.chosen(SUGGESTIONS[persona]));
-    showToast(n ? `Added ${n}.` : 'You already have those.');
+    showToast(n ? t('Added {n}.', { n }) : t('You already have those.'));
     if (router.canGoBack()) router.back();
     else router.replace('/settings');
   };
@@ -38,7 +39,7 @@ export default function SuggestionsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ paddingTop: sheetTop }}>
-        <SheetHeader title="Suggestions" />
+        <SheetHeader title={t('Suggestions')} />
       </View>
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.xl, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
         <View style={{ gap: space.sm }}>
@@ -50,7 +51,7 @@ export default function SuggestionsScreen() {
         {intent.matches.length > 0 && <SuggestionPicker items={intent.matches} selected={selected} onToggle={toggle} />}
         <View style={{ gap: space.sm }}>
           <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-            Or browse by who you are
+            {t('Or browse by who you are')}
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {PERSONAS.map((p) => (
@@ -68,7 +69,7 @@ export default function SuggestionsScreen() {
           </View>
         </View>
         <SuggestionPicker items={SUGGESTIONS[persona]} selected={selected} onToggle={toggle} />
-        <Button label={selected.size ? `Add ${selected.size}` : 'Pick some to add'} disabled={!selected.size} onPress={add} />
+        <Button label={selected.size ? t('Add {n}', { n: selected.size }) : t('Pick some to add')} disabled={!selected.size} onPress={add} />
       </ScrollView>
     </View>
   );

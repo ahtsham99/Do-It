@@ -9,6 +9,7 @@ import { groupCountdowns } from '@/features/countdowns/logic';
 import { todayKey } from '@/lib/dates';
 import { useCountdowns } from '@/store/hooks';
 import { TAB_BAR_SPACE, cardShadow, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 type When = 'future' | 'past';
 
@@ -39,9 +40,9 @@ export default function CountdownsScreen() {
   const add = () => router.push('/countdown');
   const chooseCategory = () =>
     showDialog({
-      title: 'Show',
+      title: t('Show'),
       actions: [
-        { label: 'All events', onPress: () => setCategory(null) },
+        { label: t('All events'), onPress: () => setCategory(null) },
         ...categories.map((cat) => ({ label: cat, onPress: () => setCategory(cat) })),
       ],
     });
@@ -49,24 +50,24 @@ export default function CountdownsScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Screen
-        title="Countdowns"
-        subtitle="The days worth watching"
+        title={t('Countdowns')}
+        subtitle={t('The days worth watching')}
         contentStyle={{ paddingBottom: TAB_BAR_SPACE + tabBottom + 160 }}
         right={
           <>
             <IconButton
               icon={searching ? 'close' : 'search'}
-              label="Search"
+              label={t('Search')}
               size={20}
               onPress={() => {
                 setSearching(!searching);
                 setQuery('');
               }}
             />
-            <IconButton icon="close" label="Close" size={20} onPress={() => (router.canGoBack() ? router.back() : router.replace({ pathname: '/habits', params: { view: 'goals' } }))} />
+            <IconButton icon="close" label={t('Close')} size={20} onPress={() => (router.canGoBack() ? router.back() : router.replace({ pathname: '/habits', params: { view: 'goals' } }))} />
           </>
         }>
-        {searching && <Field placeholder="Search countdowns…" value={query} onChangeText={setQuery} autoFocus />}
+        {searching && <Field placeholder={t('Search countdowns…')} value={query} onChangeText={setQuery} autoFocus />}
 
         {items.length > 0 && (
           <Press onPress={chooseCategory} style={[styles.filter, { backgroundColor: c.surface, borderColor: c.border, ...cardShadow(c) }]}>
@@ -78,14 +79,14 @@ export default function CountdownsScreen() {
         {items.length === 0 ? (
           <Empty
             icon="hourglass-outline"
-            title="Nothing to count down to"
-            body="Add exams, appointments, trips and birthdays, and watch the days drop."
-            action="Add a countdown"
+            title={t('Nothing to count down to')}
+            body={t('Add exams, appointments, trips and birthdays, and watch the days drop.')}
+            action={t('Add a countdown')}
             onAction={add}
           />
         ) : groups.length === 0 ? (
           <Text tone="muted" style={{ textAlign: 'center', paddingVertical: space.xl }}>
-            {query ? 'No matches.' : when === 'future' ? 'Nothing coming up here.' : 'Nothing in the past yet.'}
+            {query ? t('No matches.') : when === 'future' ? 'Nothing coming up here.' : 'Nothing in the past yet.'}
           </Text>
         ) : (
           groups.map((g) => (
@@ -100,7 +101,7 @@ export default function CountdownsScreen() {
         )}
       </Screen>
 
-      <Fab label="Add countdown" onPress={add} lift={items.length > 0 ? 62 : 0} />
+      <Fab label={t('Add countdown')} onPress={add} lift={items.length > 0 ? 62 : 0} />
       {items.length > 0 && (
         <View pointerEvents="box-none" style={[styles.when, { bottom: TAB_BAR_SPACE + tabBottom - 2 }]}>
           <View style={{ width: '100%', maxWidth: 600 }}>
@@ -109,8 +110,8 @@ export default function CountdownsScreen() {
               value={when}
               onChange={setWhen}
               options={[
-                { value: 'future', label: 'Future', badge: futureCount },
-                { value: 'past', label: 'Past', badge: items.length - futureCount },
+                { value: 'future', label: t('Future'), badge: futureCount },
+                { value: 'past', label: t('Past'), badge: items.length - futureCount },
               ]}
             />
           </View>

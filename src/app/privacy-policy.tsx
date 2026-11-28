@@ -4,6 +4,7 @@ import { Card, SheetHeader, Text } from '@/components/ui';
 import { useSheetTopInset } from '@/hooks/useTopInset';
 import { SUPPORT_EMAIL } from '@/lib/appInfo';
 import { SERIF, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const SECTIONS: { title: string; body: string }[] = [
   { title: 'Your data stays on your device', body: 'Your plans, habits, reminders, countdowns, goals, focus sessions, settings, name and profile picture are stored only on this device. They are never uploaded, synced or sent to us or anyone else.' },
@@ -22,12 +23,12 @@ export default function PrivacyPolicyScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ paddingTop: top }}>
-        <SheetHeader title="Privacy" cancelLabel="Close" />
+        <SheetHeader title={t('Privacy')} cancelLabel={t('Close')} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.summary, { backgroundColor: c.accent }]}>
           <Text color={c.accentText} style={{ fontSize: 17, lineHeight: 25 }}>
-            Do It keeps everything on your device. No accounts, no ads, no tracking, and nothing is sent to a server.
+            {t('Do It keeps everything on your device. No accounts, no ads, no tracking, and nothing is sent to a server.')}
           </Text>
         </View>
         {SECTIONS.map((s) => (
@@ -39,7 +40,7 @@ export default function PrivacyPolicyScreen() {
           </Card>
         ))}
         <Card style={{ gap: 6 }}>
-          <Text style={{ fontFamily: SERIF, fontSize: 22, lineHeight: 28 }}>Contact</Text>
+          <Text style={{ fontFamily: SERIF, fontSize: 22, lineHeight: 28 }}>{t('Contact')}</Text>
           <Text tone="muted" style={{ lineHeight: 23 }}>
             Questions?{' '}
             <Text color={c.accent} style={{ fontWeight: '600' }} onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}>
@@ -48,7 +49,7 @@ export default function PrivacyPolicyScreen() {
           </Text>
         </Card>
         <Text variant="small" tone="faint" style={{ textAlign: 'center' }}>
-          Last updated 27 November 2026
+          {t('Last updated 27 November 2026')}
         </Text>
       </ScrollView>
     </View>

@@ -6,6 +6,7 @@ import { radius, space, useTheme } from '@/theme';
 
 import { Press } from './Pressable';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 export interface DialogAction {
   label: string;
@@ -70,7 +71,7 @@ export function DialogHost() {
                 ))}
                 <Press onPress={close} style={styles.btn}>
                   <Text variant="bodyStrong" tone="muted">
-                    Cancel
+                    {t('Cancel')}
                   </Text>
                 </Press>
               </View>

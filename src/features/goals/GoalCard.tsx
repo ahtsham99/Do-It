@@ -7,6 +7,7 @@ import type { Goal } from '@/store/types';
 import { SERIF, hexAlpha, radius, space, useTheme } from '@/theme';
 
 import { daysLeftLabel, goalProgress, goalStatus, isSimple } from './logic';
+import { t } from '@/lib/i18n';
 
 export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
   const { c, paint } = useTheme();
@@ -31,7 +32,7 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
             {simple ? (
               goal.why?.trim() || done ? (
                 <Text variant="small" tone="muted" numberOfLines={1} style={{ fontStyle: done ? 'normal' : 'italic' }}>
-                  {done ? 'Achieved' : `“${goal.why!.trim()}”`}
+                  {done ? t('Achieved') : `“${goal.why!.trim()}”`}
                 </Text>
               ) : null
             ) : (

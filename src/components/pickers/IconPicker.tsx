@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Glyph, Icon, Press, Text, showDialog } from '@/components/ui';
 import { useEntitlements } from '@/lib/premium';
 import { radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 export function IconPicker({
   icons,
@@ -40,7 +41,7 @@ export function IconPicker({
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
       <Icon name="diamond-outline" size={14} color={c.flame} />
       <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase', fontSize: 11 }}>
-        Premium icons
+        {t('Premium icons')}
       </Text>
     </View>
     <View style={styles.grid}>
@@ -53,9 +54,9 @@ export function IconPicker({
               unlocked
                 ? onChange(i)
                 : showDialog({
-                    title: 'Premium icons',
-                    message: 'More icons are coming with Do It Premium. Everything you use today stays free.',
-                    actions: [{ label: 'Sounds good', onPress: () => {} }],
+                    title: t('Premium icons'),
+                    message: t('More icons are coming with Do It Premium. Everything you use today stays free.'),
+                    actions: [{ label: t('Sounds good'), onPress: () => {} }],
                   })
             }
             accessibilityLabel={unlocked ? i : `${i}, premium`}

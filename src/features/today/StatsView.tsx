@@ -15,6 +15,7 @@ import { useGoals, useHabits, useReminders, useSettings, useTasks } from '@/stor
 import type { Habit } from '@/store/types';
 import { useStore } from '@/store/store';
 import { SERIF, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 
 /** Your progress: streak, the last 7 days, habits, focus and goals. */
@@ -61,9 +62,9 @@ export function StatsView() {
   return (
     <>
       <View style={{ gap: 2 }}>
-        <Text style={{ fontFamily: SERIF, fontSize: 46, lineHeight: 50, letterSpacing: -0.8 }}>Your progress</Text>
+        <Text style={{ fontFamily: SERIF, fontSize: 46, lineHeight: 50, letterSpacing: -0.8 }}>{t('Your progress')}</Text>
         <Text variant="small" tone="muted">
-          The last 7 days
+          {t('The last 7 days')}
         </Text>
       </View>
 
@@ -95,15 +96,15 @@ export function StatsView() {
 
       {/* This week */}
       <View style={styles.grid}>
-        <Stat value={`${week.planDone}/${week.planned}`} label="Plans done" icon="calendar-outline" />
-        <Stat value={fmtMin(week.focusMin)} label="Focused" icon="timer-outline" onPress={() => router.push('/focus')} />
-        <Stat value={String(week.checkIns)} label="Habit check-ins" icon="flame-outline" onPress={() => router.push('/habits')} />
-        <Stat value={String(week.remindersDone)} label="Reminders done" icon="alarm-outline" onPress={() => router.push('/reminders')} />
+        <Stat value={`${week.planDone}/${week.planned}`} label={t('Plans done')} icon="calendar-outline" />
+        <Stat value={fmtMin(week.focusMin)} label={t('Focused')} icon="timer-outline" onPress={() => router.push('/focus')} />
+        <Stat value={String(week.checkIns)} label={t('Habit check-ins')} icon="flame-outline" onPress={() => router.push('/habits')} />
+        <Stat value={String(week.remindersDone)} label={t('Reminders done')} icon="alarm-outline" onPress={() => router.push('/reminders')} />
       </View>
 
 
       {habits.length > 0 && (
-        <Section title="Habits">
+        <Section title={t('Habits')}>
           <WeekGrid habits={habits} weekStartsOn={weekStartsOn} />
         </Section>
       )}
@@ -114,7 +115,7 @@ export function StatsView() {
           right={
             <Press onPress={openHistory} hitSlop={10}>
               <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
-                See all ›
+                {t('See all ›')}
               </Text>
             </Press>
           }>
@@ -131,7 +132,7 @@ export function StatsView() {
                 );
               })}
             </ScrollView>
-            <Press haptic={false} onPress={openHistory} accessibilityLabel="Open habit history">
+            <Press haptic={false} onPress={openHistory} accessibilityLabel={t('Open habit history')}>
               <HistoryGrid habit={habits.find((h) => h.id === (yearHabit ?? habits[0]).id) ?? habits[0]} weekStartsOn={weekStartsOn} weeks={weeksFor(histRange, habits, n.today)} />
             </Press>
             <RangePicker value={histRange} onChange={setHistRange} />
@@ -140,7 +141,7 @@ export function StatsView() {
       )}
 
       {/* Focus by day */}
-      <Section title="Focus by day">
+      <Section title={t('Focus by day')}>
         <Card style={{ gap: space.sm }}>
           <View style={styles.bars}>
             {week.perDay.map((m, i) => (
@@ -160,7 +161,7 @@ export function StatsView() {
       </Section>
 
       {recent.length > 0 && (
-        <Section title="Recent focus sessions">
+        <Section title={t('Recent focus sessions')}>
           <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
             {recent.map((x, i) => (
               <Press
@@ -170,10 +171,10 @@ export function StatsView() {
                 onPress={() => x.taskId && router.push({ pathname: '/task', params: { id: x.taskId } })}
                 style={[styles.session, i < recent.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.border }]}>
                 <View style={{ flex: 1 }}>
-                  <Text numberOfLines={1}>{x.label || 'Focus session'}</Text>
+                  <Text numberOfLines={1}>{x.label || t('Focus session')}</Text>
                   <Text variant="small" tone="muted">
                     {formatDay(x.day)}
-                    {x.completed ? '' : ' · ended early'}
+                    {x.completed ? '' : t(' · ended early')}
                   </Text>
                 </View>
                 <Text style={{ fontFamily: SERIF, fontSize: 24 }}>{x.minutes}m</Text>
@@ -184,7 +185,7 @@ export function StatsView() {
       )}
 
       {goals.length > 0 && (
-        <Section title={`Goals · ${inProgress.length} in progress${achieved ? ` · ${achieved} achieved` : ''}`}>
+        <Section title={`${t('Goals')} · ${t('{n} in progress', { n: inProgress.length })}${achieved ? ` · ${t('{n} achieved', { n: achieved })}` : ''}`}>
           <View style={{ gap: space.sm }}>
             {inProgress.slice(0, 3).map((g) => (
               <GoalCard key={g.id} goal={g} compact />

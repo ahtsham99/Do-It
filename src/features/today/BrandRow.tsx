@@ -6,12 +6,13 @@ import { StreakPill } from '@/features/nudges/StreakPill';
 import { useNudges } from '@/features/nudges/useNudges';
 import { Avatar } from '@/features/profile/Avatar';
 import { LOGO, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 export type MainMode = 'plan' | 'stats';
 
 const META: Record<MainMode, { label: string; icon: 'calendar-outline' | 'stats-chart-outline' }> = {
-  plan: { label: 'Plan', icon: 'calendar-outline' },
-  stats: { label: 'Stats', icon: 'stats-chart-outline' },
+  plan: { label: t('Plan'), icon: 'calendar-outline' },
+  stats: { label: t('Stats'), icon: 'stats-chart-outline' },
 };
 
 /** Logo, Plan | Stats switch, streak and your initials — shared by both views. */
@@ -21,7 +22,7 @@ export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: 
   return (
     <View style={[styles.top, { paddingTop: space.sm }]}>
       <Text variant="display" accessibilityRole="header" style={{ fontFamily: LOGO, fontSize: 32, lineHeight: 38, letterSpacing: -0.8 }}>
-        Do It
+        {t('Do It')}
       </Text>
       <View style={{ flex: 1 }} />
       <View style={[styles.switch, { backgroundColor: c.surfaceAlt, borderColor: c.border }]} accessibilityRole="tablist">
@@ -43,7 +44,7 @@ export function BrandRow({ mode, onMode, modes }: { mode: MainMode; onMode: (m: 
         })}
       </View>
       <StreakPill streak={n.streak} activeToday={n.activeToday} />
-      <Press onPress={() => router.push('/settings')} accessibilityLabel="Settings and profile">
+      <Press onPress={() => router.push('/settings')} accessibilityLabel={t('Settings and profile')}>
         <Avatar size={36} small />
       </Press>
     </View>

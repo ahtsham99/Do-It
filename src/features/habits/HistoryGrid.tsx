@@ -5,6 +5,7 @@ import { Text } from '@/components/ui';
 import { addDays, range, startOfWeek, todayKey, weekdayLetters, weekdayShort } from '@/lib/dates';
 import type { Habit } from '@/store/types';
 import { useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 /**
  * Habit history, time running left → right. One week is a single row of
@@ -82,7 +83,7 @@ export function HistoryGrid({ habit, weekStartsOn, weeks = 16 }: { habit: Habit;
           );
         })}
         <Text variant="small" tone="faint" style={{ fontSize: 11 }}>
-          Each dot is one week — darker means more days done.
+          {t('Each dot is one week — darker means more days done.')}
         </Text>
       </View>
     );

@@ -81,13 +81,13 @@ export function applyLanguage(code: LanguageCode): boolean {
   return false;
 }
 
-const fill = (s: string, vars?: Record<string, string | number>) => (vars ? s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m)) : s);
+const fill = (s: string, vars?: Record<string, string | number | null | undefined>) => (vars ? s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m)) : s);
 
 /**
  * Translate. The English text is the key, so anything missing falls back to
  * English. `{name}` placeholders are filled from `vars`.
  */
-export function t(en: string, vars?: Record<string, string | number>): string {
+export function t(en: string, vars?: Record<string, string | number | null | undefined>): string {
   const e = lang === 'en' ? undefined : DICTS[lang]?.[en];
   const s = typeof e === 'string' ? e : typeof e === 'object' ? (e.other ?? en) : en;
   return fill(s, vars);
@@ -97,7 +97,7 @@ export function t(en: string, vars?: Record<string, string | number>): string {
  * Plural: tn(3, '{n} plan', '{n} plans'). Other languages store the plural
  * forms they need under the English plural text.
  */
-export function tn(n: number, one: string, other: string, vars?: Record<string, string | number>): string {
+export function tn(n: number, one: string, other: string, vars?: Record<string, string | number | null | undefined>): string {
   const v = { n, ...vars };
   if (lang === 'en') return fill(n === 1 ? one : other, v);
   const e = DICTS[lang]?.[other] ?? DICTS[lang]?.[one];

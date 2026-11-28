@@ -16,6 +16,7 @@ import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import type { Persona, Tone } from '@/store/types';
 import { SERIF, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const STEPS = ['welcome', 'name', 'persona', 'suggest', 'tone', 'finish'] as const;
 type Step = (typeof STEPS)[number];
@@ -64,13 +65,13 @@ export default function Onboarding() {
   };
 
   let body: React.ReactNode;
-  let cta = 'Continue';
+  let cta = t('Continue');
   let canNext = true;
   let onCta = next;
 
   switch (step) {
     case 'welcome':
-      cta = 'Begin';
+      cta = t('Begin');
       body = (
         <View style={{ flex: 1, justifyContent: 'center', gap: space.lg }}>
           <View style={[styles.logo, { backgroundColor: c.accent }]}>
@@ -80,7 +81,7 @@ export default function Onboarding() {
             Remember it.{'\n'}Start it.
           </Text>
           <Text variant="body" tone="muted" style={{ fontSize: 18, lineHeight: 26 }}>
-            A calm habit planner for people who forget things and put things off. Small daily habits, gentle reminders, and a focus timer for when starting is the hard part.
+            {t('A calm habit planner for people who forget things and put things off. Small daily habits, gentle reminders, and a focus timer for when starting is the hard part.')}
           </Text>
         </View>
       );
@@ -88,8 +89,8 @@ export default function Onboarding() {
     case 'name':
       body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="What should we call you?" sub="So the app can greet you properly." />
-          <Field placeholder="First name (optional)" value={name} onChangeText={setName} returnKeyType="next" onSubmitEditing={next} />
+          <Heading title={t('What should we call you?')} sub={t('So the app can greet you properly.')} />
+          <Field placeholder={t('First name (optional)')} value={name} onChangeText={setName} returnKeyType="next" onSubmitEditing={next} />
         </View>
       );
       break;
@@ -97,7 +98,7 @@ export default function Onboarding() {
       canNext = !!persona;
       body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="Who are you?" sub="We’ll suggest habits and reminders that fit. Everything else stays the same." />
+          <Heading title={t('Who are you?')} sub={t('We’ll suggest habits and reminders that fit. Everything else stays the same.')} />
           <View style={{ gap: space.sm }}>
             {ONBOARDING_PERSONAS.map((p) => {
               const sel = persona === p.value;
@@ -126,15 +127,15 @@ export default function Onboarding() {
       );
       break;
     case 'suggest':
-      cta = selected.size ? `Add ${selected.size} & continue` : 'Skip for now';
+      cta = selected.size ? t('Add {n} & continue', { n: selected.size }) : t('Skip for now');
       body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="What do you want to work on?" sub="A few words is enough. We’ll suggest a goal, habits and reminders to match. Or skip it." />
+          <Heading title={t('What do you want to work on?')} sub={t('A few words is enough. We’ll suggest a goal, habits and reminders to match. Or skip it.')} />
           <IntentBox value={intent.text} onChange={intent.setText} />
           {intent.matches.length > 0 && (
             <>
               <Text variant="caption" tone="muted" style={styles.group}>
-                Based on what you wrote
+                {t('Based on what you wrote')}
               </Text>
               <SuggestionPicker items={intent.matches} selected={selected} onToggle={toggle} />
             </>
@@ -153,26 +154,26 @@ export default function Onboarding() {
     case 'tone':
       body = (
         <View style={{ gap: space.lg }}>
-          <Heading title="How firmly should we remind you?" sub="You can change this in Settings." />
+          <Heading title={t('How firmly should we remind you?')} sub={t('You can change this in Settings.')} />
           <Segmented
             tone="accent"
             options={[
-              { value: 'gentle', label: 'Gentle' },
-              { value: 'balanced', label: 'Firm' },
-              { value: 'savage', label: 'Relentless' },
+              { value: 'gentle', label: t('Gentle') },
+              { value: 'balanced', label: t('Firm') },
+              { value: 'savage', label: t('Relentless') },
             ]}
             value={tone}
             onChange={setTone}
           />
           <Card style={{ gap: space.sm }}>
             <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-              When you have overdue tasks
+              {t('When you have overdue tasks')}
             </Text>
             <Text variant="heading">“{pick('overdue', tone, 'onboarding')}”</Text>
           </Card>
           <Card style={{ gap: space.sm }}>
             <Text variant="caption" tone="muted" style={{ textTransform: 'uppercase' }}>
-              Every morning
+              {t('Every morning')}
             </Text>
             <Text variant="heading">“{pick('planPrompt', tone, 'onboarding')}”</Text>
           </Card>
@@ -180,23 +181,23 @@ export default function Onboarding() {
       );
       break;
     case 'finish':
-      cta = supportsLocalNotifications ? 'Allow notifications & start' : 'Start planning';
+      cta = supportsLocalNotifications ? t('Allow notifications & start') : t('Start planning');
       onCta = finish;
       body = (
         <View style={{ gap: space.lg }}>
           <Heading
-            title={`You’re in${name.trim() ? `, ${name.trim()}` : ''}.`}
-            sub="Each morning we’ll invite you to plan your day, and each evening we’ll check in. Showing up, even a little, grows your streak."
+            title={name.trim() ? t('You’re in, {name}.', { name: name.trim() }) : t('You’re in.')}
+            sub={t('Each morning we’ll invite you to plan your day, and each evening we’ll check in. Showing up, even a little, grows your streak.')}
           />
           {supportsLocalNotifications ? (
-            <Tip icon="notifications" text="Turn on notifications and we’ll remind you at the right moments." />
+            <Tip icon="notifications" text={t('Turn on notifications and we’ll remind you at the right moments.')} />
           ) : !isStandaloneWeb() ? (
             <Tip
               icon="share-outline"
-              text="Install it: tap the Share button in Safari, then “Add to Home Screen”. It opens full-screen like a real app."
+              text={t('Install it: tap the Share button in Safari, then “Add to Home Screen”. It opens full-screen like a real app.')}
             />
           ) : (
-            <Tip icon="notifications" text="Reminders appear on the Today screen whenever you open the app." />
+            <Tip icon="notifications" text={t('Reminders appear on the Today screen whenever you open the app.')} />
           )}
         </View>
       );
@@ -208,7 +209,7 @@ export default function Onboarding() {
       <View style={{ flex: 1, paddingTop: top + space.md, paddingBottom: insets.bottom + space.lg, width: '100%', maxWidth: 560, alignSelf: 'center' }}>
         <View style={[styles.top, { paddingHorizontal: space.lg }]}>
           {idx > 0 ? (
-            <Press onPress={back} hitSlop={12} accessibilityLabel="Back">
+            <Press onPress={back} hitSlop={12} accessibilityLabel={t('Back')}>
               <Icon name="chevron-back" size={24} color={c.textMuted} />
             </Press>
           ) : (

@@ -11,6 +11,7 @@ import { INBOX_LIST, type ReminderItem } from '@/store/types';
 import { space } from '@/theme';
 
 import { parseReminder } from './logic';
+import { t } from '@/lib/i18n';
 
 /** 6pm today, or 9am tomorrow if it's already late in the day. */
 function laterToday() {
@@ -82,7 +83,7 @@ export function ReminderForm({
       // Shopping lists: add the next item straight away.
       setTitle('');
       setNotes('');
-      showToast(`Added “${data.title}”`, 'checkmark-circle');
+      showToast(t('Added “{title}”', { title: data.title }), 'checkmark-circle');
       return;
     }
     onDone();
@@ -93,7 +94,7 @@ export function ReminderForm({
     <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={contentStyle}>
     <View style={{ gap: space.lg }}>
       <Field
-        placeholder={shopping ? 'Add an item' : 'Add a reminder'}
+        placeholder={shopping ? t('Add an item') : t('Add a reminder')}
         value={title}
         onChangeText={(t) => setTitle(use24h ? to24hText(t) : t)}
         returnKeyType={shopping && !existing ? 'next' : 'done'}
@@ -105,7 +106,7 @@ export function ReminderForm({
 
       {lists.length > 1 && (
         <View style={{ gap: space.sm }}>
-          <Label>List</Label>
+          <Label>{t('List')}</Label>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {lists.map((l) => (
               <Chip key={l.id} label={`${l.icon}  ${l.name}`} selected={listId === l.id} onPress={() => setListId(l.id)} />
@@ -116,18 +117,18 @@ export function ReminderForm({
 
       <Card style={{ gap: space.md }}>
         <View>
-          <Text>Remind me</Text>
+          <Text>{t('Remind me')}</Text>
           <Text variant="small" tone="muted">
             {Platform.OS === 'web' ? 'Shows on your main page when it’s time' : 'A notification at this time'}
           </Text>
         </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-          <Chip label="No alert" selected={!remind} onPress={() => (setRemind(false), setTouched(true))} />
-          <Chip label={later.date === todayKey() ? 'Later today' : use24h ? 'Tomorrow 09:00' : 'Tomorrow 9am'} selected={remind && date === later.date && time === later.time} onPress={() => pickTime(later.date, later.time)} />
+          <Chip label={t('No alert')} selected={!remind} onPress={() => (setRemind(false), setTouched(true))} />
+          <Chip label={later.date === todayKey() ? 'Later today' : use24h ? 'Tomorrow 09:00' : t('Tomorrow 9am')} selected={remind && date === later.date && time === later.time} onPress={() => pickTime(later.date, later.time)} />
           {later.date === todayKey() && (
-            <Chip label={use24h ? 'Tomorrow 09:00' : 'Tomorrow 9am'} selected={remind && date === addDays(todayKey(), 1) && time === '09:00'} onPress={() => pickTime(addDays(todayKey(), 1), '09:00')} />
+            <Chip label={use24h ? t('Tomorrow 09:00') : t('Tomorrow 9am')} selected={remind && date === addDays(todayKey(), 1) && time === '09:00'} onPress={() => pickTime(addDays(todayKey(), 1), '09:00')} />
           )}
-          <Chip label="In a week" selected={remind && date === addDays(todayKey(), 7)} onPress={() => pickTime(addDays(todayKey(), 7), time)} />
+          <Chip label={t('In a week')} selected={remind && date === addDays(todayKey(), 7)} onPress={() => pickTime(addDays(todayKey(), 7), time)} />
         </View>
         {remind && (
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -137,19 +138,19 @@ export function ReminderForm({
         )}
       </Card>
 
-      <Field label="Notes" placeholder="Phone number, details…" value={notes} onChangeText={setNotes} multiline />
+      <Field label={t('Notes')} placeholder={t('Phone number, details…')} value={notes} onChangeText={setNotes} multiline />
 
-      <Button label={existing ? 'Save' : shopping ? 'Add item' : 'Add reminder'} onPress={() => save(false)} disabled={!canSave} />
+      <Button label={existing ? t('Save') : shopping ? t('Add item') : t('Add reminder')} onPress={() => save(false)} disabled={!canSave} />
       {existing && (
         <Button
           kind="danger"
           icon="trash-outline"
-          label="Delete"
+          label={t('Delete')}
           onPress={() =>
             showDialog({
-              title: 'Delete reminder?',
+              title: t('Delete reminder?'),
               message: `“${existing.title}”`,
-              actions: [{ label: 'Delete', destructive: true, onPress: () => (deleteReminder(existing.id), onDone()) }],
+              actions: [{ label: t('Delete'), destructive: true, onPress: () => (deleteReminder(existing.id), onDone()) }],
             })
           }
         />

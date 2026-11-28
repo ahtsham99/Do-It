@@ -12,6 +12,7 @@ import { addDays, diffDays, range, startOfWeek, todayKey, weekdayShort } from '@
 import { useHabits, useSettings } from '@/store/hooks';
 import type { Habit } from '@/store/types';
 import { SERIF, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 interface RangeStats {
   done: number;
@@ -66,7 +67,7 @@ export default function HistoryScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ paddingTop: sheetTop }}>
-        <SheetHeader title="Habit history" cancelLabel="Close" />
+        <SheetHeader title={t('Habit history')} cancelLabel={t('Close')} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <RangePicker value={r} onChange={setR} />
@@ -76,16 +77,16 @@ export default function HistoryScreen() {
             All habits · {HISTORY_RANGES.find((x) => x.id === r)!.title.toLowerCase()}
           </Text>
           <View style={{ flexDirection: 'row' }}>
-            <Big value={`${all.pct}%`} label="Kept" />
-            <Big value={String(all.done)} label="Check-ins" />
-            <Big value={all.bestDay} label="Best day" />
-            <Big value={String(best)} label="Best streak" />
+            <Big value={`${all.pct}%`} label={t('Kept')} />
+            <Big value={String(all.done)} label={t('Check-ins')} />
+            <Big value={all.bestDay} label={t('Best day')} />
+            <Big value={String(best)} label={t('Best streak')} />
           </View>
         </Card>
 
         {habits.length === 0 ? (
           <Text tone="muted" style={{ textAlign: 'center' }}>
-            Add a habit to see its history here.
+            {t('Add a habit to see its history here.')}
           </Text>
         ) : (
           all.per.map(({ h, s }) => {
@@ -102,7 +103,7 @@ export default function HistoryScreen() {
                           {h.name}
                         </Text>
                         <Text variant="small" tone="muted">
-                          {s.done} of {s.expected} · {streak > 0 ? `${streakLabel(h, streak)} streak` : 'no streak now'}
+                          {s.done} of {s.expected} · {streak > 0 ? `${streakLabel(h, streak)} streak` : t('no streak now')}
                         </Text>
                       </View>
                       <Text style={{ fontFamily: SERIF, fontSize: 30, lineHeight: 34 }} color={color}>

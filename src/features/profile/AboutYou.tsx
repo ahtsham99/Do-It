@@ -6,6 +6,7 @@ import { MAIN_PERSONAS, MORE_PERSONAS } from '@/features/onboarding/suggestions'
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 /** Who you are: the main four, more under "More", or your own words. */
 export function AboutYou() {
@@ -26,7 +27,7 @@ export function AboutYou() {
 
   return (
     <View style={{ gap: space.sm }}>
-      <Label>About you</Label>
+      <Label>{t('About you')}</Label>
       <View style={styles.wrap}>
         {MAIN_PERSONAS.map((p) => (
           <Chip key={p.value} label={p.label} icon={p.icon} selected={persona === p.value} onPress={() => updateSettings({ persona: p.value, personaLabel: '' })} />
@@ -37,7 +38,7 @@ export function AboutYou() {
           accessibilityState={{ expanded: shown }}
           style={[styles.more, { borderColor: c.border }]}>
           <Text variant="small" tone="muted" style={{ fontWeight: '600' }}>
-            {shown ? 'Less' : 'More'}
+            {shown ? t('Less') : t('More')}
           </Text>
           <Icon name={shown ? 'chevron-up' : 'chevron-down'} size={14} color={c.textMuted} />
         </Press>
@@ -62,21 +63,21 @@ export function AboutYou() {
               value={text}
               onChangeText={setText}
               onSubmitEditing={add}
-              placeholder={custom ? 'Change it… e.g. Nurse, Musician' : 'Add your own… e.g. Nurse, Musician'}
+              placeholder={custom ? t('Change it… e.g. Nurse, Musician') : t('Add your own… e.g. Nurse, Musician')}
               placeholderTextColor={c.textFaint}
               returnKeyType="done"
               maxLength={30}
-              accessibilityLabel="Describe yourself"
+              accessibilityLabel={t('Describe yourself')}
               style={[styles.input, { color: c.text }, { outlineStyle: 'none' } as object]}
             />
-            <Press onPress={add} disabled={!text.trim()} accessibilityLabel="Add" style={[styles.addBtn, { backgroundColor: text.trim() ? c.accent : c.surfaceAlt }]}>
+            <Press onPress={add} disabled={!text.trim()} accessibilityLabel={t('Add')} style={[styles.addBtn, { backgroundColor: text.trim() ? c.accent : c.surfaceAlt }]}>
               <Icon name="add" size={18} color={text.trim() ? c.accentText : c.textFaint} />
             </Press>
           </View>
         </>
       )}
       <Text variant="small" tone="muted">
-        Only used to suggest habits and reminders.
+        {t('Only used to suggest habits and reminders.')}
       </Text>
     </View>
   );

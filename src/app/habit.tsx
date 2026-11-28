@@ -11,6 +11,7 @@ import { useGoals, useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import type { HabitFrequency } from '@/store/types';
 import { SWATCHES, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 export default function HabitEditor() {
   const { c, paint } = useTheme();
@@ -42,7 +43,7 @@ export default function HabitEditor() {
   return (
     <SheetScreen>
       <View>
-        <SheetHeader title={existing ? 'Habit' : 'New habit'} onSave={save} canSave={canSave} />
+        <SheetHeader title={existing ? t('Habit') : t('New habit')} onSave={save} canSave={canSave} />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -52,26 +53,26 @@ export default function HabitEditor() {
             <Glyph value={icon} size={26} color={paint(color)} />
           </View>
           <View style={{ flex: 1 }}>
-            <Field placeholder="e.g. Read 20 pages" value={name} onChangeText={setName} />
+            <Field placeholder={t('e.g. Read 20 pages')} value={name} onChangeText={setName} />
           </View>
         </View>
 
         {existing && (
           <Card style={{ gap: space.md }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Stat label="Current streak" value={streakLabel(existing, streak)} />
-              <Stat label="Total" value={`${existing.history.length}×`} />
+              <Stat label={t('Current streak')} value={streakLabel(existing, streak)} />
+              <Stat label={t('Total')} value={`${existing.history.length}×`} />
             </View>
             <HistoryGrid habit={existing} weekStartsOn={weekStartsOn} />
           </Card>
         )}
 
         <View style={{ gap: space.sm }}>
-          <Label>How often</Label>
+          <Label>{t('How often')}</Label>
           <Segmented
             options={[
-              { value: 'daily', label: 'Every day' },
-              { value: 'weekly', label: 'Times per week' },
+              { value: 'daily', label: t('Every day') },
+              { value: 'weekly', label: t('Times per week') },
             ]}
             value={frequency}
             onChange={setFrequency}
@@ -79,29 +80,29 @@ export default function HabitEditor() {
           {frequency === 'daily' && (
             <Card style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flex: 1 }}>
-                <Text>Times a day</Text>
+                <Text>{t('Times a day')}</Text>
                 <Text variant="small" tone="muted">
                   {perDay === 1 ? 'Once is enough' : `Tap the ring ${perDay} times, e.g. glasses of water`}
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-                <IconButton icon="remove" label="Fewer" size={18} onPress={() => setPerDay(Math.max(1, perDay - 1))} />
+                <IconButton icon="remove" label={t('Fewer')} size={18} onPress={() => setPerDay(Math.max(1, perDay - 1))} />
                 <Text variant="heading" style={{ minWidth: 22, textAlign: 'center' }}>
                   {perDay}
                 </Text>
-                <IconButton icon="add" label="More" size={18} onPress={() => setPerDay(Math.min(30, perDay + 1))} />
+                <IconButton icon="add" label={t('More')} size={18} onPress={() => setPerDay(Math.min(30, perDay + 1))} />
               </View>
             </Card>
           )}
           {frequency === 'weekly' && (
             <Card style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Text>Target per week</Text>
+              <Text>{t('Target per week')}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-                <IconButton icon="remove" label="Fewer" size={18} onPress={() => setTimes(Math.max(1, timesPerWeek - 1))} />
+                <IconButton icon="remove" label={t('Fewer')} size={18} onPress={() => setTimes(Math.max(1, timesPerWeek - 1))} />
                 <Text variant="heading" style={{ minWidth: 20, textAlign: 'center' }}>
                   {timesPerWeek}
                 </Text>
-                <IconButton icon="add" label="More" size={18} onPress={() => setTimes(Math.min(7, timesPerWeek + 1))} />
+                <IconButton icon="add" label={t('More')} size={18} onPress={() => setTimes(Math.min(7, timesPerWeek + 1))} />
               </View>
             </Card>
           )}
@@ -109,9 +110,9 @@ export default function HabitEditor() {
 
         {goals.length > 0 && (
           <View style={{ gap: space.sm }}>
-            <Label>Helps with a goal</Label>
+            <Label>{t('Helps with a goal')}</Label>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-              <Chip label="None" selected={!goalId} onPress={() => setGoalId(null)} />
+              <Chip label={t('None')} selected={!goalId} onPress={() => setGoalId(null)} />
               {goals.map((g) => (
                 <Chip key={g.id} label={`${g.icon}  ${g.title}`} selected={goalId === g.id} onPress={() => setGoalId(g.id)} />
               ))}
@@ -120,20 +121,20 @@ export default function HabitEditor() {
         )}
 
         <View style={{ gap: space.sm }}>
-          <Label>Colour</Label>
+          <Label>{t('Colour')}</Label>
           <ColorPicker colors={SWATCHES} value={color} onChange={setColor} />
         </View>
         <View style={{ gap: space.sm }}>
-          <Label>Icon</Label>
+          <Label>{t('Icon')}</Label>
           <IconPicker icons={HABIT_ICONS} value={icon} color={paint(color)} onChange={setIcon} />
         </View>
 
-        <Button label={existing ? 'Save changes' : 'Add habit'} onPress={save} disabled={!canSave} />
+        <Button label={existing ? t('Save changes') : t('Add habit')} onPress={save} disabled={!canSave} />
         {existing && (
           <Button
             kind="secondary"
             icon="timer-outline"
-            label="Start a focus session for this"
+            label={t('Start a focus session for this')}
             onPress={() => {
               close();
               router.push({ pathname: '/focus', params: { habitId: existing.id } });
@@ -144,12 +145,12 @@ export default function HabitEditor() {
           <Button
             kind="danger"
             icon="trash-outline"
-            label="Delete habit"
+            label={t('Delete habit')}
             onPress={() =>
               showDialog({
-                title: 'Delete habit?',
-                message: `“${existing.name}” and its history will be removed.`,
-                actions: [{ label: 'Delete', destructive: true, onPress: () => (deleteHabit(existing.id), close()) }],
+                title: t('Delete habit?'),
+                message: t('“{name}” and its history will be removed.', { name: existing.name }),
+                actions: [{ label: t('Delete'), destructive: true, onPress: () => (deleteHabit(existing.id), close()) }],
               })
             }
           />

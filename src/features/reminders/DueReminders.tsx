@@ -11,6 +11,7 @@ import type { ReminderItem } from '@/store/types';
 import { radius, space, useTheme } from '@/theme';
 
 import { isDue, whenLabel } from './logic';
+import { t } from '@/lib/i18n';
 
 /** Reminders whose time has come (re-checked every minute). */
 export function useDueReminders() {
@@ -25,12 +26,12 @@ export function DueReminderCard({ item }: { item: ReminderItem }) {
 
   const later = () =>
     showDialog({
-      title: 'Remind me again',
+      title: t('Remind me again'),
       actions: [
-        { label: 'In 15 minutes', onPress: () => (snoozeReminder(item.id, 15), showToast('We’ll remind you in 15 minutes.', 'alarm-outline')) },
-        { label: 'In 1 hour', onPress: () => (snoozeReminder(item.id, 60), showToast('We’ll remind you in an hour.', 'alarm-outline')) },
-        { label: 'This evening', onPress: () => (updateReminder(item.id, { snoozedUntil: Math.max(combine(todayKey(), '18:00').getTime(), Date.now() + 15 * 60_000) }), showToast('We’ll remind you this evening.', 'alarm-outline')) },
-        { label: 'Tomorrow morning', onPress: () => (updateReminder(item.id, { snoozedUntil: combine(addDays(todayKey(), 1), '09:00').getTime() }), showToast('We’ll remind you tomorrow at 9am.', 'alarm-outline')) },
+        { label: t('In 15 minutes'), onPress: () => (snoozeReminder(item.id, 15), showToast(t('We’ll remind you in 15 minutes.'), 'alarm-outline')) },
+        { label: t('In 1 hour'), onPress: () => (snoozeReminder(item.id, 60), showToast(t('We’ll remind you in an hour.'), 'alarm-outline')) },
+        { label: t('This evening'), onPress: () => (updateReminder(item.id, { snoozedUntil: Math.max(combine(todayKey(), '18:00').getTime(), Date.now() + 15 * 60_000) }), showToast(t('We’ll remind you this evening.'), 'alarm-outline')) },
+        { label: t('Tomorrow morning'), onPress: () => (updateReminder(item.id, { snoozedUntil: combine(addDays(todayKey(), 1), '09:00').getTime() }), showToast(t('We’ll remind you tomorrow at 9am.'), 'alarm-outline')) },
       ],
     });
 
@@ -50,8 +51,8 @@ export function DueReminderCard({ item }: { item: ReminderItem }) {
         </View>
       </Press>
       <View style={styles.actions}>
-        <Action label="Done" icon="checkmark" primary onPress={() => toggleReminder(item)} />
-        <Action label="Later" icon="alarm-outline" onPress={later} />
+        <Action label={t('Done')} icon="checkmark" primary onPress={() => toggleReminder(item)} />
+        <Action label={t('Later')} icon="alarm-outline" onPress={later} />
       </View>
     </View>
   );

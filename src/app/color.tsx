@@ -9,6 +9,7 @@ import { useSheetTopInset } from '@/hooks/useTopInset';
 import { updateSettings } from '@/store/actions/settings';
 import { useSettings } from '@/store/hooks';
 import { customColor, hslToHex, radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const HUES = [0, 25, 45, 60, 100, 145, 175, 200, 225, 260, 290, 330];
 const SHADES = [0.38, 0.5, 0.62];
@@ -34,7 +35,7 @@ export default function ColorScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ paddingTop: sheetTop }}>
-        <SheetHeader title="Your colour" onSave={save} saveLabel="Use" canSave={valid} />
+        <SheetHeader title={t('Your colour')} onSave={save} saveLabel={t('Use')} canSave={valid} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         {/* Preview: day and night side by side */}
@@ -46,7 +47,7 @@ export default function ColorScreen() {
         <AnyColorInput value={valid ? hex : '#2F8A5F'} onChange={choose} />
 
         <View style={{ gap: space.sm }}>
-          <Label>Palette</Label>
+          <Label>{t('Palette')}</Label>
           <Card style={{ gap: 6 }}>
             {SHADES.map((l) => (
               <View key={l} style={styles.row}>
@@ -65,9 +66,9 @@ export default function ColorScreen() {
         </View>
 
 
-        <Button label="Use this colour" onPress={save} disabled={!valid} />
+        <Button label={t('Use this colour')} onPress={save} disabled={!valid} />
         <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
-          Buttons and the timer use a slightly deeper shade, so text stays readable.
+          {t('Buttons and the timer use a slightly deeper shade, so text stays readable.')}
         </Text>
       </ScrollView>
     </View>
@@ -77,7 +78,7 @@ export default function ColorScreen() {
 function Dot({ color, on, onPress }: { color: string; on: boolean; onPress: () => void }) {
   const { c } = useTheme();
   return (
-    <Press onPress={onPress} accessibilityLabel={`Colour ${color}`} accessibilityState={{ selected: on }} style={[styles.dot, { borderColor: on ? c.text : 'transparent' }]}>
+    <Press onPress={onPress} accessibilityLabel={t('Colour {color}', { color })} accessibilityState={{ selected: on }} style={[styles.dot, { borderColor: on ? c.text : 'transparent' }]}>
       <View style={{ flex: 1, borderRadius: 99, backgroundColor: color }} />
     </Press>
   );
@@ -103,11 +104,11 @@ function Preview({ night, glow, accent }: { night: boolean; glow: [string, strin
         <Rect width="100%" height="55%" fill={`url(#d${id})`} opacity={night ? 0.18 : 0.08} />
       </Svg>
       <Text style={{ fontSize: 18, fontWeight: '600' }} color={night ? '#F4F3EE' : '#1E1C19'}>
-        {night ? 'Night' : 'Day'}
+        {night ? t('Night') : t('Day')}
       </Text>
       <View style={[styles.pill, { backgroundColor: accent }]}>
         <Text variant="small" color="#fff" style={{ fontWeight: '600' }}>
-          Start focus
+          {t('Start focus')}
         </Text>
       </View>
     </View>

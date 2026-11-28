@@ -7,6 +7,7 @@ import type { ReminderItem } from '@/store/types';
 import { radius, space, useTheme } from '@/theme';
 
 import { ReminderForm } from './ReminderForm';
+import { t } from '@/lib/i18n';
 
 /**
  * Slide-up sheet for adding (or editing) a reminder: everything on one card,
@@ -40,7 +41,7 @@ export function ReminderSheet({ visible, onClose, defaultListId, existing }: { v
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: c.overlay }]} onPress={onClose} accessibilityLabel="Close" />
+        <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: c.overlay }]} onPress={onClose} accessibilityLabel={t('Close')} />
         <View style={{ flex: 1, justifyContent: 'flex-end' }} pointerEvents="box-none">
           <Animated.View style={[styles.sheet, { backgroundColor: c.bg, maxHeight: height * 0.88, paddingBottom: insets.bottom + space.md, transform: [{ translateY: y }] }]}>
             {visible && (
@@ -54,12 +55,12 @@ export function ReminderSheet({ visible, onClose, defaultListId, existing }: { v
                     <View style={[styles.grabber, { backgroundColor: c.border }]} />
                     <View style={styles.header}>
                       <Press onPress={onClose} hitSlop={10} style={{ minWidth: 64 }}>
-                        <Text tone="muted">Cancel</Text>
+                        <Text tone="muted">{t('Cancel')}</Text>
                       </Press>
                       <Text variant="bodyStrong">{existing ? 'Reminder' : 'New reminder'}</Text>
                       <Press onPress={save} disabled={!canSave} hitSlop={10} style={{ minWidth: 64, alignItems: 'flex-end' }}>
                         <Text tone="accent" style={{ fontWeight: '600', opacity: canSave ? 1 : 0.35 }}>
-                          {existing ? 'Save' : 'Add'}
+                          {existing ? t('Save') : t('Add')}
                         </Text>
                       </Press>
                     </View>

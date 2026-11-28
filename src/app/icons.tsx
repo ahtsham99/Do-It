@@ -8,6 +8,7 @@ import { iconRequest } from '@/features/countdowns/iconPick';
 import { useSheetTopInset } from '@/hooks/useTopInset';
 import { useEntitlements } from '@/lib/premium';
 import { radius, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 const COLS = 5;
 const GAP = 10;
@@ -34,9 +35,9 @@ export default function IconsScreen() {
   const pick = (icon: string, premium: boolean) => {
     if (premium && !unlocked) {
       showDialog({
-        title: 'Premium icons',
-        message: 'Icons with a ✦ come with Do It Premium. Everything you use today stays free.',
-        actions: [{ label: 'Sounds good', onPress: () => {} }],
+        title: t('Premium icons'),
+        message: t('Icons with a ✦ come with Do It Premium. Everything you use today stays free.'),
+        actions: [{ label: t('Sounds good'), onPress: () => {} }],
       });
       return;
     }
@@ -66,8 +67,8 @@ export default function IconsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: top }}>
       <View style={styles.header}>
-        <IconButton icon="chevron-back" label="Back" onPress={close} />
-        <Text style={styles.title}>Icon</Text>
+        <IconButton icon="chevron-back" label={t('Back')} onPress={close} />
+        <Text style={styles.title}>{t('Icon')}</Text>
         <View style={{ width: 44 }} />
       </View>
 
@@ -103,7 +104,7 @@ export default function IconsScreen() {
                     <Press
                       key={i}
                       onPress={() => pick(i, premium)}
-                      accessibilityLabel={premium && !unlocked ? `${i}, premium` : i}
+                      accessibilityLabel={premium && !unlocked ? t('{i}, premium', { i }) : i}
                       accessibilityState={{ selected: sel }}
                       style={[styles.cell, { width: cell, height: cell, borderRadius: Math.round(cell * 0.3), backgroundColor: c.surface, borderColor: sel ? accent : c.border }]}>
                       <Glyph value={i} size={Math.round(cell * 0.46) || 28} color={c.text} />
@@ -120,7 +121,7 @@ export default function IconsScreen() {
           ))}
           {!unlocked && (
             <Text variant="small" tone="muted" style={{ textAlign: 'center' }}>
-              Icons with a ✦ come with Premium.
+              {t('Icons with a ✦ come with Premium.')}
             </Text>
           )}
         </View>

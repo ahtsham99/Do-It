@@ -5,6 +5,7 @@ import { radius, useTheme } from '@/theme';
 
 import { Icon } from './Icon';
 import { Press, tap } from './Pressable';
+import { t } from '@/lib/i18n';
 
 const ACTION_W = 112;
 const GAP = 10;
@@ -24,7 +25,7 @@ export function SwipeToDelete({
   onDelete,
   borderRadius = radius.xl,
   style,
-  label = 'Delete',
+  label = t('Delete'),
 }: {
   children: ReactNode;
   onDelete: () => void;
@@ -104,7 +105,7 @@ export function SwipeToDelete({
       <Animated.View {...responder.panHandlers} style={{ transform: [{ translateX: x }] }}>
         {children}
         {/* While open, a tap on the content closes the row instead of opening it. */}
-        {open && <Press haptic={false} onPress={close} style={StyleSheet.absoluteFill} accessibilityLabel="Close" />}
+        {open && <Press haptic={false} onPress={close} style={StyleSheet.absoluteFill} accessibilityLabel={t('Close')} />}
       </Animated.View>
     </View>
   );

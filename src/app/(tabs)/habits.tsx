@@ -11,6 +11,7 @@ import { HabitCard } from '@/features/habits/HabitCard';
 import { todayKey } from '@/lib/dates';
 import { useCountdowns, useGoals, useHabits } from '@/store/hooks';
 import { space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 type View_ = 'habits' | 'goals';
 // Remember the chosen view while the app is open.
@@ -44,11 +45,11 @@ export default function HabitsScreen() {
   const subtitle =
     view === 'habits'
       ? habits.length
-        ? `${doneToday} of ${habits.length} ticked today`
-        : 'Small things, every day'
+        ? t('{doneToday} of {n} ticked today', { doneToday, n: habits.length })
+        : t('Small things, every day')
       : goals.length
-        ? `${active.length} in progress${achieved.length ? ` · ${achieved.length} achieved` : ''}`
-        : 'Goals and the days you’re counting down to';
+        ? `${t('{n} in progress', { n: active.length })}${achieved.length ? ` · ${t('{n} achieved', { n: achieved.length })}` : ''}`
+        : t('Goals and the days you’re counting down to');
 
   return (
     <Screen
@@ -60,14 +61,14 @@ export default function HabitsScreen() {
         value={view}
         onChange={setView}
         options={[
-          { value: 'habits', label: 'Habits', icon: 'flame-outline', badge: habits.length || undefined },
-          { value: 'goals', label: 'Goals', icon: 'flag-outline', badge: active.length || undefined },
+          { value: 'habits', label: t('Habits'), icon: 'flame-outline', badge: habits.length || undefined },
+          { value: 'goals', label: t('Goals'), icon: 'flag-outline', badge: active.length || undefined },
         ]}
       />
 
       {view === 'habits' ? (
         habits.length === 0 ? (
-          <Empty icon="flame-outline" title="No habits yet" body="Start with one small thing you can do on any day." action="Add a habit" onAction={() => router.push('/habit')} />
+          <Empty icon="flame-outline" title={t('No habits yet')} body={t('Start with one small thing you can do on any day.')} action={t('Add a habit')} onAction={() => router.push('/habit')} />
         ) : (
           <>
             <ConsistencyCard habits={habits} />
@@ -77,7 +78,7 @@ export default function HabitsScreen() {
               ))}
             </View>
             {weekly.length > 0 && (
-              <Section title="Weekly">
+              <Section title={t('Weekly')}>
                 <View style={{ gap: space.lg }}>
                   {weekly.map((h) => (
                     <HabitCard key={h.id} habit={h} />
@@ -91,12 +92,12 @@ export default function HabitsScreen() {
         <>
           <Empty
             icon="flag-outline"
-            title="Set your first goal"
-            body="Pick something you’d be proud of, then break it into steps small enough to start today."
-            action="Set a goal"
+            title={t('Set your first goal')}
+            body={t('Pick something you’d be proud of, then break it into steps small enough to start today.')}
+            action={t('Set a goal')}
             onAction={() => router.push('/goal')}
           />
-          <Section title="Ideas to start from">
+          <Section title={t('Ideas to start from')}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
               {GOAL_TEMPLATES.map((t, i) => (
                 <Chip key={t.title} label={`${t.icon}  ${t.title}`} onPress={() => router.push({ pathname: '/goal', params: { template: String(i) } })} />
@@ -117,7 +118,7 @@ export default function HabitsScreen() {
             )}
           </View>
           {achieved.length > 0 && (
-            <Section title="Achieved">
+            <Section title={t('Achieved')}>
               <View style={{ gap: space.md }}>
                 {achieved.map((g) => (
                   <GoalCard key={g.id} goal={g} compact />
@@ -130,18 +131,18 @@ export default function HabitsScreen() {
 
       {view === 'goals' && (
         <Section
-          title="Countdowns"
+          title={t('Countdowns')}
           right={
             <View style={{ flexDirection: 'row', gap: space.lg }}>
               <Press onPress={() => router.push('/countdown')} hitSlop={8}>
                 <Text variant="small" color={c.accent} style={{ fontWeight: '600' }}>
-                  + Add
+                  {t('+ Add')}
                 </Text>
               </Press>
               {countdowns.length > 0 && (
                 <Press onPress={() => router.push('/countdowns')} hitSlop={8}>
                   <Text variant="small" tone="muted">
-                    All ›
+                    {t('All ›')}
                   </Text>
                 </Press>
               )}
@@ -155,7 +156,7 @@ export default function HabitsScreen() {
             </View>
           ) : (
             <Text variant="small" tone="muted">
-              Exams, trips, birthdays — add the days you’re counting down to.
+              {t('Exams, trips, birthdays — add the days you’re counting down to.')}
             </Text>
           )}
         </Section>

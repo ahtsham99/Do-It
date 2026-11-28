@@ -5,6 +5,7 @@ import { radius, space, useTheme } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Press } from './Pressable';
 import { Text } from './Text';
+import { t } from '@/lib/i18n';
 
 type Kind = 'danger' | 'warning' | 'accent' | 'success';
 
@@ -54,7 +55,7 @@ export function Banner({
         )}
       </View>
       {onDismiss && (
-        <Press onPress={onDismiss} hitSlop={14} accessibilityLabel="Dismiss" style={{ padding: 4 }}>
+        <Press onPress={onDismiss} hitSlop={14} accessibilityLabel={t('Dismiss')} style={{ padding: 4 }}>
           <Icon name="close" size={20} color={c.textMuted} />
         </Press>
       )}

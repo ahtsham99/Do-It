@@ -11,12 +11,13 @@ import { useSettings } from '@/store/hooks';
 import { font, radius, space, useTheme } from '@/theme';
 
 import { parseQuickAdd } from './parseQuickAdd';
+import { t } from '@/lib/i18n';
 
 /**
  * One-line planning: type "Gym tomorrow at 7am" and it lands on the right
  * day and time, with a reminder at that time. A preview shows what it understood.
  */
-export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7am' }: { date: DayKey; placeholder?: string }) {
+export function QuickAdd({ date, placeholder = t('Add to your day… e.g. Gym at 7am') }: { date: DayKey; placeholder?: string }) {
   const { c, fonts } = useTheme();
   const { use24h } = useSettings();
   const [text, setText] = useState('');
@@ -42,7 +43,7 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
           }}
           hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel="Add with details"
+          accessibilityLabel={t('Add with details')}
           style={[styles.plus, { backgroundColor: c.accentSoft }]}>
           <Icon name="add" size={20} color={c.accent} />
         </Press>
@@ -50,7 +51,7 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
           value={text}
           spans={parsed.spans}
           highlight={{ color: c.accent, backgroundColor: c.accentSoft }}
-          accessibilityLabel="Add a plan"
+          accessibilityLabel={t('Add a plan')}
           onChangeText={(t) => setText(use24h ? to24hText(t) : t)}
           placeholder={placeholder}
           placeholderTextColor={c.textFaint}
@@ -60,7 +61,7 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
           style={[font.body, styles.input, { color: c.text, fontFamily: fonts.text(400) }]}
         />
         {text.trim().length > 0 && (
-          <Press onPress={submit} style={[styles.go, { backgroundColor: c.accent }]} accessibilityLabel="Add">
+          <Press onPress={submit} style={[styles.go, { backgroundColor: c.accent }]} accessibilityLabel={t('Add')}>
             <Icon name="arrow-up" size={18} color={c.accentText} />
           </Press>
         )}
@@ -74,7 +75,7 @@ export function QuickAdd({ date, placeholder = 'Add to your day… e.g. Gym at 7
               label={parsed.duration ? `${formatTime(parsed.time, use24h)}–${formatTime(addMinutesToTime(parsed.time, parsed.duration), use24h)}` : formatTime(parsed.time, use24h)}
             />
           )}
-          {parsed.time && <Chip icon="notifications-outline" label="Reminder at that time" />}
+          {parsed.time && <Chip icon="notifications-outline" label={t('Reminder at that time')} />}
         </View>
       ) : null}
     </View>

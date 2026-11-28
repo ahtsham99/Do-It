@@ -10,6 +10,7 @@ import { radius, space, useTheme } from '@/theme';
 
 import { completeTask } from './celebrate';
 import { pick } from './messages';
+import { t } from '@/lib/i18n';
 
 /**
  * A reminder that's due now, with the three things a forgetful person needs:
@@ -22,13 +23,13 @@ export function ReminderCard({ occ, onDismiss }: { occ: Occurrence; onDismiss: (
 
   const later = () =>
     showDialog({
-      title: 'Remind me again',
+      title: t('Remind me again'),
       actions: [
-        { label: 'In 15 minutes', onPress: () => (snoozeTask(task.id, 15), showToast('We’ll remind you in 15 minutes.', 'alarm-outline')) },
-        { label: 'In 1 hour', onPress: () => (snoozeTask(task.id, 60), showToast('We’ll remind you in an hour.', 'alarm-outline')) },
-        { label: 'In 3 hours', onPress: () => (snoozeTask(task.id, 180), showToast('We’ll remind you in 3 hours.', 'alarm-outline')) },
+        { label: t('In 15 minutes'), onPress: () => (snoozeTask(task.id, 15), showToast(t('We’ll remind you in 15 minutes.'), 'alarm-outline')) },
+        { label: t('In 1 hour'), onPress: () => (snoozeTask(task.id, 60), showToast(t('We’ll remind you in an hour.'), 'alarm-outline')) },
+        { label: t('In 3 hours'), onPress: () => (snoozeTask(task.id, 180), showToast(t('We’ll remind you in 3 hours.'), 'alarm-outline')) },
         ...(task.repeat === 'none'
-          ? [{ label: 'Tomorrow', onPress: () => (updateTask(task.id, { date: addDays(day, 1), snoozedUntil: null }), showToast('Moved to tomorrow.', 'calendar-outline')) }]
+          ? [{ label: t('Tomorrow'), onPress: () => (updateTask(task.id, { date: addDays(day, 1), snoozedUntil: null }), showToast(t('Moved to tomorrow.'), 'calendar-outline')) }]
           : []),
       ],
     });
@@ -42,18 +43,18 @@ export function ReminderCard({ occ, onDismiss }: { occ: Occurrence; onDismiss: (
         <Press haptic={false} style={{ flex: 1, gap: 3 }} onPress={() => router.push({ pathname: '/task', params: { id: task.id, day } })}>
           <Text variant="heading">{task.title}</Text>
           <Text variant="small" tone="muted">
-            {tone === 'savage' ? `${task.time ? `Planned for ${formatTime(task.time, use24h)}` : 'Planned for today'}. ${pick('remindCard', tone, task.id)}` : `${pick('remindCard', tone, task.id)} ${task.time ? `planned for ${formatTime(task.time, use24h)}` : 'planned for today'}.`}
+            {tone === 'savage' ? `${task.time ? t('Planned for {time}', { time: formatTime(task.time, use24h) }) : t('Planned for today')}. ${pick('remindCard', tone, task.id)}` : `${pick('remindCard', tone, task.id)} ${task.time ? t('planned for {time}', { time: formatTime(task.time, use24h) }) : t('planned for today')}.`}
           </Text>
         </Press>
-        <Press onPress={onDismiss} hitSlop={14} accessibilityLabel="Dismiss" style={{ padding: 4 }}>
+        <Press onPress={onDismiss} hitSlop={14} accessibilityLabel={t('Dismiss')} style={{ padding: 4 }}>
           <Icon name="close" size={20} color={c.textMuted} />
         </Press>
       </View>
       <View style={styles.actions}>
-        <Action label="Done" icon="checkmark" onPress={() => completeTask(task, day)} primary />
-        <Action label="Later" icon="alarm-outline" onPress={later} />
+        <Action label={t('Done')} icon="checkmark" onPress={() => completeTask(task, day)} primary />
+        <Action label={t('Later')} icon="alarm-outline" onPress={later} />
         <Action
-          label="Focus"
+          label={t('Focus')}
           icon="timer-outline"
           onPress={() => router.push({ pathname: '/focus', params: { taskId: task.id } })}
         />

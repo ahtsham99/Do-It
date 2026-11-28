@@ -5,6 +5,7 @@ import { SheetHeader, SheetScreen } from '@/components/ui';
 import { ReminderForm } from '@/features/reminders/ReminderForm';
 import { useStore } from '@/store/store';
 import { space } from '@/theme';
+import { t } from '@/lib/i18n';
 
 /** Reminder editor (used from notifications and links), shown as a sheet. */
 export default function ReminderEditor() {
@@ -21,7 +22,7 @@ export default function ReminderEditor() {
         contentStyle={{ padding: space.lg, paddingBottom: space.xxl * 2, maxWidth: 640, width: '100%', alignSelf: 'center' }}
         header={(save, canSave) => (
           <View>
-            <SheetHeader title={existing ? 'Reminder' : 'New reminder'} onSave={save} canSave={canSave} />
+            <SheetHeader title={existing ? t('Reminder') : t('New reminder')} onSave={save} canSave={canSave} />
           </View>
         )}
       />

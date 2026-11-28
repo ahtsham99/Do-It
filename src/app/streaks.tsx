@@ -13,6 +13,7 @@ import type { Habit } from '@/store/types';
 import { useHabits, useSettings } from '@/store/hooks';
 import { useStore } from '@/store/store';
 import { SERIF, space, useTheme } from '@/theme';
+import { t } from '@/lib/i18n';
 
 
 /** Your streak: how many days in a row you've shown up. */
@@ -45,18 +46,18 @@ export default function StreaksScreen() {
     return { days, active: act.length, best, planned: stats.plannedDays.filter((d) => d >= first && d <= n.today).length };
   }, [first, n.today, stats.activeDays, stats.plannedDays]);
   // The compact grid draws "a habit"; active days are its history.
-  const activeAsHabit = { id: 'active', name: 'Active', icon: '', color: c.accent, frequency: 'daily', timesPerWeek: 1, history: stats.activeDays, createdAt: 0, updatedAt: 0 } as Habit;
+  const activeAsHabit = { id: 'active', name: t('Active'), icon: '', color: c.accent, frequency: 'daily', timesPerWeek: 1, history: stats.activeDays, createdAt: 0, updatedAt: 0 } as Habit;
 
   const line = n.activeToday
-    ? 'You showed up today. Come back tomorrow to keep it going.'
+    ? t('You showed up today. Come back tomorrow to keep it going.')
     : n.streak > 0
-      ? 'One reminder, one habit or one focus session keeps it going today.'
-      : 'Plan your day, tick a habit or finish one reminder to begin a streak.';
+      ? t('One reminder, one habit or one focus session keeps it going today.')
+      : t('Plan your day, tick a habit or finish one reminder to begin a streak.');
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ paddingTop: sheetTop }}>
-        <SheetHeader title="Streak" cancelLabel="Close" />
+        <SheetHeader title={t('Streak')} cancelLabel={t('Close')} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={{ alignItems: 'center', gap: space.sm, paddingVertical: space.lg }}>
@@ -73,9 +74,9 @@ export default function StreaksScreen() {
         <RangePicker value={r} onChange={setR} />
 
         <View style={{ flexDirection: 'row', gap: space.md }}>
-          <Stat label="Days active" value={`${inRange.active}/${inRange.days}`} />
-          <Stat label="Best streak" value={String(inRange.best)} />
-          <Stat label="Days planned" value={String(inRange.planned)} />
+          <Stat label={t('Days active')} value={`${inRange.active}/${inRange.days}`} />
+          <Stat label={t('Best streak')} value={String(inRange.best)} />
+          <Stat label={t('Days planned')} value={String(inRange.planned)} />
         </View>
 
         <Section title={HISTORY_RANGES.find((x) => x.id === r)!.title}>
@@ -102,7 +103,7 @@ export default function StreaksScreen() {
                   return (
                     <View key={d} style={styles.cell}>
                       <View
-                        accessibilityLabel={`${d}${on ? ', active' : ''}`}
+                        accessibilityLabel={`${d}${on ? t(', active') : ''}`}
                         style={[
                           styles.dot,
                           { backgroundColor: on ? c.accent : 'transparent', borderColor: d === n.today ? c.textMuted : on ? c.accent : c.border, opacity: future ? 0.35 : 1 },
@@ -121,7 +122,7 @@ export default function StreaksScreen() {
         </Section>
 
         {habits.length > 0 && (
-          <Section title="Habit streaks">
+          <Section title={t('Habit streaks')}>
             <Card padded={false} style={{ paddingHorizontal: space.xl - 4 }}>
               {habits.map((h, i) => {
                 const s = habitStreak(h, n.today, weekStartsOn);

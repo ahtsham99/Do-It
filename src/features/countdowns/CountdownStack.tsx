@@ -6,6 +6,7 @@ import type { Countdown } from '@/store/types';
 import { space, useTheme } from '@/theme';
 
 import { CountdownCard } from './CountdownCard';
+import { t } from '@/lib/i18n';
 
 const PEEK = 12; // how far each card behind shows below the one in front
 const SCALE = 0.05; // how much smaller each card behind is
@@ -96,7 +97,7 @@ export function CountdownStack({ items }: { items: Countdown[] }) {
 const styles = StyleSheet.create({
   // Web: give each card its own GPU layer so moving it doesn't repaint the page.
   layer: { willChange: 'transform' } as object,
-  snapX: { scrollSnapType: 'x mandatory', overscrollBehaviorX: 'contain' } as object,
+  snapX: { scrollSnapType: t('x mandatory'), overscrollBehaviorX: 'contain' } as object,
   snapStart: { scrollSnapAlign: 'start', scrollSnapStop: 'always' } as object,
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 5 },
   dot: { height: 6, borderRadius: 3 },

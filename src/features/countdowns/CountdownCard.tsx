@@ -8,6 +8,7 @@ import type { Countdown } from '@/store/types';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
 import { countdownLabel, daysUntil } from './logic';
+import { t } from '@/lib/i18n';
 
 const WHITE = '#FFFFFF';
 const SOFT = 'rgba(255,255,255,0.72)';
@@ -27,7 +28,7 @@ export function CountdownCard({ item, hero, flat }: { item: Countdown; hero?: bo
       <Press onPress={open} style={[styles.hero, { backgroundColor: fill }, !flat && shadow]}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Text variant="caption" color={SOFT} style={{ textTransform: 'uppercase' }}>
-            Next up
+            {t('Next up')}
           </Text>
           <View style={styles.heroIcon}>
             <Glyph value={item.icon} size={18} />

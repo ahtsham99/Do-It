@@ -21,14 +21,14 @@ import { styleFor } from '@/theme/fonts';
 import { PremiumPalettes } from './PremiumPalettes';
 
 const TONES: { value: Tone; label: string; blurb: string }[] = [
-  { value: 'gentle', label: 'Gentle', blurb: 'Soft reminders, no pressure.' },
-  { value: 'balanced', label: 'Firm', blurb: 'Clear and steady. The default.' },
-  { value: 'savage', label: 'Relentless', blurb: 'Direct reminders that keep you moving.' },
+  { value: 'gentle', label: t('Gentle'), blurb: t('Soft reminders, no pressure.') },
+  { value: 'balanced', label: t('Firm'), blurb: t('Clear and steady. The default.') },
+  { value: 'savage', label: t('Relentless'), blurb: t('Direct reminders that keep you moving.') },
 ];
 const THEMES: { value: ThemePreference; label: string; icon?: 'sunny-outline' | 'moon-outline' }[] = [
-  { value: 'system', label: 'Auto' },
-  { value: 'light', label: 'Light', icon: 'sunny-outline' },
-  { value: 'dark', label: 'Dark', icon: 'moon-outline' },
+  { value: 'system', label: t('Auto') },
+  { value: 'light', label: t('Light'), icon: 'sunny-outline' },
+  { value: 'dark', label: t('Dark'), icon: 'moon-outline' },
 ];
 
 /** All settings, as cards. Used by the Settings screen (and can be embedded). */
@@ -41,12 +41,12 @@ export function SettingsBody() {
     if (!on) return updateSettings({ notificationsEnabled: false });
     const ok = await requestNotificationPermission();
     updateSettings({ notificationsEnabled: ok });
-    if (!ok) showToast('Notifications are blocked in system settings', 'notifications-off');
+    if (!ok) showToast(t('Notifications are blocked in system settings'), 'notifications-off');
   };
 
   return (
     <>
-      <Press onPress={() => router.push('/profile')} accessibilityLabel="Profile">
+      <Press onPress={() => router.push('/profile')} accessibilityLabel={t('Profile')}>
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
           <Avatar size={52} small />
           <View style={{ flex: 1, gap: 2 }}>
@@ -60,11 +60,11 @@ export function SettingsBody() {
       </Press>
 
       <Card style={{ gap: space.md }}>
-        <Text style={styles.label}>Appearance</Text>
+        <Text style={styles.label}>{t('Appearance')}</Text>
         <Segmented tone="accent" options={THEMES} value={s.theme} onChange={(theme) => updateSettings({ theme })} />
         <View style={{ gap: space.sm, marginTop: space.xs }}>
           <Text variant="small" tone="muted">
-            App colour
+            {t('App colour')}
           </Text>
           <View style={styles.swatches}>
             {FREE_COLORS.map((k) => {
@@ -76,7 +76,7 @@ export function SettingsBody() {
                   onPress={() => (setColorPreview(null), updateSettings({ nightColor: k }))}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: on }}
-                  accessibilityLabel={`${n.label} app colour`}
+                  accessibilityLabel={t('{label} app colour', { label: n.label })}
                   style={{ alignItems: 'center', gap: 6 }}>
                   <View style={[styles.swatch, { borderColor: on ? c.text : 'transparent' }]}>
                     <GradientSwatch from={n.swatch[0]} to={n.swatch[1]} id={k} />
@@ -92,7 +92,7 @@ export function SettingsBody() {
               onPress={() => router.push('/color')}
               accessibilityRole="radio"
               accessibilityState={{ selected: s.nightColor === 'custom' }}
-              accessibilityLabel="Custom app colour"
+              accessibilityLabel={t('Custom app colour')}
               style={{ alignItems: 'center', gap: 6 }}>
               <View style={[styles.swatch, { borderColor: s.nightColor === 'custom' ? c.text : 'transparent' }]}>
                 {s.nightColor === 'custom' ? (
@@ -102,7 +102,7 @@ export function SettingsBody() {
                 )}
               </View>
               <Text variant="small" tone={s.nightColor === 'custom' ? 'default' : 'muted'} style={{ fontSize: 12, fontWeight: s.nightColor === 'custom' ? '600' : '400' }}>
-                Custom
+                {t('Custom')}
               </Text>
             </Press>
           </View>
@@ -110,7 +110,7 @@ export function SettingsBody() {
         <PremiumPalettes />
         <View style={{ gap: space.sm }}>
           <Text variant="small" tone="muted">
-            Day background
+            {t('Day background')}
           </Text>
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             {(Object.keys(DAY_BACKGROUNDS) as DayBackground[]).map((k) => (
@@ -118,7 +118,7 @@ export function SettingsBody() {
             ))}
           </View>
           <Text variant="small" tone="muted" style={{ marginTop: space.xs }}>
-            Night background
+            {t('Night background')}
           </Text>
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             {(Object.keys(NIGHT_BACKGROUNDS) as NightBackground[]).map((k) => (
@@ -128,9 +128,9 @@ export function SettingsBody() {
         </View>
         <Press onPress={() => router.push('/fonts')} accessibilityRole="button" style={[styles.fontsRow, { borderTopColor: c.border }]}>
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={styles.label}>Fonts</Text>
+            <Text style={styles.label}>{t('Fonts')}</Text>
             <Text variant="small" tone="muted">
-              {styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont })?.label ?? 'Custom'} style
+              {styleFor({ logo: s.logoFont, display: s.displayFont, text: s.textFont })?.label ?? t('Custom')} style
             </Text>
           </View>
           <Icon name="chevron-forward" size={18} color={c.textFaint} />
@@ -138,7 +138,7 @@ export function SettingsBody() {
       </Card>
 
       <Card style={{ gap: space.md }}>
-        <Text style={styles.label}>Nudges</Text>
+        <Text style={styles.label}>{t('Nudges')}</Text>
         <Text tone="muted" style={{ lineHeight: 23 }}>
           How firmly should the app remind you? “{pick('overdue', s.tone, 'preview')}”
         </Text>
@@ -168,21 +168,21 @@ export function SettingsBody() {
 
       <Card padded={false} style={styles.group}>
         <ListRow
-          label="Notifications"
+          label={t('Notifications')}
           detail={
             supportsLocalNotifications
-              ? 'Morning prompt, evening check-in, reminders and focus timer'
-              : 'In the web app, nudges show as banners on Today. Push notifications come with the native app.'
+              ? t('Morning prompt, evening check-in, reminders and focus timer')
+              : t('In the web app, nudges show as banners on Today. Push notifications come with the native app.')
           }
           right={supportsLocalNotifications ? <Toggle value={s.notificationsEnabled} onValueChange={toggleNotifications} /> : undefined}
         />
         <ListRow
-          label="Plan-your-day prompt"
+          label={t('Plan-your-day prompt')}
           right={<DateTimeField mode="time" value={s.dailyPromptTime} onChange={(dailyPromptTime) => updateSettings({ dailyPromptTime })} use24h={s.use24h} />}
         />
         <ListRow
-          label="Evening check-in"
-          detail="When we check in on what’s left"
+          label={t('Evening check-in')}
+          detail={t('When we check in on what’s left')}
           last
           right={<DateTimeField mode="time" value={s.eveningCheckTime} onChange={(eveningCheckTime) => updateSettings({ eveningCheckTime })} use24h={s.use24h} />}
         />
@@ -190,11 +190,11 @@ export function SettingsBody() {
 
       <Card padded={false} style={styles.group}>
         <ListRow
-          label="Focus length"
+          label={t('Focus length')}
           right={<Stepper value={s.focusMinutes} min={5} max={120} step={5} onChange={(focusMinutes) => updateSettings({ focusMinutes })} />}
         />
         <ListRow
-          label="Break length"
+          label={t('Break length')}
           last
           right={<Stepper value={s.breakMinutes} min={1} max={30} step={1} onChange={(breakMinutes) => updateSettings({ breakMinutes })} />}
         />
@@ -202,10 +202,10 @@ export function SettingsBody() {
 
       <Card padded={false} style={styles.group}>
         <ListRow
-          label="Week starts on Monday"
+          label={t('Week starts on Monday')}
           right={<Toggle value={s.weekStartsOn === 1} onValueChange={(v) => updateSettings({ weekStartsOn: v ? 1 : 0 })} />}
         />
-        <ListRow label="24-hour time" right={<Toggle value={s.use24h} onValueChange={(use24h) => updateSettings({ use24h })} />} />
+        <ListRow label={t('24-hour time')} right={<Toggle value={s.use24h} onValueChange={(use24h) => updateSettings({ use24h })} />} />
         <ListRow
           label={t('Language')}
           last
@@ -232,20 +232,20 @@ export function SettingsBody() {
           <View style={{ flex: 1, gap: 4 }}>
             <Text style={styles.label}>{isPremium ? 'Premium' : 'Free plan'}</Text>
             <Text variant="small" tone="muted">
-              Unlimited tasks, habits and countdowns for now
+              {t('Unlimited tasks, habits and countdowns for now')}
             </Text>
           </View>
           {!isPremium && (
             <Button
               small
               kind="secondary"
-              label="Upgrade"
+              label={t('Upgrade')}
               style={{ height: 44 }}
               onPress={() =>
                 showDialog({
-                  title: 'Premium is coming',
-                  message: 'Sync across devices, more themes and deeper stats. Everything you use today stays free.',
-                  actions: [{ label: 'Sounds good', onPress: () => {} }],
+                  title: t('Premium is coming'),
+                  message: t('Sync across devices, more themes and deeper stats. Everything you use today stays free.'),
+                  actions: [{ label: t('Sounds good'), onPress: () => {} }],
                 })
               }
             />
@@ -255,25 +255,25 @@ export function SettingsBody() {
 
       {/* Privacy & data: at the very bottom, like most apps. */}
       <Text variant="caption" tone="muted" style={styles.groupLabel}>
-        Privacy & data
+        {t('Privacy & data')}
       </Text>
       <Card padded={false} style={styles.group}>
         <ListRow
           icon="lock-closed-outline"
-          label="Privacy"
-          detail={Platform.OS === 'web' ? 'Your data stays in this browser, on this device.' : 'Your data stays on this device.'}
+          label={t('Privacy')}
+          detail={Platform.OS === 'web' ? 'Your data stays in this browser, on this device.' : t('Your data stays on this device.')}
           onPress={() => router.push('/privacy-policy')}
         />
         <ListRow
           icon="trash-outline"
-          label="Erase everything"
+          label={t('Erase everything')}
           danger
           last
           onPress={() =>
             showDialog({
-              title: 'Erase everything?',
-              message: 'All reminders, habits, countdowns, focus history and streaks will be deleted. This can’t be undone.',
-              actions: [{ label: 'Erase all data', destructive: true, onPress: () => resetAll() }],
+              title: t('Erase everything?'),
+              message: t('All reminders, habits, countdowns, focus history and streaks will be deleted. This can’t be undone.'),
+              actions: [{ label: t('Erase all data'), destructive: true, onPress: () => resetAll() }],
             })
           }
         />
@@ -336,9 +336,9 @@ function GradientSwatch({ from, to, id }: { from: string; to: string; id: string
 function Stepper({ value, min, max, step, onChange }: { value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-      <IconButton icon="remove" label="Less" size={16} diameter={34} onPress={() => onChange(Math.max(min, value - step))} />
+      <IconButton icon="remove" label={t('Less')} size={16} diameter={34} onPress={() => onChange(Math.max(min, value - step))} />
       <Text style={{ minWidth: 52, textAlign: 'center' }}>{value} min</Text>
-      <IconButton icon="add" label="More" size={16} diameter={34} onPress={() => onChange(Math.min(max, value + step))} />
+      <IconButton icon="add" label={t('More')} size={16} diameter={34} onPress={() => onChange(Math.min(max, value + step))} />
     </View>
   );
 }
