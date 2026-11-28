@@ -20,6 +20,7 @@ import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { DayPlan } from '@/features/today/DayPlan';
 import { setDisplay, useDisplay } from '@/features/today/display';
 import { DisplaySheet } from '@/features/today/DisplaySheet';
+import { WeekView } from '@/features/today/WeekView';
 import { FromEarlier } from '@/features/today/FromEarlier';
 import { NudgeStrip, type Nudge } from '@/features/today/NudgeStrip';
 import { StatCard } from '@/features/today/StatCard';
@@ -171,7 +172,7 @@ export function PlannerView() {
       <DisplaySheet visible={sheet} onClose={() => setSheet(false)} />
       {showMonth ? (
         <MonthGrid month={day} selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
-      ) : (
+      ) : span === 'week' ? null : (
         <WeekStrip selected={day} onSelect={pickFromStrip} tasks={tasks} weekStartsOn={weekStartsOn} />
       )}
 
@@ -179,23 +180,7 @@ export function PlannerView() {
 
       {span === 'week' && !showMonth ? (
         <>
-          {weekDays.map((d) => {
-            const its = occurrencesOn(tasks, d);
-            return (
-              <Section
-                key={d}
-                title={formatDay(d)}
-                right={
-                  <Press onPress={() => pickFromStrip(d)} hitSlop={8}>
-                    <Text variant="small" tone="muted">
-                      {its.length ? `${its.filter((o) => o.done).length}/${its.length}` : 'Open'} ›
-                    </Text>
-                  </Press>
-                }>
-                <DayPlan day={d} items={its} compact />
-              </Section>
-            );
-          })}
+          <WeekView days={weekDays} tasks={tasks} onOpenDay={pickFromStrip} />
           <QuickAdd date={day < weekStart || day > addDays(weekStart, 6) ? weekStart : day} placeholder="Add to this week… e.g. Gym friday 7am" />
         </>
       ) : (
