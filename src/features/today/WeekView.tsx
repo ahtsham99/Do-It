@@ -82,7 +82,7 @@ export function WeekView({ days, tasks, onOpenDay }: { days: DayKey[]; tasks: Ta
                 </Text>
               )}
               {!past && (
-                <Press onPress={() => router.push({ pathname: '/task', params: { date: d } })} hitSlop={8} accessibilityLabel={`Add to ${weekdayShort(d)}`} style={[styles.add, { backgroundColor: c.surfaceAlt }]}>
+                <Press onPress={() => router.push({ pathname: '/task', params: { date: d } })} hitSlop={8} accessibilityLabel={t('Add to {day}', { day: weekdayShort(d) })} style={[styles.add, { backgroundColor: c.surfaceAlt }]}>
                   <Icon name="add" size={15} color={c.textMuted} />
                 </Press>
               )}

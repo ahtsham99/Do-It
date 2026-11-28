@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, PanResponder, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, PanResponder, Platform, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { radius, useTheme } from '@/theme';
 
 import { Icon } from './Icon';
 import { Press, tap } from './Pressable';
-import { t } from '@/lib/i18n';
+import { isRTL, t } from '@/lib/i18n';
 
 const ACTION_W = 112;
 const GAP = 10;
@@ -93,7 +93,7 @@ export function SwipeToDelete({
 
   return (
     <View style={style}>
-      <Animated.View pointerEvents={open ? 'box-none' : 'none'} style={[styles.under, { opacity: actionOpacity, transform: [{ scale: actionScale }] }]}>
+      <Animated.View pointerEvents={open ? 'box-none' : 'none'} style={[styles.under, pinRight(), { opacity: actionOpacity, transform: [{ scale: actionScale }] }]}>
         <Press
           onPress={remove}
           accessibilityRole="button"
@@ -110,6 +110,10 @@ export function SwipeToDelete({
     </View>
   );
 }
+
+// Keep the pill on the right in right-to-left too, where the swipe still reveals it.
+// Native swaps left and right in RTL, so ask for `left` there; web keeps `right`.
+const pinRight = () => (Platform.OS !== 'web' && isRTL() ? { right: undefined, left: 0 } : null);
 
 const styles = StyleSheet.create({
   under: { position: 'absolute', top: 0, bottom: 0, right: 0, width: ACTION_W - GAP, alignItems: 'flex-end', justifyContent: 'center', transformOrigin: 'right' },

@@ -1,13 +1,13 @@
 import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from 'expo-router/tabs';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, Platform, StyleSheet, View } from 'react-native';
 
 import { Icon, Press, Text, type IconName } from '@/components/ui';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import { useTabBarBottom } from '@/hooks/useTopInset';
 import { radius, useTheme } from '@/theme';
-import { t } from '@/lib/i18n';
+import { isRTL, t } from '@/lib/i18n';
 
 export const TAB_META: Record<string, { title: string; icon: IconName }> = {
   index: { title: t('Today'), icon: 'sunny-outline' },
@@ -28,7 +28,11 @@ export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const [pillY, setPillY] = useState(12);
   const [x] = useState(() => new Animated.Value(0));
   const itemW = barW ? (barW - 2 - 8) / visible.length : 0;
-  const target = 4 + Math.max(0, at) * itemW + (itemW - 46) / 2;
+  // Right-to-left: the tabs run the other way. Web keeps `left` as is, so count from the
+  // other end; native swaps `left` for `right` but not translateX, so slide the other way.
+  const rtl = isRTL();
+  const slot = rtl && Platform.OS === 'web' ? visible.length - 1 - Math.max(0, at) : Math.max(0, at);
+  const target = (rtl && Platform.OS !== 'web' ? -1 : 1) * (4 + slot * itemW + (itemW - 46) / 2);
   const placed = useRef(false);
   useEffect(() => {
     if (!itemW) return;

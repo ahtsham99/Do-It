@@ -8,7 +8,7 @@ import type { Countdown } from '@/store/types';
 import { SERIF, radius, space, useTheme } from '@/theme';
 
 import { countdownLabel, daysUntil } from './logic';
-import { t } from '@/lib/i18n';
+import { t, tn } from '@/lib/i18n';
 
 const WHITE = '#FFFFFF';
 const SOFT = 'rgba(255,255,255,0.72)';
@@ -39,7 +39,7 @@ export function CountdownCard({ item, hero, flat }: { item: Countdown; hero?: bo
             {big}
           </Text>
           <Text color={WHITE} style={{ fontSize: 16, flexShrink: 1 }} numberOfLines={2}>
-            {days === 0 ? `is ${item.title}` : `${days === 1 ? 'day' : 'days'} to ${item.title}`}
+            {days === 0 ? t('is {title}', { title: item.title }) : tn(days, 'day to {title}', 'days to {title}', { title: item.title })}
           </Text>
         </View>
         <Text variant="small" color={SOFT}>

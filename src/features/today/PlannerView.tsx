@@ -84,16 +84,16 @@ export function PlannerView() {
   // In the evening, the most useful thing is to set up tomorrow.
   const planTomorrow: Nudge | null =
     n.now.getHours() >= 17
-      ? { key: 'tomorrow', kind: 'accent', icon: 'moon-outline', title: tomorrowCount ? `Plan tomorrow · ${tomorrowCount} planned so far` : t('Plan tomorrow while it’s fresh'), onPress: () => (setSpan('day'), pick(tomorrow)) }
+      ? { key: 'tomorrow', kind: 'accent', icon: 'moon-outline', title: tomorrowCount ? tn(tomorrowCount, 'Plan tomorrow · {n} planned so far', 'Plan tomorrow · {n} planned so far') : t('Plan tomorrow while it’s fresh'), onPress: () => (setSpan('day'), pick(tomorrow)) }
       : null;
   for (const r of dueItems) {
-    nudges.push({ key: `ri:${r.id}`, kind: 'warning', icon: 'notifications-outline', title: `Remember: ${r.title}`, onPress: () => router.push({ pathname: '/reminder', params: { id: r.id } }) });
+    nudges.push({ key: `ri:${r.id}`, kind: 'warning', icon: 'notifications-outline', title: t('Remember: {title}', { title: r.title }), onPress: () => router.push({ pathname: '/reminder', params: { id: r.id } }) });
   }
   for (const o of reminders) {
-    nudges.push({ key: `r:${o.task.id}`, kind: 'warning', icon: 'alarm-outline', title: `Reminder: ${o.task.title}`, onPress: () => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } }) });
+    nudges.push({ key: `r:${o.task.id}`, kind: 'warning', icon: 'alarm-outline', title: t('Reminder: {title}', { title: o.task.title }), onPress: () => router.push({ pathname: '/task', params: { id: o.task.id, day: n.today } }) });
   }
   if (planTomorrow) nudges.push(planTomorrow);
-  if (n.streakAtRisk) nudges.push({ key: 'streak', kind: 'warning', icon: 'flame-outline', title: `Keep your ${n.streak}-day streak going`, onPress: () => router.push('/streaks') });
+  if (n.streakAtRisk) nudges.push({ key: 'streak', kind: 'warning', icon: 'flame-outline', title: tn(n.streak, 'Keep your {n}-day streak going', 'Keep your {n}-day streak going'), onPress: () => router.push('/streaks') });
 
   // Evening: carry today's unfinished one-off plans over to tomorrow in one tap.
   // (Anything still to come later tonight stays put.)
@@ -123,7 +123,7 @@ export function PlannerView() {
   const weekLabel = (() => {
     const thisWeek = startOfWeek(n.today, weekStartsOn);
     const d = diffDays(thisWeek, weekStart);
-    return d === 0 ? t('This week') : d === 7 ? t('Next week') : d === -7 ? t('Last week') : `Week of ${formatDay(weekStart, { relative: false })}`;
+    return d === 0 ? t('This week') : d === 7 ? t('Next week') : d === -7 ? t('Last week') : t('Week of {date}', { date: formatDay(weekStart, { relative: false }) });
   })();
 
   // Shrink the big title so long words (Tomorrow, November, Wednesday) always fit.
